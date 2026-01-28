@@ -1,37 +1,76 @@
-from flask import Flask, request, jsonify,  render_template
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import sqlite3
 from datetime import datetime
 import os
 
+# ---------------- CONFIG ----------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB = os.path.join(BASE_DIR, "fleet_app.db")
+
 app = Flask(__name__)
-CORS(app,
- supports_credentials=True,
+CORS(app, supports_credentials=True)
 
-)
-
-DB = "fleet_app.db"
-
+# ---------------- DB ----------------
 def connect():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     return conn
 
-#home route
+def init_db():
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS vehicles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        license_number TEXT NOT NULL,
+        tool_code TEXT NOT NULL,
+        status TEXT NOT NULL
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS vehicle_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        vehicle_id INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        FOREIGN KEY(vehicle_id) REFERENCES vehicles(id)
+    )
+    """)
+
+    # create default users safely
+    cur.execute("""
+    INSERT OR IGNORE INTO users (username, password, role)
+    VALUES (?, ?, ?)
+    """, ("admin", "admin123", "admin"))
+
+    cur.execute("""
+    INSERT OR IGNORE INTO users (username, password, role)
+    VALUES (?, ?, ?)
+    """, ("user", "user123", "user"))
+
+    conn.commit()
+    conn.close()
+
+# 🔥 MUST NOT BE INDENTED
+init_db()
+
+# ---------------- ROUTES ----------------
 @app.route("/")
 def home():
     return render_template("index.html")
 
-#debug test temporary
-@app.route("/debug/db-path")
-def debug_db_path():
-    return jsonify({
-        "cwd": os.getcwd(),
-        "db_exists": os.path.exists(DB),
-        "db_absolute_path": os.path.abspath(DB)
-    })
-
-# ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
@@ -39,7 +78,7 @@ def login():
     cur = conn.cursor()
     cur.execute(
         "SELECT username, role FROM users WHERE username=? AND password=?",
-        (data["username"], data["password"])
+        (data["username"].strip(), data["password"].strip())
     )
     user = cur.fetchone()
     conn.close()
@@ -49,7 +88,6 @@ def login():
 
     return jsonify(dict(user))
 
-# ---------------- VEHICLES ----------------
 @app.route("/vehicles", methods=["GET"])
 def vehicles():
     q = request.args.get("q", "")
@@ -80,10 +118,12 @@ def add_vehicle():
         (d["license_number"], d["tool_code"], d["status"])
     )
     vid = cur.lastrowid
+
     cur.execute(
         "INSERT INTO vehicle_history (vehicle_id, status, timestamp) VALUES (?,?,?)",
         (vid, d["status"], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
+
     conn.commit()
     conn.close()
     return jsonify({"id": vid})
@@ -104,6 +144,7 @@ def update_vehicle(vid):
         "INSERT INTO vehicle_history (vehicle_id, status, timestamp) VALUES (?,?,?)",
         (vid, d["status"], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
+
     conn.commit()
     conn.close()
     return jsonify({"ok": True})
@@ -131,50 +172,6 @@ def history(vid):
     rows = [dict(r) for r in cur.fetchall()]
     conn.close()
     return jsonify(rows)
-
-
-#creating tables from startup
-def init_db():
-    conn = connect()
-    cur = conn.cursor()  
-    cur.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT NOT NULL
-)
-""")
-
-cur.execute("""
-CREATE TABLE IF NOT EXISTS vehicles (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    license_number TEXT NOT NULL,
-    tool_code TEXT NOT NULL,
-    status TEXT NOT NULL
-)
-""")
-
-cur.execute("""
-CREATE TABLE IF NOT EXISTS vehicle_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    vehicle_id INTEGER NOT NULL,
-    status TEXT NOT NULL,
-    timestamp TEXT NOT NULL,
-    FOREIGN KEY(vehicle_id) REFERENCES vehicles(id)
-)
-""")  
-  cur.execute("SELECT COUNT(*) FROM users")
-    if cur.fetchone()[0] == 0:
-        cur.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", ("admin", "admin123", "admin"))
-        cur.execute("INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)", ("user", "user123", "user"))
-
-    conn.commit()
-    conn.close()
-    app = Flask(__name__)
-    init_db()
-
-
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
