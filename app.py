@@ -132,6 +132,50 @@ def history(vid):
     conn.close()
     return jsonify(rows)
 
+
+#creating tables from startup
+def init_db():
+    conn = connect()
+    cur = conn.cursor()  
+    cur.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS vehicles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    license_number TEXT NOT NULL,
+    tool_code TEXT NOT NULL,
+    status TEXT NOT NULL
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS vehicle_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vehicle_id INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY(vehicle_id) REFERENCES vehicles(id)
+)
+""")  
+  cur.execute("SELECT COUNT(*) FROM users")
+    if cur.fetchone()[0] == 0:
+        cur.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", ("admin", "admin123", "admin"))
+        cur.execute("INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)", ("user", "user123", "user"))
+
+    conn.commit()
+    conn.close()
+    app = Flask(__name__)
+    init_db()
+
+
+
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
