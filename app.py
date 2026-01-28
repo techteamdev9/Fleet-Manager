@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,  render_template
 from flask_cors import CORS
 import sqlite3
 from datetime import datetime
@@ -15,6 +15,12 @@ def connect():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     return conn
+
+#home route
+@app.route("/")
+def home():
+    return render_template("index.html")
+
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])
