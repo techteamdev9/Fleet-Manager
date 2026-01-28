@@ -1,4 +1,6 @@
-const API = "https://fleet-manager-d8wj.onrender.com";
+// const API = "https://fleet-manager-d8wj.onrender.com";
+const API = window.location.origin;
+
 
 // ----- Runtime state -----
 let vehicles = [];
@@ -145,10 +147,19 @@ async function refreshTable() {
 
   vehicles.forEach(v => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${v.id}</td><td>${v.license_number}</td><td>${v.tool_code}</td><td>${v.status}</td>`;
-    tr.onclick = () => selectVehicle(v.id);
+    tr.classList.add("vehicle-row");
+  
+    tr.innerHTML = `
+      <td>${v.id}</td>
+      <td>${v.license_number}</td>
+      <td>${v.tool_code}</td>
+      <td>${v.status}</td>
+    `;
+  
+    tr.onclick = () => selectVehicle(tr, v.id);
     tbody.appendChild(tr);
   });
+  
 
   vehicleDetails.classList.add('hidden');
 }
@@ -170,25 +181,50 @@ function clearForm() {
   vehicleDetails.classList.add('hidden');
 }
 
-async function selectVehicle(id) {
-  selectedVehicleId = id;
-  const v = vehicles.find(x => x.id === id);
+async function selectVehicle(row, id) {
+  const isAlreadyActive = row.classList.contains("active");
 
+  // If clicking the same active row → close it
+  if (isAlreadyActive) {
+    row.classList.remove("active");
+    if (row.nextSibling && row.nextSibling.classList.contains("history-row")) {
+      row.nextSibling.remove();
+    }
+    selectedVehicleId = null;
+    return;
+  }
+
+  // Otherwise, clear previous selection & history
+  document.querySelectorAll(".vehicle-row").forEach(r => r.classList.remove("active"));
+  document.querySelectorAll(".history-row").forEach(r => r.remove());
+
+  selectedVehicleId = id;
+  row.classList.add("active");
+
+  // Fill form
+  const v = vehicles.find(x => x.id === id);
   license.value = v.license_number;
   toolCode.value = v.tool_code;
   statusSelect.value = v.status;
 
-  const res = await fetch(`${API}/vehicles/${id}/history`,  
-  {credentials: "include" }
-  );
+  // Fetch history
+  const res = await fetch(`${API}/vehicles/${id}/history`, { credentials: "include" });
   const history = await res.json();
 
-  historyList.innerHTML = "";
-  history.forEach(h => {
-    const li = document.createElement('li');
-    li.textContent = `${h.timestamp} | סטטוס: ${h.status}`;
-    historyList.appendChild(li);
-  });
+  // Build history row
+  const historyRow = document.createElement("tr");
+  historyRow.classList.add("history-row");
 
-  vehicleDetails.classList.remove('hidden');
+  const td = document.createElement("td");
+  td.colSpan = 4;
+  td.innerHTML = history.length
+    ? `<strong>היסטוריית רכב:</strong>
+       <ul>${history.map(h => `<li>${h.timestamp} | סטטוס: ${h.status}</li>`).join("")}</ul>`
+    : "<em>אין היסטוריה לרכב זה</em>";
+
+  historyRow.appendChild(td);
+
+  // Insert under clicked row
+  row.after(historyRow);
 }
+
