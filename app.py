@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify,  render_template
 from flask_cors import CORS
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 CORS(app,
@@ -21,6 +22,14 @@ def connect():
 def home():
     return render_template("index.html")
 
+#debug test temporary
+@app.route("/debug/db-path")
+def debug_db_path():
+    return jsonify({
+        "cwd": os.getcwd(),
+        "db_exists": os.path.exists(DB),
+        "db_absolute_path": os.path.abspath(DB)
+    })
 
 # ---------------- LOGIN ----------------
 @app.route("/login", methods=["POST"])
