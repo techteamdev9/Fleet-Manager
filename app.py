@@ -121,7 +121,7 @@ def add_vehicle():
 
     cur.execute(
         "INSERT INTO vehicle_history (vehicle_id, status, timestamp) VALUES (?,?,?)",
-        (vid, d["status"], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        (vid, d["status"], datetime.now().astimezone().strftime("%d-%m-%Y %H:%M:%S"))
     )
 
     conn.commit()
@@ -142,7 +142,7 @@ def update_vehicle(vid):
 
     cur.execute(
         "INSERT INTO vehicle_history (vehicle_id, status, timestamp) VALUES (?,?,?)",
-        (vid, d["status"], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        (vid, d["status"], datetime.now().astimezone().strftime("%d-%m-%Y %H:%M:%S"))
     )
 
     conn.commit()
