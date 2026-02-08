@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <meta charset="UTF-8">
-
   <title>Fleet Manager</title>
-
   <style>
     * {
       box-sizing: border-box;
@@ -127,46 +127,110 @@
     .hidden {
       display: none;
     }
+    .hidden2{
+      display:none;
+    }
 
     #welcome {
       font-weight: bold;
       margin-bottom: 10px;
     }
-    /* Make vehicle rows feel clickable and soft */
-#vehicleTable tbody tr.vehicle-row {
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.12s ease;
+
+    /* Profile icon container (hidden before login) */
+    #profileDiv {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: none; /* Hide initially */
+    }
+
+    #profileMenu {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-#vehicleTable tbody tr.vehicle-row:hover {
-  background-color: #f2f7fb; /* very light gentle blue */
+
+
+    #profileMenu p {
+      margin: 5px 0;
+    }
+
+    #profileMenu button {
+      padding: 5px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #profileMenu button:hover {
+      background-color: #e32f2f;
+    }
+
+    /* Add styles to position the container and icon */
+    #header-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-top: 20px;
+    }
+
+    #profile-container {
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+
+    #profile-icon {
+      cursor: pointer;
+      font-size: 30px;
+      transition: transform 0.2s ease;
+    }
+
+    #profile-icon:hover {
+      transform: scale(1.1);
+    }
+
+    #statsContainer {
+  margin-bottom: 20px;
 }
 
-#vehicleTable tbody tr.vehicle-row.active {
-  background-color: #e6f1fb; /* soft selected color */
-  transform: scale(0.995);   /* very subtle "pressed" effect */
+#todayStats, #prevStats {
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
 }
 
-/* History row style */
-#vehicleTable tbody tr.history-row td {
-  background-color: #fafcff;
-  padding: 12px 18px;
-  font-size: 14px;
-  color: #444;
-}
-
-/* History list spacing */
-#vehicleTable tbody tr.history-row ul {
-  margin: 6px 0 0;
-  padding-right: 18px;
+#todayStats p, #prevStats p {
+  font-size: 16px;
+  color: #333;
 }
 
   </style>
 </head>
 
 <body>
+<!-- Add a container for the text and icon -->
+<div id="header-container">
+  <h1>Fleet Manager</h1>
+  <!-- Profile icon (will be shown only after login) -->
+  <div id="profileDiv" class="hidden2"> <!-- Hidden initially -->
+    <i class="fas fa-user-circle" id="profile-icon" style="font-size: 30px; cursor: pointer;" onclick="toggleProfileMenu()"></i>
+  </div>
+</div>
 
-<h2>Fleet Manager</h2>
+<!-- Profile Menu (hidden by default) -->
+<div id="profileMenu" class="hidden2">
+  <p><strong id="profileUsername">Username</strong></p>
+  <p><span id="profileRole">Role</span></p>
+  <button onclick="logout()">Logout</button>
+</div>
 
 <div id="loginDiv">
   <input type="text" id="username" placeholder="שם משתמש">
@@ -212,6 +276,29 @@
     </thead>
     <tbody></tbody>
   </table>
+  <div id="reportFilters">
+    <label>From: <input type="date" id="fromDate"></label>
+    <label>To: <input type="date" id="toDate"></label>
+    <button type="button" onclick="updateReportsChart()">Filter</button>
+  </div>
+  
+  <div id="statsContainer">
+    <h3>Vehicle Status Stats</h3>
+
+    <div id="todayStats">
+      <!-- Today's stats will be populated here -->
+    </div>
+    
+    <div id="prevStats">
+      <!-- Previous day's stats will be populated here -->
+    </div>
+    
+    <h3>Submitted Reports</h3>
+    <canvas id="reportsChart" width="400" height="200"></canvas>
+    
+    <h3>Vehicle Status Chart</h3>
+    <canvas id="statusChart" width="400" height="200"></canvas>
+    
 
   <div id="vehicleDetails" class="hidden">
     <h3>היסטוריית רכב</h3>
