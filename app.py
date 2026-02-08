@@ -20,12 +20,21 @@ import os
 # ---------------- CONFIG ----------------
 import os
 
+#local dev
+# DB_CONFIG = {
+#     "host": os.getenv("DB_HOST", "localhost"),
+#     "user": os.getenv("DB_USER", "root"),
+#     "password": os.getenv("DB_PASS", "mysqlp123"),
+#     "database": os.getenv("DB_NAME", "fleet_manager"),
+#     "port":int(os.getenv("DB_PORT","3306"))
+# }
+
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
+    "host": os.getenv("DB_HOST", "fleet-manager.mysql.render.com"),  # Update this to the correct hostname
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASS", "mysqlp123"),
     "database": os.getenv("DB_NAME", "fleet_manager"),
-    "port":int(os.getenv("DB_PORT","3306"))
+    "port": int(os.getenv("DB_PORT", "3306"))
 }
 
 
