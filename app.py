@@ -24,7 +24,8 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASS", "mysqlp123"),
-    "database": os.getenv("DB_NAME", "fleet_manager")
+    "database": os.getenv("DB_NAME", "fleet_manager"),
+    "port":3306
 }
 
 
