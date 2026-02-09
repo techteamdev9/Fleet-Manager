@@ -1,111 +1,103 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import mysql.connector
-from datetime import datetime
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from datetime import datetime, timedelta
+import pandas as pd
 import os
 
 # ---------------- CONFIG ----------------
-#sqlite
-# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# DB = os.path.join(BASE_DIR, "fleet_app.db")
+#for .env locally:
+# from dotenv import load_dotenv
+#load_dotenv()   # 🔁 load .env
 
-#mysql
-# DB_CONFIG = {
-#     "host": "localhost",
-#     "user": "fleet_user",
-#     "password": "strong_password",
-#     "database": "fleet_manager"
-# }
-
-# ---------------- CONFIG ----------------
-import os
-
-#local dev
-# DB_CONFIG = {
-#     "host": os.getenv("DB_HOST", "localhost"),
-#     "user": os.getenv("DB_USER", "root"),
-#     "password": os.getenv("DB_PASS", "mysqlp123"),
-#     "database": os.getenv("DB_NAME", "fleet_manager"),
-#     "port":int(os.getenv("DB_PORT","3306"))
-# }
-
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "fleet_manager.mysql.render.com"),  # Update this to the correct hostname
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASS", "mysqlp123"),
-    "database": os.getenv("DB_NAME", "fleet_manager"),
-    "port": int(os.getenv("DB_PORT", "3306"))
-}
-
-
-
+DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 # ---------------- DB ----------------
-# def connect():
-#     conn = sqlite3.connect(DB)
-#     conn.row_factory = sqlite3.Row
-#     return conn
+
 def connect():
-    conn = mysql.connector.connect(**DB_CONFIG)
-    return conn
+    return psycopg2.connect(DATABASE_URL, sslmode="require")  # 🔁 CHANGED
 
 
 def init_db():
     conn = connect()
     cur = conn.cursor()
 
+    # ---------------- Permissions ----------------
     cur.execute("""
-   CREATE TABLE IF NOT EXISTS users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL
-)
+    CREATE TABLE IF NOT EXISTS permissions (
+        id INT PRIMARY KEY,
+        name VARCHAR(50) NOT NULL
+    )
     """)
 
     cur.execute("""
-   CREATE TABLE IF NOT EXISTS vehicles (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    license_number VARCHAR(50) NOT NULL,
-    tool_code VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL
-)
+    INSERT INTO permissions (id, name)
+    VALUES (1, 'admin'), (2, 'user')
+    ON CONFLICT (id) DO NOTHING
     """)
 
+    # ---------------- Users ----------------
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(20),
+        permission_id INT REFERENCES permissions(id)
+    )
+    """)
+
+    # ---------------- Vehicles ----------------
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS vehicles (
+        id SERIAL PRIMARY KEY,
+        license_number VARCHAR(50) UNIQUE NOT NULL,
+        tool_code VARCHAR(50) NOT NULL,
+        status VARCHAR(50) NOT NULL
+    )
+    """)
+
+    # ---------------- Vehicle History ----------------
     cur.execute("""
     CREATE TABLE IF NOT EXISTS vehicle_history (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_id INT NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    timestamp DATETIME NOT NULL,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
-)
+        id SERIAL PRIMARY KEY,
+        vehicle_id INT REFERENCES vehicles(id) ON DELETE CASCADE,
+        status VARCHAR(50) NOT NULL,
+        timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
     """)
 
-    # create default users safely
+    # ---------------- Default users ----------------
     cur.execute("""
-    INSERT IGNORE INTO users (username, password, role)
-    VALUES (%s, %s, %s)
-    """, ("admin", "admin123", "admin"))
+    INSERT INTO users (username, password, role, permission_id)
+    VALUES (%s, %s, %s, %s)
+    ON CONFLICT (username) DO NOTHING
+    """, ("admin", "admin123", "admin", 1))
 
     cur.execute("""
-    INSERT IGNORE INTO users (username, password, role)
-    VALUES (%s, %s, %s)
-    """, ("user", "user123", "user"))
+    INSERT INTO users (username, password, role, permission_id)
+    VALUES (%s, %s, %s, %s)
+    ON CONFLICT (username) DO NOTHING
+    """, ("user", "user123", "user", 2))
 
     conn.commit()
     conn.close()
 
-# 🔥 MUST NOT BE INDENTED
+
+# 🔥 run once on startup
 init_db()
 
 # ---------------- ROUTES ----------------
+
 @app.route("/")
 def home():
     return render_template("index.html")
+
+# ---------------- AUTH ----------------
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -115,7 +107,7 @@ def login():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT u.username, p.name AS role
+        SELECT u.username, p.name
         FROM users u
         JOIN permissions p ON u.permission_id = p.id
         WHERE u.username=%s AND u.password=%s
@@ -127,182 +119,138 @@ def login():
     if not user:
         return jsonify({"error": "Invalid credentials"}), 401
 
-    # force role to lowercase
     return jsonify({
         "username": user[0],
-        "role": user[1].lower()   # i changed this
+        "role": user[1].lower()
     })
 
-
-
+# ---------------- VEHICLES ----------------
 
 @app.route("/vehicles", methods=["GET"])
-def vehicles():
+def get_vehicles():
     q = request.args.get("q", "")
     conn = connect()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
     if q:
         q = f"%{q}%"
         cur.execute("""
             SELECT * FROM vehicles
-            WHERE license_number LIKE %s
-               OR tool_code LIKE %s
-               OR status LIKE %s
+            WHERE license_number ILIKE %s
+               OR tool_code ILIKE %s
+               OR status ILIKE %s
         """, (q, q, q))
     else:
         cur.execute("SELECT * FROM vehicles")
 
-    rows = [dict(zip([col[0] for col in cur.description], r)) for r in cur.fetchall()]
+    rows = cur.fetchall()
     conn.close()
     return jsonify(rows)
 
 
 @app.route("/vehicles", methods=["POST"])
 def add_vehicle():
-    # Get data from the request
-    data = request.get_json()
-    license_number = data.get("license_number")
-    tool_code = data.get("tool_code")
-    status = data.get("status")
+    data = request.json
 
-    # Connect to the database
     conn = connect()
     cur = conn.cursor()
 
-    # Insert vehicle into the vehicles table
-    cur.execute("INSERT INTO vehicles (license_number, tool_code, status) VALUES (%s, %s, %s)",
-                (license_number, tool_code, status))
-    
-    # Get the vehicle_id of the newly inserted vehicle
-    vehicle_id = cur.lastrowid
+    cur.execute("""
+        INSERT INTO vehicles (license_number, tool_code, status)
+        VALUES (%s, %s, %s)
+        RETURNING id
+    """, (data["license_number"], data["tool_code"], data["status"]))
 
-    # Insert an initial history record for this new vehicle
-    cur.execute("INSERT INTO history (vehicle_id, status) VALUES (%s, %s)",
-                (vehicle_id, status))
+    vid = cur.fetchone()[0]
 
-    # Commit the changes and close the cursor and connection
+    cur.execute("""
+        INSERT INTO vehicle_history (vehicle_id, status)
+        VALUES (%s, %s)
+    """, (vid, data["status"]))
+
     conn.commit()
-    cur.close()
     conn.close()
 
-    # Return a success message
-    return jsonify({"message": "Vehicle added successfully and history recorded!"})
-
+    return jsonify({"message": "Vehicle added"})
 
 
 @app.route("/vehicles/<int:id>", methods=["PUT"])
 def update_vehicle(id):
-    data = request.get_json()
-    status = data.get("status")
-    license_number = data.get("license_number")
-    tool_code = data.get("tool_code")
+    data = request.json
 
     conn = connect()
     cur = conn.cursor()
 
-    # Update vehicle
-    cur.execute("UPDATE vehicles SET license_number=%s, tool_code=%s, status=%s WHERE id=%s",
-                (license_number, tool_code, status, id))
+    cur.execute("""
+        UPDATE vehicles
+        SET license_number=%s, tool_code=%s, status=%s
+        WHERE id=%s
+    """, (data["license_number"], data["tool_code"], data["status"], id))
 
-    # Insert a new history record
-    cur.execute("INSERT INTO history (vehicle_id, status) VALUES (%s, %s)",
-                (id, status))
+    cur.execute("""
+        INSERT INTO vehicle_history (vehicle_id, status)
+        VALUES (%s, %s)
+    """, (id, data["status"]))
 
     conn.commit()
-    cur.close()
     conn.close()
 
-    return jsonify({"message": "Vehicle updated and history recorded"})
+    return jsonify({"message": "Vehicle updated"})
 
 
-
-@app.route("/vehicles/<int:vid>", methods=["DELETE"])
-def delete_vehicle(vid):
+@app.route("/vehicles/<int:id>", methods=["DELETE"])
+def delete_vehicle(id):
     conn = connect()
     cur = conn.cursor()
-
-    # First, delete the history records associated with the vehicle
-    cur.execute("DELETE FROM vehicle_history WHERE vehicle_id=%s", (vid,))
-
-    # Now, delete the vehicle
-    cur.execute("DELETE FROM vehicles WHERE id=%s", (vid,))
-
+    cur.execute("DELETE FROM vehicles WHERE id=%s", (id,))
     conn.commit()
     conn.close()
-
     return jsonify({"ok": True})
 
 
-@app.route("/vehicles/<int:vehicle_id>/history")
-def vehicle_history(vehicle_id):
-    conn = None  # <--- Declare conn here so it's always defined
-    try:
-        # Establish DB connection
-        conn = connect()
-        if not conn:
-            print("Unable to connect to database")
-            return jsonify({"error": "Unable to connect to database"}), 500
+# ---------------- HISTORY ----------------
 
-        cursor = conn.cursor(dictionary=True)  # rows as dict
-        print(f"Fetching history for vehicle ID: {vehicle_id}")
-
-        cursor.execute("""
-            SELECT timestamp, status
-            FROM history
-            WHERE vehicle_id = %s
-            ORDER BY timestamp DESC
-        """, (vehicle_id,))
-        
-        rows = cursor.fetchall()
-
-        if not rows:
-            print("No history found for vehicle:", vehicle_id)
-            return jsonify([])
-
-        print(f"History for vehicle {vehicle_id}: {rows}")
-        return jsonify(rows)
-
-    except Exception as e:
-        print(f"Error fetching vehicle history: {e}")
-        return jsonify({"error": "Failed to fetch history"}), 500
-
-    finally:
-        if conn:
-            conn.close()
-
-
-
-
-# ------------------------ Stats Endpoint ------------------------
-@app.route("/stats", methods=["GET"])
-def stats():
-    # Only admin can access
-    # In real app, add session/cookie check; here we assume front-end sends username
-    username = request.args.get("username", "")
-    
+@app.route("/vehicles/<int:id>/history")
+def vehicle_history(id):
     conn = connect()
-    cur = conn.cursor(dictionary=True)
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # Get current date stats from the history table
-    today = datetime.now().strftime("%Y-%m-%d")
+    cur.execute("""
+        SELECT timestamp, status
+        FROM vehicle_history
+        WHERE vehicle_id=%s
+        ORDER BY timestamp DESC
+    """, (id,))
+
+    rows = cur.fetchall()
+    conn.close()
+    return jsonify(rows)
+
+# ---------------- STATS ----------------
+
+@app.route("/stats")
+def stats():
+    conn = connect()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+
     cur.execute("""
         SELECT status, COUNT(*) AS count
-        FROM history h
-        WHERE DATE(h.timestamp) = %s
+        FROM vehicle_history
+        WHERE DATE(timestamp)=%s
         GROUP BY status
     """, (today,))
-    today_stats = {row["status"]: row["count"] for row in cur.fetchall()}
+    today_stats = {r["status"]: r["count"] for r in cur.fetchall()}
 
-    # Get previous day stats from the history table
-    prev_day = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     cur.execute("""
         SELECT status, COUNT(*) AS count
-        FROM history h
-        WHERE DATE(h.timestamp) = %s
+        FROM vehicle_history
+        WHERE DATE(timestamp)=%s
         GROUP BY status
-    """, (prev_day,))
-    prev_stats = {row["status"]: row["count"] for row in cur.fetchall()}
+    """, (yesterday,))
+    prev_stats = {r["status"]: r["count"] for r in cur.fetchall()}
 
     conn.close()
 
@@ -311,23 +259,20 @@ def stats():
         "previous": prev_stats
     })
 
+# ---------------- REPORTS ----------------
 
-
-
-
-# ------------------------ Reports Endpoint ------------------------
 @app.route("/reports")
-def get_reports():
+def reports():
     from_date = request.args.get("from_date")
     to_date = request.args.get("to_date")
 
-    query = "SELECT status FROM history WHERE 1"
-
+    query = "SELECT status FROM vehicle_history WHERE 1=1"
     params = []
 
     if from_date:
         query += " AND DATE(timestamp) >= %s"
         params.append(from_date)
+
     if to_date:
         query += " AND DATE(timestamp) <= %s"
         params.append(to_date)
@@ -343,26 +288,7 @@ def get_reports():
     return jsonify(rows)
 
 
-
-
-
-
-# ---------------- TEMP: Show all users ----------------
-@app.route("/debug_users")
-def debug_users():
-    conn = connect()
-    cur = conn.cursor(dictionary=True)
-    cur.execute("SELECT * FROM users")
-    users = cur.fetchall()
-    conn.close()
-
-    # Build simple HTML table
-    html = "<h2>All Users in DB</h2><table border='1'><tr><th>ID</th><th>Username</th><th>Password</th><th>Role</th></tr>"
-    for u in users:
-        html += f"<tr><td>{u['id']}</td><td>{u['username']}</td><td>{u['password']}</td><td>{u['role']}</td></tr>"
-    html += "</table>"
-    return html
-
 # ---------------- RUN ----------------
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

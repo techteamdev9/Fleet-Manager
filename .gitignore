@@ -1,4 +1,4 @@
-fleet_app.db
+fleet-app.db
 __pycache__/
 *.pyc
 .env
