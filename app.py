@@ -89,7 +89,16 @@ def init_db():
 
 
 # 🔥 run once on startup
-init_db()
+# 🔥 Run database initialization safely
+if DATABASE_URL:
+    try:
+        init_db()
+        print("Database initialized successfully.")
+    except Exception as e:
+        print("Error initializing database:", e)
+else:
+    print("DATABASE_URL not set! Skipping database initialization.")
+
 
 # ---------------- ROUTES ----------------
 
@@ -312,6 +321,10 @@ def stats_range():
     conn.close()
 
     return jsonify({r["status"]: r["count"] for r in rows})
+
+@app.route("/health")
+def health():
+    return "OK"
 
 
 # ---------------- RUN ----------------
