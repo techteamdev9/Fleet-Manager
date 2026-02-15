@@ -4,7 +4,7 @@ const API = window.location.origin;
 
 // ----- Runtime state -----
 let vehicles = [];
-let statuses = ["פעיל", "נמכר", "הוצא משימוש"];
+let statuses = ["פעיל", "נמכר", "הוצא משימוש","גויס","שוחרר","בדרך לשחרור","נופק","זיכוי","הופץ - תקין","הופץ - לא תקין","במוסך"];
 let currentUser = null;
 let selectedVehicleId = null;
 
@@ -59,6 +59,10 @@ async function login() {
     ["addVehicle", "updateVehicle", "deleteVehicle"].forEach(fn =>
       document.querySelector(`button[onclick="${fn}()"]`).disabled = true
     );
+  }
+  if (currentUser.role === 'admin') {
+    fetchStats();
+    updateReportsChart()
   }
 }
 
@@ -117,13 +121,16 @@ async function addVehicle() {
   const status = statusSelect.value;
   await fetch(`${API}/vehicles`, {
     method: "POST",
-    credentials:"include",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ license_number: lic, tool_code: tool, status })
   });
 
   await refreshTable();
   clearForm();
+  fetchStats();
+
+  updateReportsChart();
 }
 
 async function updateVehicle() {
@@ -133,7 +140,7 @@ async function updateVehicle() {
 
     const res = await fetch(`${API}/vehicles/${selectedVehicleId}`, {
       method: "PUT",
-      credentials:"include",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         license_number: license.value,
@@ -146,6 +153,13 @@ async function updateVehicle() {
 
     await refreshTable();   // refresh the table without reloading page
     clearForm();            // clear form
+    // Initial load after admin login
+
+    fetchStats();
+
+    updateReportsChart();
+
+
   } catch (err) {
     console.error(err);
     alert("Error updating vehicle");
@@ -157,9 +171,9 @@ async function deleteVehicle() {
   if (!confirm("Delete this vehicle?")) return;
 
   await fetch(`${API}/vehicles/${selectedVehicleId}`, {
-     method: "DELETE",
-     credentials:"include",
-    });
+    method: "DELETE",
+    credentials: "include",
+  });
   selectedVehicleId = null;
   await refreshTable();
   clearForm();
@@ -171,7 +185,7 @@ async function deleteVehicle() {
 async function refreshTable() {
   const q = search.value.trim();
   const res = await fetch(`${API}/vehicles?q=${encodeURIComponent(q)}`,
-  {credentials: "include" }
+    { credentials: "include" }
   );
   vehicles = await res.json();
 
@@ -181,18 +195,18 @@ async function refreshTable() {
   vehicles.forEach(v => {
     const tr = document.createElement('tr');
     tr.classList.add("vehicle-row");
-  
+
     tr.innerHTML = `
       <td>${v.id}</td>
       <td>${v.license_number}</td>
       <td>${v.tool_code}</td>
       <td>${v.status}</td>
     `;
-  
+
     tr.onclick = () => selectVehicle(tr, v.id);
     tbody.appendChild(tr);
   });
-  
+
 
   vehicleDetails.classList.add('hidden');
 }
@@ -223,13 +237,8 @@ async function fetchStats() {
       ${Object.keys(prevStats).map(status => `<li>${status}: ${prevStats[status]}</li>`).join("")}
     </ul>
   `;
-}
-
-
-// Call fetchStats on initial load after login (for the admin)
-if (currentUser && currentUser.role === 'admin') {
-  fetchStats();
-  updateReportsChart();  // Load all reports by default
+  // update chart w todays stats
+  renderStatusChart(todayStats)
 }
 
 
@@ -286,6 +295,7 @@ async function fetchReports() {
 if (currentUser && currentUser.role === 'admin') {
   fetchStats();
   fetchReports();
+
 }
 
 
@@ -307,41 +317,50 @@ function clearForm() {
 }
 
 async function selectVehicle(row, id) {
-  const isAlreadyActive = row.classList.contains("active");
+  const isAlreadyOpen = row.classList.contains("active");
 
   // If clicking the same active row → close it
-  if (isAlreadyActive) {
+  if (isAlreadyOpen) {
+    // Remove active class from row
     row.classList.remove("active");
+
+    // Remove the history row below it (if exists)
     if (row.nextSibling && row.nextSibling.classList.contains("history-row")) {
       row.nextSibling.remove();
     }
+
     selectedVehicleId = null;
     return;
   }
 
-  // Otherwise, clear previous selection & history
-  document.querySelectorAll(".vehicle-row").forEach(r => r.classList.remove("active"));
-  document.querySelectorAll(".history-row").forEach(r => r.remove());
+  // Otherwise: close any previously open history
+  document.querySelectorAll(".vehicle-row.active").forEach(r => {
+    r.classList.remove("active");
+    if (r.nextSibling && r.nextSibling.classList.contains("history-row")) {
+      r.nextSibling.remove();
+    }
+  });
 
+  // Now open this row
   selectedVehicleId = id;
   row.classList.add("active");
 
-  // Fill form
+  // Fill form values
   const v = vehicles.find(x => x.id === id);
   license.value = v.license_number;
   toolCode.value = v.tool_code;
   statusSelect.value = v.status;
 
-  // Fetch history
+  // Fetch and display history
   try {
     const res = await fetch(`${API}/vehicles/${id}/history`, { credentials: "include" });
 
-    if (!res.ok) {
-      // If response is not ok, throw an error
-      throw new Error(`Failed to fetch history for vehicle ${id}.`);
-    }
+    if (!res.ok) throw new Error(`Failed to fetch history for vehicle ${id}.`);
 
     const history = await res.json();
+
+    // Remove existing history rows just in case
+    document.querySelectorAll(".history-row").forEach(r => r.remove());
 
     // Build history row
     const historyRow = document.createElement("tr");
@@ -349,20 +368,34 @@ async function selectVehicle(row, id) {
 
     const td = document.createElement("td");
     td.colSpan = 4;
-    td.innerHTML = history.length
-      ? `<strong>היסטוריית רכב:</strong>
-         <ul>${history.map(h => `<li>${h.timestamp} | סטטוס: ${h.status}</li>`).join("")}</ul>`
-      : "<em>אין היסטוריה לרכב זה</em>";
+
+    if (history.length) {
+      // Sort history by timestamp (latest first)
+      history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      td.innerHTML = `<strong>היסטוריית רכב:</strong>
+        <ul>
+          ${history.map((h, index) => {
+            const isLatestUpdate = index === 0; // Highlight the most recent update (latest)
+            const backgroundColor = isLatestUpdate ? '#d4edda' : ''; // Light green for latest
+            return `<li style="background-color:${backgroundColor};">${h.timestamp} | סטטוס: ${h.status}</li>`;
+          }).join("")}
+        </ul>`;
+    } else {
+      td.innerHTML = "<em>אין היסטוריה לרכב זה</em>";
+    }
 
     historyRow.appendChild(td);
 
-    // Insert under clicked row
+    // Insert the history row right below the clicked vehicle
     row.after(historyRow);
 
   } catch (error) {
     console.error("Error fetching vehicle history:", error);
-    
-    // Handle error gracefully: show a message in the UI
+
+    // If there's an error, show a friendly message
+    document.querySelectorAll(".history-row").forEach(r => r.remove());
+
     const historyRow = document.createElement("tr");
     historyRow.classList.add("history-row");
 
@@ -376,7 +409,11 @@ async function selectVehicle(row, id) {
 }
 
 
+
+
 let reportsChartInstance = null; // keep chart instance for updates
+
+
 
 async function updateReportsChart() {
   const from = document.getElementById("fromDate").value;
@@ -392,10 +429,9 @@ async function updateReportsChart() {
     const data = await res.json();
     console.log("Reports Data:", data);  // Check the response structure
 
-    // Process the data
+    // Process the data for the reports chart
     const statusCounts = {};
     data.forEach(r => {
-      console.log(r);  // Debugging each element
       const status = r[0]; // Access the first element of each array (the status)
       if (!statusCounts[status]) statusCounts[status] = 0;
       statusCounts[status]++;
@@ -403,19 +439,25 @@ async function updateReportsChart() {
 
     console.log("Grouped Status Counts:", statusCounts);  // Check the grouped data
 
-    const ctx = document.getElementById('reportsChart').getContext('2d');
+    // Update reports chart
+    const ctxR = document.getElementById("reportsChart").getContext("2d");
 
-    // Destroy previous chart if exists
-    if (reportsChartInstance) reportsChartInstance.destroy();
+    // Destroy previous report chart if exists
+    if (reportsChartInstance) {
+      reportsChartInstance.destroy();
+      reportsChartInstance = null; // Make sure we set it to null
+    }
 
-    reportsChartInstance = new Chart(ctx, {
-      type: 'pie',
+    reportsChartInstance = new Chart(ctxR, {
+      type: "pie",
       data: {
         labels: Object.keys(statusCounts),
-        datasets: [{
-          data: Object.values(statusCounts),
-          backgroundColor: ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f']
-        }]
+        datasets: [
+          {
+            data: Object.values(statusCounts),
+            backgroundColor: ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f'],
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -423,14 +465,20 @@ async function updateReportsChart() {
           title: {
             display: true,
             text: 'Submitted Reports by Vehicle Status'
-          }
-        }
-      }
+          },
+        },
+      },
     });
+
+    // Now update the status chart as well with the filtered data
+    renderStatusChart(statusCounts); // Call your function to render status chart with filtered data
   } catch (error) {
     console.error("Error fetching reports data:", error);
   }
 }
+
+
+
 
 
 
@@ -448,6 +496,56 @@ function toggleProfileMenu() {
   } else {
     profileMenu.style.display = 'block';
   }
+}
+
+// // temporary function
+// document.addEventListener("DOMContentLoaded", () => {
+//   fetchStats();      // top numbers + top pie
+// });
+
+// Global statusChartInstance to manage the chart
+let statusChartInstance = null;
+
+function renderStatusChart(stats) {
+  const ctx = document.getElementById('statusChart')?.getContext('2d');
+  
+  if (!ctx) {
+    console.error("statusChart canvas not found");
+    return;
+  }
+
+  // If there is an existing chart instance, destroy it before rendering a new one
+  if (statusChartInstance) {
+    statusChartInstance.destroy(); // Destroy previous chart
+    statusChartInstance = null;    // Reset the chart instance to null
+  }
+
+  // Create a new chart instance
+  statusChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(stats),
+      datasets: [{
+        label: 'Vehicle Status Counts',
+        data: Object.values(stats),
+        backgroundColor: [
+          '#3498db',
+          '#e74c3c',
+          '#2ecc71',
+          '#f1c40f'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Vehicle Status Stats'
+        }
+      }
+    }
+  });
 }
 
 
