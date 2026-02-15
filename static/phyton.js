@@ -4,7 +4,7 @@ const API = window.location.origin;
 
 // ----- Runtime state -----
 let vehicles = [];
-let statuses = ["פעיל", "נמכר", "הוצא משימוש","גויס","שוחרר","בדרך לשחרור","נופק","זיכוי","הופץ - תקין","הופץ - לא תקין","במוסך"];
+let statuses = ["פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר", "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין", "הופץ - לא תקין", "במוסך"];
 let currentUser = null;
 let selectedVehicleId = null;
 
@@ -63,7 +63,11 @@ async function login() {
   if (currentUser.role === 'admin') {
     fetchStats();
     updateReportsChart()
+  } if (currentUser.role !== 'admin') {
+    document.getElementById("statsContainer").style.display = "none";
   }
+
+
 }
 
 
@@ -376,10 +380,10 @@ async function selectVehicle(row, id) {
       td.innerHTML = `<strong>היסטוריית רכב:</strong>
         <ul>
           ${history.map((h, index) => {
-            const isLatestUpdate = index === 0; // Highlight the most recent update (latest)
-            const backgroundColor = isLatestUpdate ? '#d4edda' : ''; // Light green for latest
-            return `<li style="background-color:${backgroundColor};">${h.timestamp} | סטטוס: ${h.status}</li>`;
-          }).join("")}
+        const isLatestUpdate = index === 0; // Highlight the most recent update (latest)
+        const backgroundColor = isLatestUpdate ? '#d4edda' : ''; // Light green for latest
+        return `<li style="background-color:${backgroundColor};">${h.timestamp} | סטטוס: ${h.status}</li>`;
+      }).join("")}
         </ul>`;
     } else {
       td.innerHTML = "<em>אין היסטוריה לרכב זה</em>";
@@ -416,6 +420,11 @@ let reportsChartInstance = null; // keep chart instance for updates
 
 
 async function updateReportsChart() {
+  if (currentUser.role !== "admin") {
+    document.getElementById("statsContainer").style.display = "none";
+    console.warn("Access denied: Admins only");
+    return; // Stop execution
+  }
   const from = document.getElementById("fromDate").value;
   const to = document.getElementById("toDate").value;
 
@@ -508,7 +517,7 @@ let statusChartInstance = null;
 
 function renderStatusChart(stats) {
   const ctx = document.getElementById('statusChart')?.getContext('2d');
-  
+
   if (!ctx) {
     console.error("statusChart canvas not found");
     return;
