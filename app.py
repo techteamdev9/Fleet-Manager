@@ -7,9 +7,9 @@ import pandas as pd
 import os
 
 # ---------------- CONFIG ----------------
-#for .env locally:
-# from dotenv import load_dotenv
-#load_dotenv()   # 🔁 load .env
+#just for local
+#from dotenv import load_dotenv
+#load_dotenv() 
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 
@@ -286,6 +286,32 @@ def reports():
     conn.close()
 
     return jsonify(rows)
+
+@app.route("/stats_range")
+def stats_range():
+    from_date = request.args.get("from_date")
+    to_date = request.args.get("to_date")
+
+    query = "SELECT status, COUNT(*) AS count FROM vehicle_history WHERE 1=1"
+    params = []
+
+    if from_date:
+        query += " AND DATE(timestamp) >= %s"
+        params.append(from_date)
+
+    if to_date:
+        query += " AND DATE(timestamp) <= %s"
+        params.append(to_date)
+
+    query += " GROUP BY status"
+
+    conn = connect()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute(query, params)
+    rows = cur.fetchall()
+    conn.close()
+
+    return jsonify({r["status"]: r["count"] for r in rows})
 
 
 # ---------------- RUN ----------------
