@@ -212,6 +212,71 @@
   color: #333;
 }
 
+/* Vehicle Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 8px;  /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+}
+
+th {
+  background: #3498db;  /* Blue background for header */
+  color: white;  /* White text for header */
+  font-weight: bold;
+  padding: 12px 15px;  /* More space for a modern look */
+  border-top-left-radius: 8px;  /* Rounded top left corner */
+  border-top-right-radius: 8px;  /* Rounded top right corner */
+}
+
+td {
+  padding: 12px 15px;  /* Uniform padding */
+  text-align: right;  /* Right aligned text */
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #ddd;  /* Light border for separation */
+}
+
+tr {
+  transition: background-color 0.3s ease;  /* Smooth hover transition */
+}
+
+tr:hover {
+  background-color: #f7f9fc;  /* Light hover effect */
+  cursor: pointer;  /* Pointer cursor to indicate interactivity */
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;  /* Zebra stripes for alternating rows */
+}
+
+tr:nth-child(odd) {
+  background-color: #ffffff;  /* White background for odd rows */
+}
+
+td:first-child {
+  font-weight: bold;  /* Highlight the ID column */
+  color: #3498db;  /* Blue color for the first column */
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  th, td {
+    padding: 8px 10px;  /* Smaller padding on mobile */
+  }
+}
+
+/* Highlight the most recent (first) history update */
+.history-row li.highlight {
+  background-color: #d4f7d4; /* Soft light green */
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+
+
   </style>
 </head>
 
