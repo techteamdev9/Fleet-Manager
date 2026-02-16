@@ -5,6 +5,7 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 import pandas as pd
 import os
+import time
 
 # ---------------- CONFIG ----------------
 #just for local
@@ -18,9 +19,23 @@ CORS(app, supports_credentials=True)
 
 # ---------------- DB ----------------
 
-def connect():
-    return psycopg2.connect(DATABASE_URL, sslmode="require")  # 🔁 CHANGED
-
+# def connect():
+#     return psycopg2.connect(DATABASE_URL, sslmode="require")  # 🔁 CHANGED
+#test connect
+def connect(retries=5, delay=2):
+    """Tries to connect to the database, retrying on failure."""
+    if not os.getenv("DATABASE_URL"):
+        raise Exception("DATABASE_URL not set!")
+    
+    while retries > 0:
+        try:
+            return psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
+        except Exception as e:
+            print(f"Failed to connect, retrying in {delay}s...", e)
+            retries -= 1
+            time.sleep(delay)
+    
+    raise Exception("Could not connect to DB after retries")
 
 def init_db():
     conn = connect()
