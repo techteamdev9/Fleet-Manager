@@ -105,16 +105,7 @@ def init_db():
 
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
-if DATABASE_URL:
-    try:
-        init_db()
-        print("Database initialized successfully.")
-    except Exception as e:
-        print("Error initializing database:", e)
-else:
-    print("DATABASE_URL not set! Skipping database initialization.")
-
-
+#init_db() #for manual init
 # ---------------- ROUTES ----------------
 
 @app.route("/")
