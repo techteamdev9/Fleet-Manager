@@ -23,51 +23,18 @@ async function login() {
   });
 
   if (!res.ok) return alert("Invalid credentials");
-  currentUser = await res.json();
 
-  console.log("Logged in user:", currentUser);
+  const user = await res.json();
 
-  // Hide login form and show main content
-  document.getElementById('loginDiv').classList.add('hidden');
-  document.getElementById('mainDiv').classList.remove('hidden');
+  // Store logged-in user
+  sessionStorage.setItem("user", JSON.stringify(user));
 
-  // Show profile icon after login
-  document.getElementById('profileDiv').style.display = 'block';
-
-
-  // Update profile icon and user info in the menu
-  document.getElementById('profileUsername').textContent = currentUser.username;
-  document.getElementById('profileRole').textContent = currentUser.role;
-
-  // Update the welcome message
-  document.getElementById('welcome').textContent = `Welcome ${currentUser.username} (${currentUser.role})`;
-
-  // Call other functions to load status options and vehicle table
-  refreshStatusOptions();
-  await refreshTable();
-  clearForm();
-
-  // Reset all inputs/buttons first
-  ["license", "toolCode", "statusSelect"].forEach(id => document.getElementById(id).disabled = false);
-  ["addVehicle", "updateVehicle", "deleteVehicle"].forEach(fn =>
-    document.querySelector(`button[onclick="${fn}()"]`).disabled = false
-  );
-
-  // Disable inputs/buttons only if NOT admin
-  if (currentUser.role !== "admin") {
-    ["license", "toolCode", "statusSelect"].forEach(id => document.getElementById(id).disabled = true);
-    ["addVehicle", "updateVehicle", "deleteVehicle"].forEach(fn =>
-      document.querySelector(`button[onclick="${fn}()"]`).disabled = true
-    );
+  // Redirect based on role
+  if (user.role === 'admin') {
+    window.location.href = "/admin";
+  } else {
+    window.location.href = "/vehicles-page";
   }
-  if (currentUser.role === 'admin') {
-    fetchStats();
-    updateReportsChart()
-  } if (currentUser.role !== 'admin') {
-    document.getElementById("statsContainer").style.display = "none";
-  }
-
-
 }
 
 
@@ -123,11 +90,15 @@ async function addVehicle() {
   const lic = license.value.trim();
   const tool = toolCode.value.trim();
   const status = statusSelect.value;
+  const availableElem = document.getElementById("availableSelect");
+  const available = availableElem ? availableElem.value === "true" : true; // default = true
+ 
+
   await fetch(`${API}/vehicles`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ license_number: lic, tool_code: tool, status })
+    body: JSON.stringify({ license_number: lic, tool_code: tool, status, available_for_service: available })
   });
 
   await refreshTable();

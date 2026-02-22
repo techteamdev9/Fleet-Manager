@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicles</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #2c3e50;
+    }
+
+    input,
+    select,
+    button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: right;
+    }
+
+    th {
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f7f9fc;
+      cursor: pointer;
+    }
+
+    #vehicleTable {
+  width: 100%;             /* take full width of container */
+  max-width: 100%;         /* don’t overflow */
+  border-collapse: collapse;
+  table-layout: fixed;     /* force fixed column widths */
+  word-wrap: break-word;   /* break long words */
+}
+
+#vehicleTable th, #vehicleTable td {
+  overflow-wrap: break-word; /* ensure content wraps */
+  text-align: left;
+  font-size: 14px;
+}
+
+  </style>
+</head>
+
+<body>
+
+  <!-- =======================
+       HEADER + NAV BUTTONS
+       ======================= -->
+  <div class="vehicle-header" style="display:flex; justify-content:space-between; align-items:center;">
+
+    <h2>רשימת רכבים</h2>
+
+    <div>
+      <button id="adminDashboardBtn" style="display:none;" onclick="goToAdmin()">📊 Admin Dashboard</button>
+      <button onclick="logout()">🚪 התנתקות</button>
+    </div>
+
+  </div>
+
+  <!-- ==================
+       SEARCH CONTROLS
+       ================== -->
+
+  <input id="search" placeholder="חפש רכב">
+  <button onclick="refreshTable()">חפש</button>
+  <button onclick="clearSearch()">נקה</button>
+  <!-- <h3>Upload Vehicles from Excel</h3> -->
+
+  <div id="excelUploadSection" style="display:none;">
+    <input type="file" id="excelFile" accept=".xlsx,.xls">
+    <button onclick="uploadExcel()">Upload Excel</button>
+  </div>
+
+
+
+  <!-- ===============
+       VEHICLE TABLE
+       =============== -->
+
+  <table id="vehicleTable">
+    <thead>
+      <tr>
+        <th>מזהה</th>
+        <th>מספר רישוי</th>
+        <th>קוד כלי</th>
+        <th>סטטוס</th>
+        <th>זמינות</th>
+
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- ===============
+       VEHICLE FORM
+       =============== -->
+
+  <div id="vehicleForm">
+    <h3>טופס רכב</h3>
+    <input id="license" placeholder="מספר רישוי">
+    <input id="toolCode" placeholder="קוד כלי">
+    <select id="statusSelect"></select>
+    <br>
+    <button onclick="addVehicle()">הוספה</button>
+    <button onclick="updateVehicle()">עדכון</button>
+    <button onclick="deleteVehicle()">מחיקה</button>
+    <button onclick="clearForm()">ניקוי</button>
+  </div>
+
+  <script src="{{ url_for('static', filename='vehicles.js') }}"></script>
+</body>
+
+</html>

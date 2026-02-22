@@ -1,376 +1,53 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <meta charset="UTF-8">
-  <title>Fleet Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Manager - Login</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f4f6f9;
-      margin: 0;
-      padding: 30px;
-      color: #333;
-      direction: rtl;
-      text-align: right;
-    }
-
-    h2, h3 {
-      margin-top: 0;
-      color: #2c3e50;
-    }
-
-    /* Card layout */
-    #loginDiv,
-    #mainDiv {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 900px;
-      margin: auto;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    #loginDiv {
-      max-width: 400px;
-      text-align: center;
-    }
-
-    /* Inputs */
-    input,
-    select {
-      width: 100%;
-      padding: 8px 10px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
-      text-align: right;
-    }
-
-    /* Buttons */
-    button {
-      padding: 8px 14px;
-      margin: 6px 2px;
-      border: none;
-      border-radius: 4px;
-      background: #3498db;
-      color: #fff;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background: #2980b9;
-    }
-
-    button:active {
-      transform: scale(0.97);
-    }
-
-    /* Secondary buttons */
-    button:nth-child(2n) {
-      background: #95a5a6;
-    }
-
-    button:nth-child(2n):hover {
-      background: #7f8c8d;
-    }
-
-    /* Table */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      background: #fff;
-    }
-
-    th {
-      background: #ecf0f1;
-      font-weight: 600;
-    }
-
-    th,
-    td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: right;
-    }
-
-    tr:hover {
-      background: #f9f9f9;
-      cursor: pointer;
-    }
-
-    .section {
-      margin-top: 20px;
-    }
-
-    #vehicleDetails {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 6px;
-    }
-
-    ul {
-      padding-right: 18px;
-      padding-left: 0;
-    }
-
-    .hidden {
-      display: none;
-    }
-    .hidden2{
-      display:none;
-    }
-
-    #welcome {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    /* Profile icon container (hidden before login) */
-    #profileDiv {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: none; /* Hide initially */
-    }
-
-    #profileMenu {
-  display: none;
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 10px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-
-
-    #profileMenu p {
-      margin: 5px 0;
-    }
-
-    #profileMenu button {
-      padding: 5px;
-      background-color: #f44336;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    #profileMenu button:hover {
-      background-color: #e32f2f;
-    }
-
-    /* Add styles to position the container and icon */
-    #header-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      margin-top: 20px;
-    }
-
-    #profile-container {
-      margin-top: 10px;
-      margin-right: 10px;
-    }
-
-    #profile-icon {
-      cursor: pointer;
-      font-size: 30px;
-      transition: transform 0.2s ease;
-    }
-
-    #profile-icon:hover {
-      transform: scale(1.1);
-    }
-
-    #statsContainer {
-  margin-bottom: 20px;
-}
-
-#todayStats, #prevStats {
-  background-color: #f1f1f1;
-  padding: 10px;
-  border-radius: 6px;
-  margin-top: 10px;
-}
-
-#todayStats p, #prevStats p {
-  font-size: 16px;
-  color: #333;
-}
-
-/* Vehicle Table */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background: #fff;
-  border-radius: 8px;  /* Rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
-}
-
-th {
-  background: #3498db;  /* Blue background for header */
-  color: white;  /* White text for header */
-  font-weight: bold;
-  padding: 12px 15px;  /* More space for a modern look */
-  border-top-left-radius: 8px;  /* Rounded top left corner */
-  border-top-right-radius: 8px;  /* Rounded top right corner */
-}
-
-td {
-  padding: 12px 15px;  /* Uniform padding */
-  text-align: right;  /* Right aligned text */
-  font-size: 16px;
-  color: #333;
-  border-bottom: 1px solid #ddd;  /* Light border for separation */
-}
-
-tr {
-  transition: background-color 0.3s ease;  /* Smooth hover transition */
-}
-
-tr:hover {
-  background-color: #f7f9fc;  /* Light hover effect */
-  cursor: pointer;  /* Pointer cursor to indicate interactivity */
-}
-
-tr:nth-child(even) {
-  background-color: #f9f9f9;  /* Zebra stripes for alternating rows */
-}
-
-tr:nth-child(odd) {
-  background-color: #ffffff;  /* White background for odd rows */
-}
-
-td:first-child {
-  font-weight: bold;  /* Highlight the ID column */
-  color: #3498db;  /* Blue color for the first column */
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-  th, td {
-    padding: 8px 10px;  /* Smaller padding on mobile */
-  }
-}
-
-/* Highlight the most recent (first) history update */
-.history-row li.highlight {
-  background-color: #d4f7d4; /* Soft light green */
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-
-
+    body { font-family: "Segoe UI", Arial, sans-serif; background: #f4f6f9; padding: 30px; text-align: center; }
+    #loginDiv { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    #loginDiv input{width:90%}
+    input { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; border-radius: 4px; border: 1px solid #ccc; }
+    button { padding: 10px 20px; font-size: 16px; border-radius: 4px; border: none; background: #3498db; color: #fff; cursor: pointer; }
+    button:hover { background: #2980b9; }
+    
   </style>
 </head>
-
 <body>
-<!-- Add a container for the text and icon -->
-<div id="header-container">
-  <h1>Fleet Manager</h1>
-  <!-- Profile icon (will be shown only after login) -->
-  <div id="profileDiv" class="hidden2"> <!-- Hidden initially -->
-    <i class="fas fa-user-circle" id="profile-icon" style="font-size: 30px; cursor: pointer;" onclick="toggleProfileMenu()"></i>
+  <div id="loginDiv">
+    <h2>Fleet Manager</h2>
+    <input type="text" id="username" placeholder="שם משתמש">
+    <input type="password" id="password" placeholder="סיסמה">
+    <button type="button" onclick="login()">התחברות</button>
   </div>
-</div>
 
-<!-- Profile Menu (hidden by default) -->
-<div id="profileMenu" class="hidden2">
-  <p><strong id="profileUsername">Username</strong></p>
-  <p><span id="profileRole">Role</span></p>
-  <button onclick="logout()">Logout</button>
-</div>
+  <script>
+    const API = window.location.origin;
 
-<div id="loginDiv">
-  <input type="text" id="username" placeholder="שם משתמש">
-  <input type="password" id="password" placeholder="סיסמה">
-  <button type="button" onclick="login()">התחברות</button>
-</div>
+    async function login() {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
 
-<div id="mainDiv" class="hidden">
-  <p id="welcome"></p>
-  <button type="button" onclick="logout()">התנתקות</button>
+      const res = await fetch(`${API}/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: u, password: p })
+      });
 
-  <h3>טופס רכב</h3>
+      if (!res.ok) return alert("Invalid credentials");
 
-  מספר רישוי:
-  <input id="license">
+      const user = await res.json();
+      sessionStorage.setItem("user", JSON.stringify(user));
 
-  קוד כלי:
-  <input id="toolCode">
-
-  סטטוס:
-  <select id="statusSelect"></select>
-
-  <button type="button" onclick="addVehicle()">הוספה</button>
-  <button type="button" onclick="updateVehicle()">עדכון</button>
-  <button type="button" onclick="deleteVehicle()">מחיקה</button>
-  <button type="button" onclick="clearForm()">ניקוי</button>
-
-  <h3>רשימת רכבים</h3>
-
-  חיפוש:
-  <input id="search" placeholder="חפש רכב">
-  <button type="button" onclick="refreshTable()">חפש</button>
-  <button type="button" onclick="clearSearch()">נקה</button>
-
-  <table id="vehicleTable">
-    <thead>
-      <tr>
-        <th>מזהה</th>
-        <th>מספר רישוי</th>
-        <th>קוד כלי</th>
-        <th>סטטוס</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div id="reportFilters">
-    <label>From: <input type="date" id="fromDate"></label>
-    <label>To: <input type="date" id="toDate"></label>
-    <button type="button" onclick="updateReportsChart()">Filter</button>
-  </div>
-  
-  <div id="statsContainer">
-    <h3>Vehicle Status Stats</h3>
-
-    <div id="todayStats">
-      <!-- Today's stats will be populated here -->
-    </div>
-    
-    <div id="prevStats">
-      <!-- Previous day's stats will be populated here -->
-    </div>
-    
-    <h3>Submitted Reports</h3>
-    <canvas id="reportsChart" width="400" height="200"></canvas>
-    
-    <h3>Vehicle Status Chart</h3>
-    <canvas id="statusChart" width="400" height="200"></canvas>
-    
-
-  <div id="vehicleDetails" class="hidden">
-    <h3>היסטוריית רכב</h3>
-    <ul id="historyList"></ul>
-  </div>
-</div>
-
-<script src="{{ url_for('static', filename='phyton.js') }}"></script>
+      if (user.role === 'admin') {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/vehicles-page";
+      }
+    }
+  </script>
 </body>
 </html>

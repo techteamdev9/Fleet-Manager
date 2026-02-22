@@ -28,14 +28,17 @@ def init_db():
         # i changed this: replaced INSERT OR IGNORE with safe check
 
     # ---------------- Vehicles table ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS vehicles (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        license_number VARCHAR(50) NOT NULL,
-        tool_code VARCHAR(50) NOT NULL,
-        status VARCHAR(50) NOT NULL
-    )
-    """)  # i changed this: MySQL compatible
+   # ---------------- Vehicles ----------------
+cur.execute("""
+CREATE TABLE IF NOT EXISTS vehicles (
+    id SERIAL PRIMARY KEY,
+    license_number VARCHAR(50) UNIQUE NOT NULL,
+    tool_code VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    available_for_service BOOLEAN DEFAULT TRUE  -- new field
+)
+""")
+  # i changed this: MySQL compatible
 
     # ---------------- Vehicle history table ----------------
     cur.execute("""

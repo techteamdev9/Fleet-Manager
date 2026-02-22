@@ -1,0 +1,289 @@
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 30px;
+      color: #333;
+      direction: rtl;
+      text-align: right;
+    }
+
+    h2, h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    /* Card layout */
+    #loginDiv,
+    #mainDiv {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 900px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    #loginDiv {
+      max-width: 400px;
+      text-align: center;
+    }
+
+    /* Inputs */
+    input,
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      text-align: right;
+    }
+
+    /* Buttons */
+    button {
+      padding: 8px 14px;
+      margin: 6px 2px;
+      border: none;
+      border-radius: 4px;
+      background: #3498db;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    /* Secondary buttons */
+    button:nth-child(2n) {
+      background: #95a5a6;
+    }
+
+    button:nth-child(2n):hover {
+      background: #7f8c8d;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    th {
+      background: #ecf0f1;
+      font-weight: 600;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: right;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+      cursor: pointer;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    #vehicleDetails {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+
+    ul {
+      padding-right: 18px;
+      padding-left: 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+    .hidden2{
+      display:none;
+    }
+
+    #welcome {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    /* Profile icon container (hidden before login) */
+    #profileDiv {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: none; /* Hide initially */
+    }
+
+    #profileMenu {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+
+
+    #profileMenu p {
+      margin: 5px 0;
+    }
+
+    #profileMenu button {
+      padding: 5px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #profileMenu button:hover {
+      background-color: #e32f2f;
+    }
+
+    /* Add styles to position the container and icon */
+    #header-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-top: 20px;
+    }
+
+    #profile-container {
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+
+    #profile-icon {
+      cursor: pointer;
+      font-size: 30px;
+      transition: transform 0.2s ease;
+    }
+
+    #profile-icon:hover {
+      transform: scale(1.1);
+    }
+
+    #statsContainer {
+  margin-bottom: 20px;
+}
+
+#todayStats, #prevStats {
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+#todayStats p, #prevStats p {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Vehicle Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 8px;  /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+}
+
+th {
+  background: #3498db;  /* Blue background for header */
+  color: white;  /* White text for header */
+  font-weight: bold;
+  padding: 12px 15px;  /* More space for a modern look */
+  border-top-left-radius: 8px;  /* Rounded top left corner */
+  border-top-right-radius: 8px;  /* Rounded top right corner */
+}
+
+td {
+  padding: 12px 15px;  /* Uniform padding */
+  text-align: right;  /* Right aligned text */
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #ddd;  /* Light border for separation */
+}
+
+tr {
+  transition: background-color 0.3s ease;  /* Smooth hover transition */
+}
+
+tr:hover {
+  background-color: #f7f9fc;  /* Light hover effect */
+  cursor: pointer;  /* Pointer cursor to indicate interactivity */
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;  /* Zebra stripes for alternating rows */
+}
+
+tr:nth-child(odd) {
+  background-color: #ffffff;  /* White background for odd rows */
+}
+
+td:first-child {
+  font-weight: bold;  /* Highlight the ID column */
+  color: #3498db;  /* Blue color for the first column */
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  th, td {
+    padding: 8px 10px;  /* Smaller padding on mobile */
+  }
+}
+
+/* Highlight the most recent (first) history update */
+.history-row li.highlight {
+  background-color: #d4f7d4; /* Soft light green */
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.not-available {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+#vehicleCard {
+  display: none;
+  position: fixed;
+  top: 80px;
+  right: 50px;
+  width: 350px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+

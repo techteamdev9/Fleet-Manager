@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Vehicle card styling */
+    #vehicleCard {
+      display:none;
+      position:fixed;
+      top:50px;
+      right:50px;
+      width:300px;
+      background:#fff;
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+      z-index:1000;
+      max-height:80vh;
+      overflow-y:auto;
+      font-family: Arial, sans-serif;
+    }
+    #vehicleCard h3 { margin-top:0; }
+    #vehicleCard ul { padding-left:20px; }
+    #vehicleCard button { cursor:pointer; background:transparent; border:none; font-size:16px; }
+
+    /* Highlight cars not available */
+    .not-available { background:#fdd; }
+    #vehiclesTable {
+  width: 100%;             /* take full width of container */
+  max-width: 100%;         /* don’t overflow */
+  border-collapse: collapse;
+  table-layout: fixed;     /* force fixed column widths */
+  word-wrap: break-word;   /* break long words */
+}
+
+#vehiclesTable th, #vehiclesTable td {
+  overflow-wrap: break-word; /* ensure content wraps */
+  text-align: left;
+  font-size: 14px;
+}
+
+    
+  </style>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<button onclick="goToVehicles()">🚗 Vehicles</button>
+<button onclick="logout()">Logout</button>
+
+<!-- Today / Previous stats -->
+<div>
+  <h3>Today Stats</h3>
+  <div id="todayStats"></div>
+</div>
+<div>
+  <h3>Previous Day Stats</h3>
+  <div id="prevStats"></div>
+</div>
+
+<!-- Date filter -->
+<div>
+  From: <input type="date" id="fromDate">
+  To:   <input type="date" id="toDate">
+  <button onclick="updateCharts(); loadVehicles();">Filter</button>
+</div>
+
+<!-- Time series chart -->
+<div>
+  <h3>Vehicle History Over Time</h3>
+  <canvas id="timeChart"></canvas>
+</div>
+
+<!-- Pie chart -->
+<div>
+  <h3>Status Distribution</h3>
+  <canvas id="pieChart"></canvas>
+</div>
+
+<!-- Vehicles table -->
+<h2>Vehicles</h2>
+<table id="vehiclesTable" border="1" cellpadding="8">
+  <thead>
+    <tr>
+      <th>License</th>
+      <th>Tool Code</th>
+      <th>Status</th>
+      <th>Available for Service</th>
+      <th>Info</th>
+    </tr>
+  </thead>
+  <tbody  id="vehiclesTableBody"></tbody>
+</table>
+
+<!-- Vehicle Info Card -->
+<div id="vehicleCard">
+  <button id="closeCard">✖</button>
+  <div id="vehicleCardContent"></div>
+</div>
+
+<script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>
