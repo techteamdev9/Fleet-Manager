@@ -63,77 +63,159 @@
 
 #vehicleTable th, #vehicleTable td {
   overflow-wrap: break-word; /* ensure content wraps */
-  text-align: left;
+  text-align: center;
   font-size: 14px;
 }
 
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 5px;
+  }
+  .card{
+    padding: 5px;
+  }
+}
+
+#excelUploadSection input[type="file"] {
+  margin-top: 5px;
+}
+
+#excelUploadSection button {
+  margin-top: 5px;
+}
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pagination-container button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  }
+
+.pagination-container button:hover {
+  background: #1d4ed8;
+}
+
+.pagination-container span {
+  font-weight: bold;
+  font-size: 16px;
+  white-space: nowrap; /* Prevent wrapping to new line */
+  min-width: 50px;     /* Ensure enough space for "X / Y" */
+  text-align: center;
+}
   </style>
 </head>
 
 <body>
 
-  <!-- =======================
-       HEADER + NAV BUTTONS
-       ======================= -->
-  <div class="vehicle-header" style="display:flex; justify-content:space-between; align-items:center;">
+  <div class="container">
 
-    <h2>רשימת רכבים</h2>
-
-    <div>
-      <button id="adminDashboardBtn" style="display:none;" onclick="goToAdmin()">📊 Admin Dashboard</button>
-      <button onclick="logout()">🚪 התנתקות</button>
+    <!-- Header -->
+    <div class="page-header">
+      <h2>רשימת רכבים</h2>
+      <div>
+        <button id="adminDashboardBtn" style="display:none;" onclick="goToAdmin()">📊 Admin</button>
+        <button onclick="logout()">🚪 התנתקות</button>
+      </div>
     </div>
-
-  </div>
-
-  <!-- ==================
-       SEARCH CONTROLS
-       ================== -->
-
-  <input id="search" placeholder="חפש רכב">
-  <button onclick="refreshTable()">חפש</button>
-  <button onclick="clearSearch()">נקה</button>
-  <!-- <h3>Upload Vehicles from Excel</h3> -->
-
-  <div id="excelUploadSection" style="display:none;">
+  
+    <!-- Search Card -->
+    <div class="card">
+      <input id="search" placeholder="חפש רכב">
+      <button onclick="refreshTable()">חפש</button>
+      <button onclick="clearSearch()">נקה</button>
+    </div>
+  
+      <!-- Excel Upload -->
+  <div id="excelUploadSection" style="display:none; margin-top:10px;">
     <input type="file" id="excelFile" accept=".xlsx,.xls">
     <button onclick="uploadExcel()">Upload Excel</button>
   </div>
-
-
-
-  <!-- ===============
-       VEHICLE TABLE
-       =============== -->
-
-  <table id="vehicleTable">
-    <thead>
-      <tr>
-        <th>מזהה</th>
-        <th>מספר רישוי</th>
-        <th>קוד כלי</th>
-        <th>סטטוס</th>
-        <th>זמינות</th>
-
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <!-- ===============
-       VEHICLE FORM
-       =============== -->
-
-  <div id="vehicleForm">
-    <h3>טופס רכב</h3>
-    <input id="license" placeholder="מספר רישוי">
-    <input id="toolCode" placeholder="קוד כלי">
-    <select id="statusSelect"></select>
-    <br>
-    <button onclick="addVehicle()">הוספה</button>
-    <button onclick="updateVehicle()">עדכון</button>
-    <button onclick="deleteVehicle()">מחיקה</button>
-    <button onclick="clearForm()">ניקוי</button>
+    <!-- Table Card -->
+    <div class="card table-wrapper">
+      <table id="vehicleTable">
+        <thead>
+          <tr>
+            <th>מזהה</th>
+            <th>מספר רישוי</th>
+            <th>קוד כלי</th>
+            <th>סטטוס</th>
+            <th>זמינות</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="pagination-container">
+      <button id="prevPage">« Previous</button>
+      <span id="currentPage">1</span>
+      <button id="nextPage">Next »</button>
+    </div>
+    <!-- Form Card -->
+    <div class="card" id="vehicleForm">
+      <h3>טופס רכב</h3>
+      <input id="license" placeholder="מספר רישוי">
+      <input id="toolCode" placeholder="קוד כלי">
+      <select id="statusSelect"></select>
+      <br><br>
+      <button onclick="addVehicle()">הוספה</button>
+      <button onclick="updateVehicle()">עדכון</button>
+      <button onclick="deleteVehicle()">מחיקה</button>
+      <button onclick="clearForm()">ניקוי</button>
+    </div>
+  
   </div>
 
   <script src="{{ url_for('static', filename='vehicles.js') }}"></script>

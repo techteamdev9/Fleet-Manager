@@ -40,70 +40,226 @@
 
 #vehiclesTable th, #vehiclesTable td {
   overflow-wrap: break-word; /* ensure content wraps */
-  text-align: left;
+  text-align: center;
   font-size: 14px;
 }
 
-    
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f9;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #1f2937;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar button {
+  background: #374151;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #4b5563;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  background: white;
+  padding: 15px 25px;
+  border-bottom: 1px solid #ddd;
+}
+
+.content {
+  padding: 20px;
+}
+
+/* Cards */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+/* Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* Table */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+#vehiclesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+.table-wrapper {
+  overflow-x: auto;
+}
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .layout {
+    flex-direction: column;
+  }
+.card{
+  padding: 10px;
+}
+body{
+  padding: 5px;
+}
+}
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pagination-container button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width:100%;
+}
+
+.pagination-container button:hover {
+  background: #1d4ed8;
+}
+
+.pagination-container span {
+  font-weight: bold;
+  font-size: 16px;
+  white-space: nowrap;
+}
   </style>
 </head>
 <body>
 
-<h2>Admin Dashboard</h2>
+  <div class="layout">
 
-<button onclick="goToVehicles()">🚗 Vehicles</button>
-<button onclick="logout()">Logout</button>
-
-<!-- Today / Previous stats -->
-<div>
-  <h3>Today Stats</h3>
-  <div id="todayStats"></div>
-</div>
-<div>
-  <h3>Previous Day Stats</h3>
-  <div id="prevStats"></div>
-</div>
-
-<!-- Date filter -->
-<div>
-  From: <input type="date" id="fromDate">
-  To:   <input type="date" id="toDate">
-  <button onclick="updateCharts(); loadVehicles();">Filter</button>
-</div>
-
-<!-- Time series chart -->
-<div>
-  <h3>Vehicle History Over Time</h3>
-  <canvas id="timeChart"></canvas>
-</div>
-
-<!-- Pie chart -->
-<div>
-  <h3>Status Distribution</h3>
-  <canvas id="pieChart"></canvas>
-</div>
-
-<!-- Vehicles table -->
-<h2>Vehicles</h2>
-<table id="vehiclesTable" border="1" cellpadding="8">
-  <thead>
-    <tr>
-      <th>License</th>
-      <th>Tool Code</th>
-      <th>Status</th>
-      <th>Available for Service</th>
-      <th>Info</th>
-    </tr>
-  </thead>
-  <tbody  id="vehiclesTableBody"></tbody>
-</table>
-
-<!-- Vehicle Info Card -->
-<div id="vehicleCard">
-  <button id="closeCard">✖</button>
-  <div id="vehicleCardContent"></div>
-</div>
-
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Admin</h2>
+      <button onclick="goToVehicles()">🚗 Vehicles</button>
+      <button onclick="logout()">Logout</button>
+    </aside>
+  
+    <!-- Main Area -->
+    <div class="main">
+  
+      <!-- Top Navbar -->
+      <div class="navbar">
+        <h2>Dashboard</h2>
+      </div>
+  
+      <div class="content">
+  
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="card">
+            <h3>Today Stats</h3>
+            <div id="todayStats"></div>
+          </div>
+  
+          <div class="card">
+            <h3>Previous Day Stats</h3>
+            <div id="prevStats"></div>
+          </div>
+        </div>
+  
+        <!-- Date Filter -->
+        <div class="card">
+          From: <input type="date" id="fromDate">
+          To: <input type="date" id="toDate">
+          <button onclick="updateCharts(); loadVehicles();">Filter</button>
+        </div>
+  
+        <!-- Charts -->
+        <div class="stats-grid">
+          <div class="card">
+            <h3>Vehicle History</h3>
+            <canvas id="timeChart"></canvas>
+          </div>
+  
+          <div class="card">
+            <h3>Status Distribution</h3>
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+  
+        <!-- Vehicles Table -->
+        <div class="card">
+          <h3>Vehicles</h3>
+          <div class="table-wrapper">
+            <table id="vehiclesTable">
+              <thead>
+                <tr>
+                  <th>License</th>
+                  <th>Tool Code</th>
+                  <th>Status</th>
+                  <th>Available for Service</th>
+                  <th>Info</th>
+                </tr>
+              </thead>
+              <tbody id="vehiclesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="pagination-container">
+          <button id="prevPageAdmin">« Previous</button>
+          <span id="currentPageAdmin">1</span>
+          <button id="nextPageAdmin">Next »</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Vehicle Info Card stays exactly same -->
+  <div id="vehicleCard">
+    <button id="closeCard">✖</button>
+    <div id="vehicleCardContent"></div>
+  </div>
 <script src="{{ url_for('static', filename='admin.js') }}"></script>
 </body>
 </html>

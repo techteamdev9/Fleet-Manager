@@ -7,10 +7,10 @@ if (!currentUser) {
 // API + SESSION
 // ---------------------------
 function logout() {
-    sessionStorage.clear();
-    window.location.href = "/";
-  }
-  
+  sessionStorage.clear();
+  window.location.href = "/";
+}
+
 const API = window.location.origin;
 
 
@@ -21,9 +21,9 @@ const API = window.location.origin;
 let vehicles = [];
 let selectedVehicleId = null;
 let statuses = [
-  "פעיל","נמכר","הוצא משימוש","גויס","שוחרר",
-  "בדרך לשחרור","נופק","זיכוי","הופץ - תקין",
-  "הופץ - לא תקין","במוסך"
+  "פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר",
+  "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין",
+  "הופץ - לא תקין", "במוסך"
 ];
 
 // ---------------------------
@@ -31,20 +31,20 @@ let statuses = [
 // ---------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Show admin dashboard button only for admins
-if (currentUser && currentUser.role === "admin") {
+  // Show admin dashboard button only for admins
+  if (currentUser && currentUser.role === "admin") {
     document.getElementById("adminDashboardBtn").style.display = "inline-block";
   }
-  
+
   setupPage();
   refreshTable();
 });
 
 function goToAdmin() {
-    window.location.href = "/admin";
-  }
+  window.location.href = "/admin";
+}
 
-  
+
 function setupPage() {
   // Show admin-only UI if admin
   if (currentUser.role === "admin") {
@@ -92,25 +92,23 @@ function refreshStatusOptions() {
 // REFRESH VEHICLE TABLE
 // ---------------------------
 
-async function refreshTable() {
+let currentPageVehicles = 1;
+const rowsPerPageVehicles = 10; // Adjust how many vehicles per page
 
+async function refreshTable(page = 1) {
   const searchInput = document.getElementById("search");
   const searchValue = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-  // 🔹 Fetch ALL vehicles (no ?q= anymore)
+  // 🔹 Fetch all vehicles
   const res = await fetch(`${API}/vehicles`, {
     credentials: "include"
   });
-
   let vehicles = await res.json();
 
-  // 🔹 Filter on ALL columns including available_for_service
+  // 🔹 Filter if search value
   if (searchValue) {
     vehicles = vehicles.filter(v => {
-      const availableText = v.available_for_service
-        ? "ניתן לגיוס"
-        : "לא ניתן לגיוס";
-
+      const availableText = v.available_for_service ? "ניתן לגיוס" : "לא ניתן לגיוס";
       return (
         (v.id + "").includes(searchValue) ||
         (v.license_number || "").toLowerCase().includes(searchValue) ||
@@ -126,14 +124,21 @@ async function refreshTable() {
 
   tbody.innerHTML = "";
 
-  vehicles.forEach(v => {
+  // 🔹 Pagination logic
+  const totalPages = Math.ceil(vehicles.length / rowsPerPageVehicles);
+  if (page < 1) page = 1;
+  if (page > totalPages) page = totalPages;
+  currentPageVehicles = page;
+
+  const start = (page - 1) * rowsPerPageVehicles;
+  const end = start + rowsPerPageVehicles;
+  const vehiclesToRender = vehicles.slice(start, end);
+
+  vehiclesToRender.forEach(v => {
     const tr = document.createElement("tr");
     tr.classList.add("vehicle-row");
 
-    const availableText = v.available_for_service
-      ? "ניתן לגיוס"
-      : "לא ניתן לגיוס";
-
+    const availableText = v.available_for_service ? "ניתן לגיוס" : "לא ניתן לגיוס";
     const color = v.available_for_service ? "green" : "red";
 
     tr.innerHTML = `
@@ -146,9 +151,23 @@ async function refreshTable() {
       </td>
     `;
 
-    tr.onclick = () => selectVehicle(tr, v.id);
+    // Fill form inputs when row clicked
+    tr.addEventListener("click", () => {
+      document.getElementById("license").value = v.license_number;
+      document.getElementById("toolCode").value = v.tool_code;
+      document.getElementById("statusSelect").value = v.status;
+      selectVehicle(tr, v.id);
+    });
+
     tbody.appendChild(tr);
   });
+
+  // 🔹 Update pagination display
+  document.querySelector(".pagination-container span").textContent = `${totalPages} / ${page}`;
+
+  // Enable/disable buttons
+  document.getElementById("prevPage").disabled = page <= 1;
+  document.getElementById("nextPage").disabled = page >= totalPages;
 }
 
 
@@ -167,76 +186,76 @@ function clearSearch() {
 
 async function selectVehicle(row, id) {
 
-    // If this row is already active → close it
-    if (row.classList.contains("active")) {
-  
-      // Remove highlight
-      row.classList.remove("active");
-  
-      // Remove history row right below
-      if (row.nextSibling && row.nextSibling.classList.contains("history-row")) {
-        row.nextSibling.remove();
-      }
-  
-      selectedVehicleId = null;
-      return; // STOP here
+  // If this row is already active → close it
+  if (row.classList.contains("active")) {
+
+    // Remove highlight
+    row.classList.remove("active");
+
+    // Remove history row right below
+    if (row.nextSibling && row.nextSibling.classList.contains("history-row")) {
+      row.nextSibling.remove();
     }
-  
-    // Otherwise → close any other open history
-    document.querySelectorAll(".vehicle-row.active").forEach(r => {
-      r.classList.remove("active");
-      if (r.nextSibling && r.nextSibling.classList.contains("history-row")) {
-        r.nextSibling.remove();
-      }
+
+    selectedVehicleId = null;
+    return; // STOP here
+  }
+
+  // Otherwise → close any other open history
+  document.querySelectorAll(".vehicle-row.active").forEach(r => {
+    r.classList.remove("active");
+    if (r.nextSibling && r.nextSibling.classList.contains("history-row")) {
+      r.nextSibling.remove();
+    }
+  });
+
+  // Mark clicked row as active
+  row.classList.add("active");
+  selectedVehicleId = id;
+
+  // Optional: fill form fields
+  const v = vehicles.find(x => x.id === id);
+  if (v) {
+    document.getElementById("license").value = v.license_number;
+    document.getElementById("toolCode").value = v.tool_code;
+    document.getElementById("statusSelect").value = v.status;
+  }
+
+  // Fetch and display history
+  try {
+    const res = await fetch(`${API}/vehicles/${id}/history`, {
+      credentials: "include"
     });
-  
-    // Mark clicked row as active
-    row.classList.add("active");
-    selectedVehicleId = id;
-  
-    // Optional: fill form fields
-    const v = vehicles.find(x => x.id === id);
-    if (v) {
-      document.getElementById("license").value = v.license_number;
-      document.getElementById("toolCode").value = v.tool_code;
-      document.getElementById("statusSelect").value = v.status;
-    }
-  
-    // Fetch and display history
-    try {
-      const res = await fetch(`${API}/vehicles/${id}/history`, {
-        credentials: "include"
-      });
-      const history = await res.json();
-  
-      const historyRow = document.createElement("tr");
-      historyRow.classList.add("history-row");
-  
-      const td = document.createElement("td");
-      td.colSpan = 5;
-  
-      if (history.length > 0) {
-        history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        td.innerHTML = `
+    const history = await res.json();
+
+    const historyRow = document.createElement("tr");
+    historyRow.classList.add("history-row");
+
+    const td = document.createElement("td");
+    td.colSpan = 5;
+
+    if (history.length > 0) {
+      history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      td.innerHTML = `
           <strong>היסטוריית רכב:</strong>
           <ul>
             ${history.map((h, i) => {
-              const style = i === 0 ? "background:#d4edda;font-weight:bold;" : "";
-              return `<li style="${style}">${h.timestamp} | סטטוס: ${h.status}</li>`;
-            }).join("")}
+        const style = i === 0 ? "background:#d4edda;font-weight:bold;" : "";
+        return `<li style="${style}">${h.timestamp} | סטטוס: ${h.status}</li>`;
+      }).join("")}
           </ul>`;
-      } else {
-        td.innerHTML = "<em>אין היסטוריה לרכב זה</em>";
-      }
-  
-      historyRow.appendChild(td);
-      row.after(historyRow);
-  
-    } catch (err) {
-      console.error("Error fetching history:", err);
+    } else {
+      td.innerHTML = "<em>אין היסטוריה לרכב זה</em>";
     }
+
+    historyRow.appendChild(td);
+    row.after(historyRow);
+
+  } catch (err) {
+    console.error("Error fetching history:", err);
   }
-  
+}
+
 
 // ---------------------------
 // ADMIN CRUD FUNCTIONS
@@ -256,7 +275,7 @@ async function addVehicle() {
   await fetch(`${API}/vehicles`, {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type":"application/json" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ license_number: license, tool_code: toolCode, status })
   });
 
@@ -275,7 +294,7 @@ async function updateVehicle() {
   await fetch(`${API}/vehicles/${selectedVehicleId}`, {
     method: "PUT",
     credentials: "include",
-    headers: { "Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ license_number: license, tool_code: toolCode, status })
   });
 
@@ -366,3 +385,41 @@ window.addEventListener("DOMContentLoaded", async () => {
     console.error("Error initializing vehicles page:", err);
   }
 });
+
+
+// Pagination for Vehicles page
+// let currentPageVehicles = 1;
+// const rowsPerPageVehicles = 10;
+
+function showPageVehicles(page) {
+  const tbody = document.querySelector("#vehicleTable tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const totalPages = Math.ceil(rows.length / rowsPerPageVehicles);
+
+  if (page < 1) page = 1;
+  if (page > totalPages) page = totalPages;
+  currentPageVehicles = page;
+
+  // Hide all rows
+  rows.forEach(row => row.style.display = "none");
+
+  // Show rows for current page
+  const start = (page - 1) * rowsPerPageVehicles;
+  const end = start + rowsPerPageVehicles;
+  rows.slice(start, end).forEach(row => row.style.display = "");
+
+  // Update page number
+  document.querySelector(".pagination-container span").textContent = page;
+}
+
+// Attach buttons
+document.getElementById("prevPage").addEventListener("click", () => {
+  refreshTable(currentPageVehicles - 1);
+});
+
+document.getElementById("nextPage").addEventListener("click", () => {
+  refreshTable(currentPageVehicles + 1);
+});
+
+// Initialize after table loads
+window.addEventListener("load", () => showPageVehicles(1));

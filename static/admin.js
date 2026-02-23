@@ -134,9 +134,11 @@ async function drawPieChart() {
 }
 
 // ---- Vehicles Table ----
-async function loadVehicles() {
+let currentPageAdmin = 1;
+const rowsPerPageAdmin = 10; // Adjust as needed
+
+async function loadVehicles(page = 1) {
   try {
-    // Get selected dates for filtering
     const from = document.getElementById("fromDate").value;
     const to   = document.getElementById("toDate").value;
 
@@ -147,11 +149,20 @@ async function loadVehicles() {
     const data = await res.json();
 
     const tbody = document.getElementById("vehiclesTableBody");
-    tbody.innerHTML = data.map(vehicle => {
-      // Convert Boolean to Hebrew text
-      const availText = vehicle.available_for_service ? "ניתן" : "לא ניתן";
+    if (!tbody) return;
 
-      // Set color
+    // 🔹 Pagination logic
+    const totalPages = Math.ceil(data.length / rowsPerPageAdmin);
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    currentPageAdmin = page;
+
+    const start = (page - 1) * rowsPerPageAdmin;
+    const end = start + rowsPerPageAdmin;
+    const vehiclesToRender = data.slice(start, end);
+
+    tbody.innerHTML = vehiclesToRender.map(vehicle => {
+      const availText = vehicle.available_for_service ? "ניתן" : "לא ניתן";
       const color = availText === "ניתן" ? "green" : "red";
 
       return `
@@ -168,7 +179,14 @@ async function loadVehicles() {
         </tr>
       `;
     }).join("");
-   } catch (err) {
+
+    // 🔹 Update pagination display
+    document.getElementById("currentPageAdmin").textContent = `${totalPages} / ${page}`;
+
+    document.getElementById("prevPageAdmin").disabled = page <= 1;
+    document.getElementById("nextPageAdmin").disabled = page >= totalPages;
+
+  } catch (err) {
     console.error("Failed to load vehicles", err);
     const tbody = document.getElementById("vehiclesTableBody");
     if (tbody) tbody.innerHTML = "<tr><td colspan='5'>Error loading vehicles</td></tr>";
@@ -304,3 +322,38 @@ async function uploadExcel() {
   }
 }
 
+let currentPage = 1;
+const rowsPerPage = 10;
+
+function showPage(page) {
+  const tbody = document.getElementById("vehiclesTableBody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+  if (page < 1) page = 1;
+  if (page > totalPages) page = totalPages;
+  currentPage = page;
+
+  // Hide all rows
+  rows.forEach(row => row.style.display = "none");
+
+  // Show rows for current page
+  const start = (page - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  rows.slice(start, end).forEach(row => row.style.display = "");
+
+  // Update page number
+  document.getElementById("currentPage").textContent = page;
+}
+
+// Attach buttons
+document.getElementById("prevPageAdmin").addEventListener("click", () => {
+  loadVehicles(currentPageAdmin - 1);
+});
+
+document.getElementById("nextPageAdmin").addEventListener("click", () => {
+  loadVehicles(currentPageAdmin + 1);
+});
+
+// Initialize after table loads
+// window.addEventListener("load", () => showPage(1));
