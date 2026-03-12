@@ -139,7 +139,7 @@ def init_db():
 
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
-#init_db() #for manual init
+init_db() #for manual init
 # ---------------- ROUTES ----------------
 
 @app.route("/")
