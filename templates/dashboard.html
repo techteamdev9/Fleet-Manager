@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Manager - Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    /* Top navbar */
+    .navbar {
+      background: #1f2937;
+      color: white;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .navbar-user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+      color: #d1d5db;
+    }
+
+    .badge-role {
+      background: #3b82f6;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover { background: #dc2626; }
+
+    /* Main content */
+    .content {
+      max-width: 1000px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-title h1 {
+      font-size: 28px;
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    .page-title p {
+      color: #6b7280;
+      margin-top: 8px;
+      font-size: 15px;
+    }
+
+    /* Module grid */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .module-card {
+      background: white;
+      border-radius: 14px;
+      padding: 36px 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+    }
+
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.13);
+    }
+
+    .module-card.admin-only {
+      border-color: #fde68a;
+    }
+
+    .module-card .admin-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #fbbf24;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+
+    .module-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: 18px;
+    }
+
+    .icon-blue   { background: #eff6ff; color: #2563eb; }
+    .icon-green  { background: #f0fdf4; color: #16a34a; }
+    .icon-purple { background: #faf5ff; color: #7c3aed; }
+    .icon-orange { background: #fff7ed; color: #ea580c; }
+
+    .module-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .module-card p {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .module-card .arrow {
+      margin-top: 20px;
+      color: #9ca3af;
+      font-size: 18px;
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .module-card:hover .arrow {
+      color: #3b82f6;
+      transform: translateX(-4px);
+    }
+
+    /* Disabled card (admin only shown to users) */
+    .module-card.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+      .modules-grid { grid-template-columns: 1fr; }
+      .page-title h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="navbar-brand">מערכת ינשוף</span>
+    <div class="navbar-user">
+      <span id="welcomeMsg"></span>
+      <span class="badge-role" id="roleBadge"></span>
+      <button class="btn-logout" onclick="logout()">התנתקות</button>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="page-title">
+      <h1>מערכת ינשוף</h1>
+    </div>
+
+    <div class="modules-grid">
+
+      <!-- 1. Vehicles Management -->
+      <a class="module-card" href="/vehicles-page">
+        <div class="module-icon icon-blue">
+          <i class="fas fa-truck"></i>
+        </div>
+        <h3>ניהול רכבים</h3>
+        <p>הוספה, עדכון ומחיקה של רכבים. צפייה בהיסטוריית סטטוס ואמצעים.</p>
+        <span class="arrow"><i class="fas fa-chevron-left"></i></span>
+      </a>
+
+      <!-- 2. Users Management (admin only) -->
+      <a class="module-card admin-only" href="/users-page" id="usersCard">
+        <span class="admin-tag">Admin</span>
+        <div class="module-icon icon-green">
+          <i class="fas fa-users-cog"></i>
+        </div>
+        <h3>ניהול משתמשים</h3>
+        <p>הוספה ועדכון משתמשי מערכת, הגדרת הרשאות ותפקידים.</p>
+        <span class="arrow"><i class="fas fa-chevron-left"></i></span>
+      </a>
+
+      <!-- 3. Events (new) -->
+      <a class="module-card" href="/events-page">
+        <div class="module-icon icon-purple">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <h3>אירועים</h3>
+        <p>תיעוד ומעקב אחר אירועי שטח, תקלות ואירועים תפעוליים.</p>
+        <span class="arrow"><i class="fas fa-chevron-left"></i></span>
+      </a>
+
+      <!-- 4. Reports & Representation -->
+      <a class="module-card admin-only" href="/admin" id="reportsCard">
+        <span class="admin-tag">Admin</span>
+        <div class="module-icon icon-orange">
+          <i class="fas fa-chart-bar"></i>
+        </div>
+        <h3>דוחות ותצוגה</h3>
+        <p>סטטיסטיקות, גרפים ודוחות פעילות לפי תאריכים וסטטוסים.</p>
+        <span class="arrow"><i class="fas fa-chevron-left"></i></span>
+      </a>
+
+    </div>
+  </div>
+
+  <script>
+    const currentUser = JSON.parse(sessionStorage.getItem("user"));
+
+    if (!currentUser) {
+      window.location.href = "/";
+    }
+
+    document.getElementById("welcomeMsg").textContent = `שלום, ${currentUser.username}`;
+    document.getElementById("roleBadge").textContent = currentUser.role;
+
+    // Hide or disable admin-only cards for regular users
+    if (currentUser.role !== "admin") {
+      document.getElementById("usersCard").classList.add("disabled");
+      document.getElementById("reportsCard").classList.add("disabled");
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "/";
+    }
+  </script>
+
+</body>
+</html>

@@ -37,12 +37,12 @@ async function loadTodayStats() {
     const data = await res.json();
 
     // Render today stats
-    const todayDiv = document.getElementById("todayStats");
-    todayDiv.innerHTML = renderStats(data.today);
+    // const todayDiv = document.getElementById("todayStats");
+    // todayDiv.innerHTML = renderStats(data.today);
 
     // Render previous day stats
-    const prevDiv = document.getElementById("prevStats");
-    prevDiv.innerHTML = renderStats(data.previous);
+    // const prevDiv = document.getElementById("prevStats");
+    // prevDiv.innerHTML = renderStats(data.previous);
 
   } catch (err) {
     console.error("Error loading stats:", err);
@@ -84,12 +84,12 @@ async function drawTimeChart() {
 
   timeChart = new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets: [{ label:"Updates Count", data:totals, borderColor:"#3498db", backgroundColor:"rgba(52,152,219,0.2)", fill:true, tension:0.3 }] },
+    data: { labels, datasets: [{ label:"עידכוני גיוס", data:totals, borderColor:"#3498db", backgroundColor:"rgba(52,152,219,0.2)", fill:true, tension:0.3 }] },
     options: {
       responsive:true,
       scales: {
         x:{ 
-          title:{ display:true, text:"Date" },
+          title:{ display:true, text:"תאריך" },
           ticks:{
             callback:function(value){
               const date = new Date(this.getLabelForValue(value));
@@ -100,7 +100,7 @@ async function drawTimeChart() {
             }
           }
         },
-        y:{ title:{ display:true, text:"Count" }, beginAtZero:true }
+        y:{ title:{ display:true, text:"גוייס" }, beginAtZero:true }
       }
     }
   });
@@ -129,7 +129,7 @@ async function drawPieChart() {
   pieChart = new Chart(ctx2,{
     type:'pie',
     data:{ labels:Object.keys(counts), datasets:[{ data:Object.values(counts), backgroundColor:["#3498db","#e74c3c","#2ecc71","#f1c40f","#9b59b6","#1abc9c","#e67e22"] }] },
-    options:{ responsive:true, plugins:{ title:{ display:true, text:"Status Distribution" } } }
+    options:{ responsive:true, plugins:{ } }
   });
 }
 

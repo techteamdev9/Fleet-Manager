@@ -10,7 +10,7 @@ import time
 # ---------------- CONFIG ----------------
 #just for local
 #from dotenv import load_dotenv
-#load_dotenv() 
+#load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 
@@ -146,6 +146,18 @@ def init_db():
 def home():
     return render_template("index.html")
 
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route("/events-page")
+def events_page():
+    return render_template("events.html")
+
+@app.route("/users-page")
+def users_page():
+    return render_template("users_management.html")
+
 # ---------------- AUTH ----------------
 
 @app.route("/login", methods=["POST"])
@@ -240,14 +252,16 @@ def add_vehicle():
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO vehicles (license_number, tool_code, status, available_for_service)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO vehicles (license_number, tool_code, unitcode, status, available_for_service)
+        VALUES (%s, %s, %s, %s, %s)
         RETURNING id
     """, (
         data["license_number"],
         data["tool_code"],
+        data["unitcode"],   # new field
         data["status"],
-        available))
+        available
+    ))
 
     vid = cur.fetchone()[0]
 
@@ -274,18 +288,19 @@ def update_vehicle(id):
     available = data.get("available_for_service", True)  # default = ניתן
     cur.execute("""
         UPDATE vehicles
-        SET license_number = %s,
-            tool_code = %s,
-            status = %s,
-            available_for_service = %s  -- Added field here
-        WHERE id = %s
+    SET license_number = %s,
+        tool_code = %s,
+        unitcode = %s,
+        status = %s,
+        available_for_service = %s
+    WHERE id = %s
     """, (
-        data["license_number"],
-        data["tool_code"],
-        data["status"],
-        available,
-        # data["available_for_service"],  # New field coming from frontend
-        id
+    data["license_number"],
+    data["tool_code"],
+    data["unitcode"],
+    data["status"],
+    available,
+    id
     ))
 
     # Insert into vehicle history as before
@@ -581,6 +596,274 @@ def upload_excel():
 
 #     return "DB fixed successfully"
 
+# ---------------- EVENTS ----------------
+
+def ensure_events_table():
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS events (
+            id SERIAL PRIMARY KEY,
+            title VARCHAR(200) NOT NULL,
+            description TEXT,
+            event_type VARCHAR(50) DEFAULT 'general',
+            severity VARCHAR(20) DEFAULT 'info',
+            vehicle_id INT REFERENCES vehicles(id) ON DELETE SET NULL,
+            created_by VARCHAR(50),
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+try:
+    ensure_events_table()
+except Exception as e:
+    print("Could not ensure events table:", e)
+
+@app.route("/events", methods=["GET"])
+def get_events():
+    q          = request.args.get("q", "")
+    event_type = request.args.get("event_type", "")
+    severity   = request.args.get("severity", "")
+    from_date  = request.args.get("from_date", "")
+    to_date    = request.args.get("to_date", "")
+
+    conn = connect()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    # Application Security Requirement: parameterized queries, boundary validation
+    query = """
+        SELECT e.*, v.license_number AS vehicle_license
+        FROM events e
+        LEFT JOIN vehicles v ON e.vehicle_id = v.id
+        WHERE 1=1
+    """
+    params = []
+
+    if q:
+        query += " AND (e.title ILIKE %s OR e.description ILIKE %s)"
+        params.extend([f"%{q}%", f"%{q}%"])
+    if event_type:
+        query += " AND e.event_type = %s"
+        params.append(event_type)
+    if severity:
+        query += " AND e.severity = %s"
+        params.append(severity)
+    if from_date:
+        query += " AND DATE(e.created_at) >= %s"
+        params.append(from_date)
+    if to_date:
+        query += " AND DATE(e.created_at) <= %s"
+        params.append(to_date)
+
+    query += " ORDER BY e.created_at DESC"
+    cur.execute(query, params)
+    rows = cur.fetchall()
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route("/events/<int:event_id>", methods=["GET"])
+def get_event(event_id):
+    conn = connect()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT e.*, v.license_number AS vehicle_license
+        FROM events e
+        LEFT JOIN vehicles v ON e.vehicle_id = v.id
+        WHERE e.id = %s
+    """, (event_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify(row)
+
+
+@app.route("/events", methods=["POST"])
+def add_event():
+    data = request.json
+    title      = str(data.get("title", "")).strip()
+    description = str(data.get("description", "")).strip()
+    event_type = str(data.get("event_type", "general")).strip()
+    severity   = str(data.get("severity", "info")).strip()
+    vehicle_id = data.get("vehicle_id") or None
+    created_by = str(data.get("created_by", "")).strip() or "system"
+
+    if not title:
+        return jsonify({"error": "title required"}), 400
+
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO events (title, description, event_type, severity, vehicle_id, created_by)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        RETURNING id
+    """, (title, description, event_type, severity, vehicle_id, created_by))
+    new_id = cur.fetchone()[0]
+    conn.commit()
+    conn.close()
+    return jsonify({"id": new_id, "message": "Event created"})
+
+
+@app.route("/events/<int:event_id>", methods=["PUT"])
+def update_event(event_id):
+    data = request.json
+    title      = str(data.get("title", "")).strip()
+    description = str(data.get("description", "")).strip()
+    event_type = str(data.get("event_type", "general")).strip()
+    severity   = str(data.get("severity", "info")).strip()
+    vehicle_id = data.get("vehicle_id") or None
+
+    if not title:
+        return jsonify({"error": "title required"}), 400
+
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE events
+        SET title=%s, description=%s, event_type=%s, severity=%s, vehicle_id=%s
+        WHERE id=%s
+    """, (title, description, event_type, severity, vehicle_id, event_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Event updated"})
+
+
+@app.route("/events/<int:event_id>", methods=["DELETE"])
+def delete_event(event_id):
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM events WHERE id=%s", (event_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
+
+
+# ---------------- USERS MANAGEMENT ----------------
+
+@app.route("/users", methods=["GET"])
+def get_users():
+    conn = connect()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT u.id, u.username, u.role, u.permission_id, p.name AS permission_name
+        FROM users u
+        JOIN permissions p ON u.permission_id = p.id
+        ORDER BY u.id ASC
+    """)
+    rows = cur.fetchall()
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route("/users/<int:user_id>", methods=["GET"])
+def get_user(user_id):
+    conn = connect()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT u.id, u.username, u.role, u.permission_id, p.name AS permission_name
+        FROM users u
+        JOIN permissions p ON u.permission_id = p.id
+        WHERE u.id = %s
+    """, (user_id,))
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify(row)
+
+
+@app.route("/users", methods=["POST"])
+def add_user():
+    data = request.json
+    username      = str(data.get("username", "")).strip()
+    password      = str(data.get("password", "")).strip()
+    role          = str(data.get("role", "")).strip()
+    permission_id = int(data.get("permission_id", 2))
+
+    if not username or not password:
+        return jsonify({"error": "username and password required"}), 400
+
+    conn = connect()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO users (username, password, role, permission_id)
+            VALUES (%s, %s, %s, %s)
+        """, (username, password, role, permission_id))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"error": "Username already exists"}), 409
+    conn.close()
+    return jsonify({"message": "User created"})
+
+
+@app.route("/users/<int:user_id>", methods=["PUT"])
+def update_user(user_id):
+    data = request.json
+    role          = str(data.get("role", "")).strip()
+    permission_id = int(data.get("permission_id", 2))
+    password      = data.get("password", "")
+
+    conn = connect()
+    cur = conn.cursor()
+    if password:
+        cur.execute("""
+            UPDATE users SET role=%s, permission_id=%s, password=%s WHERE id=%s
+        """, (role, permission_id, str(password).strip(), user_id))
+    else:
+        cur.execute("""
+            UPDATE users SET role=%s, permission_id=%s WHERE id=%s
+        """, (role, permission_id, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "User updated"})
+
+
+@app.route("/users/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE id=%s", (user_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
+
+conn = connect()
+cur = conn.cursor()
+
+cur.execute("ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS unitcode VARCHAR(50);")
+conn.commit()
+
+conn = connect()
+cur = conn.cursor()
+
+# 1. Check if the table exists
+cur.execute("""
+    SELECT EXISTS (
+        SELECT 1 
+        FROM information_schema.tables 
+        WHERE table_name = 'vehicles'
+    );
+""")
+exists = cur.fetchone()[0]
+
+if exists:
+    print("Vehicles table exists. Contents:")
+    # 2. Fetch all rows
+    cur.execute("SELECT * FROM vehicles;")
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
+else:
+    print("Vehicles table does NOT exist!")
+
+cur.close()
+conn.close()
 # ---------------- RUN ----------------
 
 # if __name__ == "__main__":

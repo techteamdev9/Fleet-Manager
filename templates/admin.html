@@ -181,6 +181,7 @@ body{
     <!-- Sidebar -->
     <aside class="sidebar">
       <h2>Admin</h2>
+      <button onclick="window.location.href='/dashboard'">🏠 Dashboard</button>
       <button onclick="goToVehicles()">🚗 Vehicles</button>
       <button onclick="logout()">Logout</button>
     </aside>
@@ -190,56 +191,42 @@ body{
   
       <!-- Top Navbar -->
       <div class="navbar">
-        <h2>Dashboard</h2>
+        <h2>תצוגה</h2>
       </div>
   
       <div class="content">
-  
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-          <div class="card">
-            <h3>Today Stats</h3>
-            <div id="todayStats"></div>
-          </div>
-  
-          <div class="card">
-            <h3>Previous Day Stats</h3>
-            <div id="prevStats"></div>
-          </div>
-        </div>
-  
         <!-- Date Filter -->
         <div class="card">
-          From: <input type="date" id="fromDate">
-          To: <input type="date" id="toDate">
-          <button onclick="updateCharts(); loadVehicles();">Filter</button>
+          תאריך התחלה: <input type="date" id="fromDate">
+          תאריך סוף: <input type="date" id="toDate">
+          <button onclick="updateCharts(); loadVehicles();">חפש</button>
         </div>
   
         <!-- Charts -->
         <div class="stats-grid">
           <div class="card">
-            <h3>Vehicle History</h3>
+            <h3>קצב גיוס לפי פעימות</h3>
             <canvas id="timeChart"></canvas>
           </div>
   
           <div class="card">
-            <h3>Status Distribution</h3>
+            <h3>סטאטוס כלים</h3>
             <canvas id="pieChart"></canvas>
           </div>
         </div>
   
         <!-- Vehicles Table -->
         <div class="card">
-          <h3>Vehicles</h3>
+          <h3>רכבים</h3>
           <div class="table-wrapper">
             <table id="vehiclesTable">
               <thead>
                 <tr>
-                  <th>License</th>
-                  <th>Tool Code</th>
-                  <th>Status</th>
-                  <th>Available for Service</th>
-                  <th>Info</th>
+                  <th>מספר רישוי</th>
+                  <th>קוד כלי</th>
+                  <th>סטאטוס</th>
+                  <th>זמין לשירות</th>
+                  <th>מידע</th>
                 </tr>
               </thead>
               <tbody id="vehiclesTableBody"></tbody>
@@ -247,9 +234,9 @@ body{
           </div>
         </div>
         <div class="pagination-container">
-          <button id="prevPageAdmin">« Previous</button>
+          <button id="prevPageAdmin">קודם</button>
           <span id="currentPageAdmin">1</span>
-          <button id="nextPageAdmin">Next »</button>
+          <button id="nextPageAdmin">הבא</button>
         </div>
       </div>
     </div>

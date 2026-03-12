@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
     tool_code VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL,
     available_for_service BOOLEAN DEFAULT TRUE  -- new field
+     unitCode VARCHAR(50) 
 )
 """)
   # i changed this: MySQL compatible

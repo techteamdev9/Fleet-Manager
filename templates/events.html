@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אירועים - Fleet Manager</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    .navbar {
+      background: #1f2937;
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-left { display: flex; align-items: center; gap: 16px; }
+    .navbar-brand { font-size: 18px; font-weight: 700; }
+
+    .btn-back {
+      background: #374151;
+      color: #d1d5db;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .btn-back:hover { background: #4b5563; }
+
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    .content { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-header h2 { font-size: 22px; color: #1f2937; }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .filters label { font-size: 13px; color: #6b7280; display: block; margin-bottom: 4px; }
+
+    .filters input, .filters select {
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+
+    /* Table */
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #374151;
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 2px solid #e5e7eb;
+      text-align: right;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f3f4f6;
+      color: #374151;
+    }
+
+    tr:hover td { background: #f9fafb; }
+
+    /* Severity badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-high     { background: #fee2e2; color: #991b1b; }
+    .badge-medium   { background: #fef3c7; color: #92400e; }
+    .badge-low      { background: #d1fae5; color: #065f46; }
+    .badge-info     { background: #dbeafe; color: #1e40af; }
+
+    /* Event type colors */
+    .type-operational { color: #7c3aed; }
+    .type-maintenance { color: #ea580c; }
+    .type-incident    { color: #dc2626; }
+    .type-general     { color: #6b7280; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 14px;
+      padding: 28px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      margin: 20px;
+    }
+
+    .modal h3 { font-size: 18px; margin-bottom: 20px; color: #1f2937; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; color: #6b7280; margin-bottom: 6px; font-weight: 600; }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      direction: rtl;
+    }
+
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-start;
+      margin-top: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state i { font-size: 48px; margin-bottom: 12px; display: block; }
+
+    /* Admin-only controls */
+    .admin-controls { display: none; }
+
+    @media (max-width: 640px) {
+      .page-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .filters { flex-direction: column; }
+      }
+      /* @media (max-width: 640px) {
+
+table, thead, tbody, th, td, tr {
+  display: block;
+  width: 100%;
+}
+
+thead {
+  display: none;
+}
+
+tr {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+td {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+td:last-child {
+  border-bottom: none;
+}
+
+td::before {
+  content: attr(data-label);
+  font-weight: 600;
+  color: #6b7280;
+}
+} */
+.event-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.event-card{
+  background: white;
+  border-radius: 14px;
+  width: 92%;
+  max-width: 420px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  animation: cardPop .2s ease;
+}
+
+@keyframes cardPop{
+  from{
+    transform:scale(.9);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+.close-card{
+  float:left;
+  border:none;
+  background:none;
+  font-size:20px;
+  cursor:pointer;
+}
+.event-card-grid{
+  margin-top:15px;
+  display:grid;
+  gap:10px;
+}
+@media (max-width:640px){
+
+#eventsTable th:nth-child(3),
+#eventsTable td:nth-child(3),
+#eventsTable th:nth-child(4),
+#eventsTable td:nth-child(4),
+#eventsTable th:nth-child(6),
+#eventsTable td:nth-child(6){
+    display:none;
+}
+
+}
+.admin-controls button{
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:13px;
+}
+@media (max-width:640px){
+
+.admin-controls{
+  display:flex;
+  gap:6px;
+}
+
+.admin-controls button{
+  flex:1;
+  font-size:12px;
+  padding:6px;
+}
+
+}
+.admin-controls button:first-child{
+  background:#3b82f6;
+  color:white;
+}
+
+.admin-controls button:last-child{
+  background:#f59e0b;
+  color:white;
+}
+.pagination{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-top:15px;
+}
+
+.pagination button{
+  padding:6px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+/* Desktop default - normal size */
+.btn-view {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* Mobile: smaller button */
+@media (max-width: 640px) {
+  .btn-view {
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a class="btn-back" href="/dashboard"><i class="fas fa-arrow-right"></i> חזרה</a>
+      <span class="navbar-brand"><i class="fas fa-calendar-alt"></i> אירועים</span>
+    </div>
+    <button class="btn-logout" onclick="logout()">התנתקות</button>
+  </nav>
+
+  <div class="content">
+
+    <div class="page-header">
+      <h2>יומן אירועים - שוטף וחריגים</h2>
+      <button class="btn btn-success admin-controls" id="newEventBtn" onclick="openModal()">
+        <i class="fas fa-plus"></i> אירוע חדש
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card">
+      <div class="filters">
+        <div>
+          <label>חיפוש</label>
+          <input type="text" id="searchInput" placeholder="חפש לפי כותרת...">
+        </div>
+        <div>
+          <label>סוג אירוע</label>
+          <select id="filterType">
+            <option value="">הכל</option>
+            <option value="operational">תפעולי</option>
+            <option value="maintenance">תחזוקה</option>
+            <option value="incident">תקרית</option>
+            <option value="general">כללי</option>
+          </select>
+        </div>
+        <div>
+          <label>חומרה</label>
+          <select id="filterSeverity">
+            <option value="">הכל</option>
+            <option value="high">גבוהה</option>
+            <option value="medium">בינונית</option>
+            <option value="low">נמוכה</option>
+            <option value="info">מידע</option>
+          </select>
+        </div>
+        <div>
+          <label>מתאריך</label>
+          <input type="date" id="filterFrom">
+        </div>
+        <div>
+          <label>עד תאריך</label>
+          <input type="date" id="filterTo">
+        </div>
+        <div style="padding-top: 18px;">
+          <button class="btn btn-primary" onclick="loadEvents()">סנן</button>
+          <button class="btn btn-secondary" onclick="clearFilters()">נקה</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Table -->
+    <div class="card">
+      <div class="table-wrapper">
+        <table id="eventsTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>כותרת</th>
+              <th>סוג אירוע</th>
+              <th>חומרה</th>
+              <th>רכב</th>
+              <th>נוצר על ידי</th>
+              <th>תאריך</th>
+              <th class="admin-controls">פעולות</th>
+            </tr>
+          </thead>
+          <tbody id="eventsTableBody">
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                  טוען אירועים...
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="pagination">
+
+      <button onclick="prevPage()">⬅ הקודם</button>
+      
+      <span id="pageInfo"></span>
+      
+      <button onclick="nextPage()">הבא ➡</button>
+      
+      </div>
+    <div id="eventCardOverlay" class="event-overlay">
+
+      <div class="event-card">
+    
+        <button class="close-card" onclick="closeEventCard()">✕</button>
+    
+        <h3 id="cardTitle"></h3>
+    
+        <div class="event-card-grid">
+    
+          <div><b>סוג אירוע:</b> <span id="cardType"></span></div>
+    
+          <div><b>חומרה:</b> <span id="cardSeverity"></span></div>
+    
+          <div><b>רכב:</b> <span id="cardVehicle"></span></div>
+    
+          <div><b>נוצר ע"י:</b> <span id="cardUser"></span></div>
+    
+          <div><b>תאריך:</b> <span id="cardDate"></span></div>
+    
+        </div>
+    
+      </div>
+    
+    </div>
+    <div id="desktopEventOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); justify-content:center; align-items:center; z-index:1000;">
+      <div style="background:white; padding:20px; border-radius:12px; max-width:500px; width:90%; position:relative;">
+        <button onclick="closeDesktopCard()" style="position:absolute; top:10px; right:10px;">✕</button>
+        <h3 id="desktopCardTitle"></h3>
+        <div>
+          <p><b>סוג אירוע:</b> <span id="desktopCardType"></span></p>
+          <p><b>חומרה:</b> <span id="desktopCardSeverity"></span></p>
+          <p><b>רכב:</b> <span id="desktopCardVehicle"></span></p>
+          <p><b>נוצר ע"י:</b> <span id="desktopCardUser"></span></p>
+          <p><b>תאריך:</b> <span id="desktopCardDate"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Modal (create/edit) -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 id="modalTitle">אירוע חדש</h3>
+
+      <input type="hidden" id="eventId">
+
+      <div class="form-group">
+        <label>כותרת *</label>
+        <input type="text" id="eventTitle" placeholder="תיאור קצר של האירוע">
+      </div>
+
+      <div class="form-group">
+        <label>תיאור</label>
+        <textarea id="eventDesc" placeholder="פרטים נוספים על האירוע..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>סוג אירוע</label>
+        <select id="eventType">
+          <option value="general">כללי</option>
+          <option value="operational">תפעולי</option>
+          <option value="maintenance">תחזוקה</option>
+          <option value="incident">תקרית</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>חומרה</label>
+        <select id="eventSeverity">
+          <option value="info">מידע</option>
+          <option value="low">נמוכה</option>
+          <option value="medium">בינונית</option>
+          <option value="high">גבוהה</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>רכב קשור (אופציונלי)</label>
+        <select id="eventVehicle">
+          <option value="">— ללא רכב ספציפי —</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="saveEvent()">שמור</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+        <button class="btn btn-danger" id="deleteEventBtn" style="display:none; margin-right:auto;" onclick="deleteEvent()">מחק</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='events.js') }}"></script>
+</body>
+</html>

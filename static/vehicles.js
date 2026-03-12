@@ -1,5 +1,4 @@
 // ---------------------------
-
 const currentUser = JSON.parse(sessionStorage.getItem("user"));
 if (!currentUser) {
   window.location.href = "/";
@@ -104,6 +103,7 @@ async function refreshTable(page = 1) {
     credentials: "include"
   });
   let vehicles = await res.json();
+  console.log(vehicles)
 
   // 🔹 Filter if search value
   if (searchValue) {
@@ -135,6 +135,7 @@ async function refreshTable(page = 1) {
   const vehiclesToRender = vehicles.slice(start, end);
 
   vehiclesToRender.forEach(v => {
+
     const tr = document.createElement("tr");
     tr.classList.add("vehicle-row");
 
@@ -145,22 +146,189 @@ async function refreshTable(page = 1) {
       <td>${v.id}</td>
       <td>${v.license_number}</td>
       <td>${v.tool_code}</td>
+      <td>${v.unitcode || ""}</td>
       <td>${v.status}</td>
       <td style="color:${color}; font-weight:bold;">
         ${availableText}
       </td>
+      <td class="row-actions">
+
+<button class="edit-btn"
+onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
+<i class="fas fa-pencil-alt"></i>
+</button>
+
+<button class="delete-btn"
+        onclick="event.stopPropagation(); deleteVehicle('${v.id}')">
+  <i class="fas fa-trash"></i>
+</button>
+
+</td>
     `;
 
-    // Fill form inputs when row clicked
+    // ----- EDIT BUTTON ROW (hidden initially) -----
+    const editRow = document.createElement("tr");
+    editRow.classList.add("vehicle-edit-row");
+    editRow.style.display = "none";
+
+    editRow.innerHTML = `
+    <td colspan="5">
+    <button class="btn-edit-vehicle" onclick="openVehicleModal2()">ערוך</button>
+  </td>
+    `;
+
+    // Edit button click
+    // Edit button click
+    editRow.querySelector("button").addEventListener("click", (ev) => {
+      ev.stopPropagation(); // prevent row click
+
+      // --- Mark the row as active like in selectVehicle ---
+      document.querySelectorAll(".vehicle-row.active").forEach(r => r.classList.remove("active"));
+      tr.classList.add("active");
+      selectedVehicleId = v.id;
+
+      // --- Optional: fill inputs in modal ---
+      openVehicleModal(v);
+    });
+
+    // Row click
     tr.addEventListener("click", () => {
+
+      // hide all edit rows
+      document.querySelectorAll(".vehicle-edit-row").forEach(r => {
+        r.style.display = "none";
+      });
+
+      // show this one
+      editRow.style.display = "table-row";
+
+      // existing behavior
       document.getElementById("license").value = v.license_number;
       document.getElementById("toolCode").value = v.tool_code;
       document.getElementById("statusSelect").value = v.status;
+
       selectVehicle(tr, v.id);
     });
 
     tbody.appendChild(tr);
+    tbody.appendChild(editRow);
+
   });
+
+
+  //   const editBtn = tr.querySelector(".btn-edit");
+
+  // editBtn.addEventListener("click", (ev) => {
+  //   ev.stopPropagation(); // prevents row click
+  //   openVehicleModal(v);
+  // });
+
+  //edit vehicle form
+  function openVehicleModal(vehicle = null) {
+    const form = document.getElementById("vehicleForm");
+    if (form && typeof form.reset === "function") form.reset();
+
+    document.getElementById("vehicleId").value = "";
+    document.getElementById("vehicleModalTitle").textContent = "רכב חדש";
+
+    // The select element
+    const statusSelect = document.getElementById("statusSelect1");
+
+    // Define all possible statuses
+    const allStatuses = ["פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר",
+      "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין",
+      "הופץ - לא תקין", "במוסך"]; // add more if needed
+
+    // Clear old options
+    statusSelect.innerHTML = "";
+
+    // Fill the select with all options
+    allStatuses.forEach(s => {
+      const option = document.createElement("option");
+      option.value = s;
+      option.textContent = s;
+      statusSelect.appendChild(option);
+    });
+
+    if (vehicle) {
+      document.getElementById("vehicleId").value = vehicle.id;
+      document.getElementById("license1").value = vehicle.license_number || "";
+      document.getElementById("toolCode1").value = vehicle.tool_code || "";
+      document.getElementById("vehicleAvailable").checked = !!vehicle.available_for_service;
+
+      // Set the current vehicle status as selected
+      if (vehicle.status) {
+        // If the status is not in the predefined list, add it
+        if (!allStatuses.includes(vehicle.status)) {
+          const opt = document.createElement("option");
+          opt.value = vehicle.status;
+          opt.textContent = vehicle.status;
+          statusSelect.appendChild(opt);
+        }
+        statusSelect.value = vehicle.status;
+      }
+
+      document.getElementById("vehicleModalTitle").textContent = "עריכת רכב";
+    }
+
+    document.getElementById("vehicleModalOverlay").classList.add("active");
+  }
+
+  // ----- Close the modal -----
+  function closeVehicleModal() {
+    const overlay = document.getElementById("vehicleModalOverlay");
+    if (overlay) overlay.classList.remove("active");
+  }
+  function closeVehicleModal2() {
+    const overlay = document.getElementById("vehicleModalOverlay2");
+    if (overlay) overlay.classList.remove("active");
+  }
+
+  // async function saveVehicle() {
+  //   const id = document.getElementById("vehicleId").value;
+
+  //   const payload = {
+  //     license_number: document.getElementById("license").value.trim(),
+  //     tool_code: document.getElementById("toolCode").value.trim(),
+  //     status: document.getElementById("statusSelect").value,
+  //     available_for_service: document.getElementById("vehicleAvailable").checked
+  //   };
+
+  //   const method = id ? "PUT" : "POST";
+  //   const url = id ? `${API}/vehicles/${id}` : `${API}/vehicles`;
+
+  //   try {
+  //     const res = await fetch(url, {
+  //       method,
+  //       credentials: "include",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(payload)
+  //     });
+
+  //     if (!res.ok) throw new Error();
+
+  //     closeVehicleModal();
+  //     loadVehicles(); // refresh table
+  //   }
+  //   catch (err) {
+  //     alert("שמירת הרכב נכשלה");
+  //   }
+  // }
+
+
+
+
+
+  // Fill form inputs when row clicked
+  // tr.addEventListener("click", () => {
+  //   document.getElementById("license").value = v.license_number;
+  //   document.getElementById("toolCode").value = v.tool_code;
+  //   document.getElementById("statusSelect").value = v.status;
+  //   selectVehicle(tr, v.id);
+  // });
+
+  // tbody.appendChild(tr);
+
 
   // 🔹 Update pagination display
   document.querySelector(".pagination-container span").textContent = `${totalPages} / ${page}`;
@@ -170,6 +338,17 @@ async function refreshTable(page = 1) {
   document.getElementById("nextPage").disabled = page >= totalPages;
 }
 
+  function saveVehicle() {
+
+    const vehicleId = document.getElementById("vehicleId").value;
+  
+    if (vehicleId) {
+      updateVehicle();
+    } else {
+      addVehicle();
+    }
+  
+  }
 
 // ---------------------------
 // CLEAR SEARCH
@@ -185,23 +364,17 @@ function clearSearch() {
 // ---------------------------
 
 async function selectVehicle(row, id) {
-
-  // If this row is already active → close it
+  // 1. If this row is already active → close it
   if (row.classList.contains("active")) {
-
-    // Remove highlight
     row.classList.remove("active");
-
-    // Remove history row right below
     if (row.nextSibling && row.nextSibling.classList.contains("history-row")) {
       row.nextSibling.remove();
     }
-
     selectedVehicleId = null;
-    return; // STOP here
+    return;
   }
 
-  // Otherwise → close any other open history
+  // 2. Otherwise → close any other open history rows
   document.querySelectorAll(".vehicle-row.active").forEach(r => {
     r.classList.remove("active");
     if (r.nextSibling && r.nextSibling.classList.contains("history-row")) {
@@ -209,11 +382,11 @@ async function selectVehicle(row, id) {
     }
   });
 
-  // Mark clicked row as active
+  // 3. Mark clicked row as active
   row.classList.add("active");
   selectedVehicleId = id;
 
-  // Optional: fill form fields
+  // 4. Optional: fill form fields
   const v = vehicles.find(x => x.id === id);
   if (v) {
     document.getElementById("license").value = v.license_number;
@@ -221,7 +394,7 @@ async function selectVehicle(row, id) {
     document.getElementById("statusSelect").value = v.status;
   }
 
-  // Fetch and display history
+  // 5. Fetch and display history in a Table
   try {
     const res = await fetch(`${API}/vehicles/${id}/history`, {
       credentials: "include"
@@ -232,20 +405,47 @@ async function selectVehicle(row, id) {
     historyRow.classList.add("history-row");
 
     const td = document.createElement("td");
-    td.colSpan = 5;
+    td.colSpan = 5; // Adjust based on your main table's column count
+    td.style.backgroundColor = "#f9f9f9";
 
     if (history.length > 0) {
+      // Sort: Newest first
       history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
       td.innerHTML = `
-          <strong>היסטוריית רכב:</strong>
-          <ul>
-            ${history.map((h, i) => {
-        const style = i === 0 ? "background:#d4edda;font-weight:bold;" : "";
-        return `<li style="${style}">${h.timestamp} | סטטוס: ${h.status}</li>`;
+          <div style="padding: 15px; direction: rtl; text-align: right;">
+            <strong style="display: block; margin-bottom: 10px; font-size: 1.1em;">פירוט היסטוריית רכב:</strong>
+            <table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #ddd; border-radius: 4px;">
+              <thead>
+                <tr style="background: #ececec; border-bottom: 2px solid #ccc;">
+                  <th style="padding: 10px; border-left: 1px solid #ddd;text-align;">תאריך</th>
+                  <th style="padding: 10px; border-left: 1px solid #ddd;text-align;">שעה</th>
+                  <th style="padding: 10px;text-align;">סטטוס</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${history.map((h, i) => {
+        const dateObj = new Date(h.timestamp);
+        const dateStr = dateObj.toLocaleDateString('he-IL');
+        const timeStr = dateObj.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        // Highlight the most recent row
+        const rowStyle = i === 0
+          ? "background: #d4edda; font-weight: bold; border-bottom: 1px solid #ddd;"
+          : "border-bottom: 1px solid #eee;";
+
+        return `
+                    <tr style="${rowStyle}">
+                      <td style="padding: 8px; border-left: 1px solid #eee;">${dateStr}</td>
+                      <td style="padding: 8px; border-left: 1px solid #eee;">${timeStr}</td>
+                      <td style="padding: 8px;">${h.status}</td>
+                    </tr>`;
       }).join("")}
-          </ul>`;
+              </tbody>
+            </table>
+          </div>`;
     } else {
-      td.innerHTML = "<em>אין היסטוריה לרכב זה</em>";
+      td.innerHTML = `<div style="padding: 15px; direction: rtl; text-align: right;"><em>אין היסטוריה רשומה לרכב זה.</em></div>`;
     }
 
     historyRow.appendChild(td);
@@ -253,6 +453,7 @@ async function selectVehicle(row, id) {
 
   } catch (err) {
     console.error("Error fetching history:", err);
+    alert("שגיאה בטעינת ההיסטוריה");
   }
 }
 
@@ -264,9 +465,10 @@ async function selectVehicle(row, id) {
 async function addVehicle() {
   if (currentUser.role !== "admin") return;
 
-  const license = document.getElementById("license").value.trim();
-  const toolCode = document.getElementById("toolCode").value.trim();
-  const status = document.getElementById("statusSelect").value;
+  const license = document.getElementById("license1").value.trim();
+  const toolCode = document.getElementById("toolCode1").value.trim();
+  const status = document.getElementById("statusSelect1").value;
+  const unitcode=document.getElementById("unitcode").value;
 
   if (!license || !toolCode || !status) {
     return alert("Please enter all fields");
@@ -276,39 +478,51 @@ async function addVehicle() {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ license_number: license, tool_code: toolCode, status })
+    body: JSON.stringify({ license_number: license,unitcode, tool_code: toolCode, status })
   });
-
+  closeVehicleModal();
   clearForm();
   refreshTable();
 }
-
+function closeVehicleModal1() {
+  const overlay = document.getElementById("vehicleModalOverlay");
+  if (overlay) overlay.classList.remove("active");
+}
 async function updateVehicle() {
   if (currentUser.role !== "admin") return;
-  if (!selectedVehicleId) return;
 
-  const license = document.getElementById("license").value.trim();
-  const toolCode = document.getElementById("toolCode").value.trim();
-  const status = document.getElementById("statusSelect").value;
+  // Get the vehicle ID from the form input
+  const vehicleId = document.getElementById("vehicleId").value;
+  if (!vehicleId) return;
 
-  await fetch(`${API}/vehicles/${selectedVehicleId}`, {
+  const license = document.getElementById("license1").value.trim();
+  const unitcode = document.getElementById("unitcode").value.trim();
+  const toolCode = document.getElementById("toolCode1").value.trim();
+  const status = document.getElementById("statusSelect1").value;
+  const available_for_service = document.getElementById("vehicleAvailable").checked;
+    await fetch(`${API}/vehicles/${vehicleId}`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ license_number: license, tool_code: toolCode, status })
+    body: JSON.stringify({ license_number: license,unitcode, tool_code: toolCode, status, available_for_service })
   });
 
+  closeVehicleModal();
   clearForm();
   refreshTable();
 }
 
-async function deleteVehicle() {
+async function deleteVehicle(vehicleId = null) {
   if (currentUser.role !== "admin") return;
-  if (!selectedVehicleId) return;
+
+  // Use the passed ID or fallback to selectedVehicleId
+  const idToDelete = vehicleId || selectedVehicleId;
+
+  if (!idToDelete) return; // no vehicle selected
 
   if (!confirm("Delete this vehicle?")) return;
 
-  await fetch(`${API}/vehicles/${selectedVehicleId}`, {
+  await fetch(`${API}/vehicles/${idToDelete}`, {
     method: "DELETE",
     credentials: "include"
   });
@@ -323,9 +537,9 @@ async function deleteVehicle() {
 
 function clearForm() {
   selectedVehicleId = null;
-  document.getElementById("license").value = "";
-  document.getElementById("toolCode").value = "";
-  document.getElementById("statusSelect").selectedIndex = 0;
+  document.getElementById("license1").value = "";
+  document.getElementById("toolCode1").value = "";
+  document.getElementById("statusSelect1").selectedIndex = 0;
 }
 
 
@@ -420,6 +634,131 @@ document.getElementById("prevPage").addEventListener("click", () => {
 document.getElementById("nextPage").addEventListener("click", () => {
   refreshTable(currentPageVehicles + 1);
 });
+
+function nextPage() {
+
+  const maxPage = Math.ceil(allEvents.length / rowsPerPage);
+
+  if (currentPage < maxPage) {
+    currentPage++;
+    renderTable();
+  }
+
+}
+
+function prevPage() {
+
+  if (currentPage > 1) {
+    currentPage--;
+    renderTable();
+  }
+
+}
+
+//add vehicle form
+function openVehicleModal(vehicle = null) {
+  const form = document.getElementById("vehicleForm");
+  if (form && typeof form.reset === "function") form.reset();
+
+  document.getElementById("vehicleId").value = "";
+  document.getElementById("vehicleModalTitle").textContent = "רכב חדש";
+
+  if (vehicle) {
+    document.getElementById("vehicleId").value = vehicle.id;
+    document.getElementById("license").value = vehicle.license_number || "";
+    document.getElementById("toolCode").value = vehicle.tool_code || "";
+    document.getElementById("statusSelect").value = vehicle.status || "";
+    document.getElementById("vehicleAvailable").checked = !!vehicle.available_for_service;
+
+    document.getElementById("vehicleModalTitle").textContent = "עריכת רכב";
+  }
+
+  document.getElementById("vehicleModalOverlay").style.display = "flex";
+}
+
+function closeVehicleModal() {
+  const form = document.getElementById("vehicleForm1");
+
+  if (form) {
+    form.reset(); // clears all inputs
+  }
+
+  // clear hidden id
+  document.getElementById("vehicleId").value = "";
+
+  document.getElementById("vehicleModalOverlay").style.display = "none";
+}
+
+async function openVehicleModal2(vehicleOrId = null) {
+  const form = document.getElementById("vehicleForm1");
+  if (form && typeof form.reset === "function") form.reset();
+    // The select element
+    const statusSelect = document.getElementById("statusSelect1");
+
+    // Define all possible statuses
+    const allStatuses = ["פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר",
+      "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין",
+      "הופץ - לא תקין", "במוסך"]; // add more if needed
+
+    // Clear old options
+    statusSelect.innerHTML = "";
+
+    // Fill the select with all options
+    allStatuses.forEach(s => {
+      const option = document.createElement("option");
+      option.value = s;
+      option.textContent = s;
+      statusSelect.appendChild(option);
+    });
+  let vehicle = null;
+
+  // 1. If an object is passed, use it
+  if (vehicleOrId && typeof vehicleOrId === "object") {
+    vehicle = vehicleOrId;
+  } 
+  // 2. If an ID is passed, find the vehicle
+  else if (vehicleOrId) {
+    console.log(vehicles)
+    vehicle = vehicles.find(v => v.id === vehicleOrId);
+    if (!vehicle) {
+      console.error("Vehicle not found:", vehicleOrId);
+      return;
+    }
+  } 
+  // 3. If nothing passed, do nothing
+  else {
+    console.warn("No vehicle or ID passed to openVehicleModal2");
+    return;
+  }
+
+  // 4. Fill form inputs exactly like selectVehicle
+  document.getElementById("vehicleId").value = vehicle.id;
+  document.getElementById("unitcode").value = vehicle.unitcode || "";
+  document.getElementById("license1").value = vehicle.license_number || "";
+  document.getElementById("toolCode1").value = vehicle.tool_code || "";
+  // document.getElementById("statusSelect1").value = vehicle.status || "";
+   // Set the current vehicle status as selected
+   if (vehicle.status) {
+    // If the status is not in the predefined list, add it
+    if (!allStatuses.includes(vehicle.status)) {
+      const opt = document.createElement("option");
+      opt.value = vehicle.status;
+      opt.textContent = vehicle.status;
+      statusSelect.appendChild(opt);
+    }
+    statusSelect.value = vehicle.status;
+  }
+  document.getElementById("vehicleAvailable").checked = !!vehicle.available_for_service;
+
+  document.getElementById("vehicleModalTitle").textContent = "עריכת רכב";
+
+  // 5. Show modal overlay
+  document.getElementById("vehicleModalOverlay").style.display = "flex";
+}
+function clearVehicleForm() {
+  const form = document.getElementById("vehicleForm1");
+  if (form) form.reset();
+}
 
 // Initialize after table loads
 window.addEventListener("load", () => showPageVehicles(1));
