@@ -233,6 +233,11 @@
     .file-name {
       font-style: italic;
     }
+    .disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
   </style>
 </head>
 
@@ -263,6 +268,7 @@
       <div class="file-upload-wrapper">
         <input type="file" id="excelFile" accept=".xlsx,.xls">
         <label for="excelFile" class="file-upload-label">בחר קובץ</label>
+        <span id="excelFileName" style="margin-left:10px; font-weight: bold;"></span>
       </div>
     </div>
     <button class="btn btn-success admin-controls" id="newVehicleBtn" onclick="openVehicleModal()">
@@ -326,6 +332,14 @@
           <option value="נמכר">נמכר</option>
           <option value="הוצא משימוש">הוצא משימוש</option>
           <option value="גויס">גויס</option>
+          <option value="שוחרר">שוחרר</option>
+          <option value="בדרך לשחרור">בדרך לשחרור</option>
+          <option value="נופק">נופק</option>
+          <option value="זיכוי">זיכוי</option>
+          <option value="הופץ - תקין">הופץ - תקין</option>
+          <option value="הופץ - לא תקין">הופץ - לא תקין</option>
+          <option value="במוסך">במוסך</option>
+        
         </select>
         <br>
         <label>קוד יחידה</label>

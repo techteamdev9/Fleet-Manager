@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -9,14 +9,14 @@ import time
 
 # ---------------- CONFIG ----------------
 #just for local
-#from dotenv import load_dotenv
-#load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-
+app.secret_key = os.getenv("SECRET_KEY") or "devsecret"
 # ---------------- DB ----------------
 
 # def connect():
@@ -139,7 +139,7 @@ def init_db():
 
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
-init_db() #for manual init
+#init_db() #for manual init
 # ---------------- ROUTES ----------------
 
 @app.route("/")
@@ -180,6 +180,10 @@ def login():
     if not user:
         return jsonify({"error": "Invalid credentials"}), 401
 
+    session["user"] = {
+    "username": user[0],
+    "role": user[1].lower()
+}
     return jsonify({
         "username": user[0],
         "role": user[1].lower()
@@ -542,22 +546,26 @@ def upload_excel():
             if "available_for_service" in df.columns:
                 value = str(row["available_for_service"]).strip().lower()
 
-                if value in ["false", "0", "לא ניתן", "no"]:
+                if value in ["false", "FALSE", "0", "לא ניתן", "no"]:
                     available = False
+
+            unitcode_value = str(row["unitcode"]).strip() if "unitcode" in df.columns else None
 
             cur.execute("""
                 INSERT INTO vehicles
-                (license_number, tool_code, status, available_for_service)
-                VALUES (%s, %s, %s, %s)
+                (license_number, tool_code, status, available_for_service, unitcode)
+                VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (license_number) DO UPDATE
                 SET tool_code = EXCLUDED.tool_code,
                     status = EXCLUDED.status,
-                    available_for_service = EXCLUDED.available_for_service
+                    available_for_service = EXCLUDED.available_for_service,
+                    unitcode = COALESCE(EXCLUDED.unitcode, vehicles.unitcode)
             """, (
                 str(row["license_number"]).strip(),
                 str(row["tool_code"]).strip(),
                 str(row["status"]).strip(),
-                available
+                available,
+                unitcode_value
             ))
 
         conn.commit()
@@ -568,6 +576,9 @@ def upload_excel():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/check_session")
+def check_session():
+    return jsonify(dict(session))
 
 #test rout
 # @app.route("/fix-db")

@@ -34,11 +34,32 @@ document.addEventListener("DOMContentLoaded", () => {
   if (currentUser && currentUser.role === "admin") {
     document.getElementById("adminDashboardBtn").style.display = "inline-block";
   }
+  const excelInput = document.getElementById("excelFile");
+  const excelFileName = document.getElementById("excelFileName");
 
+  excelInput.addEventListener("change", function () {
+    if (excelInput.files.length > 0) {
+      let name = excelInput.files[0].name;
+
+      // Optionally, show only first 20-30 chars if very long
+      if (name.length > 30) {
+        name = name.substring(0, 27) + "...";
+      }
+
+      excelFileName.textContent = name;
+    } else {
+      excelFileName.textContent = ""; // no file selected
+    }
+  });
   setupPage();
   refreshTable();
 });
-
+function disableAdminControls() {
+  if (currentUser.role !== "admin") {
+    document.querySelectorAll('.edit-btn, .delete-btn, .admin-controls')
+      .forEach(el => el.classList.add("disabled"));
+  }
+}
 function goToAdmin() {
   window.location.href = "/admin";
 }
@@ -212,7 +233,7 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
 
     tbody.appendChild(tr);
     tbody.appendChild(editRow);
-
+    disableAdminControls();
   });
 
 
@@ -338,17 +359,17 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
   document.getElementById("nextPage").disabled = page >= totalPages;
 }
 
-  function saveVehicle() {
+function saveVehicle() {
 
-    const vehicleId = document.getElementById("vehicleId").value;
-  
-    if (vehicleId) {
-      updateVehicle();
-    } else {
-      addVehicle();
-    }
-  
+  const vehicleId = document.getElementById("vehicleId").value;
+
+  if (vehicleId) {
+    updateVehicle();
+  } else {
+    addVehicle();
   }
+
+}
 
 // ---------------------------
 // CLEAR SEARCH
@@ -468,7 +489,8 @@ async function addVehicle() {
   const license = document.getElementById("license1").value.trim();
   const toolCode = document.getElementById("toolCode1").value.trim();
   const status = document.getElementById("statusSelect1").value;
-  const unitcode=document.getElementById("unitcode").value;
+  const unitcode = document.getElementById("unitcode").value;
+  const available_for_service = document.getElementById("vehicleAvailable").checked;
 
   if (!license || !toolCode || !status) {
     return alert("Please enter all fields");
@@ -478,7 +500,7 @@ async function addVehicle() {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ license_number: license,unitcode, tool_code: toolCode, status })
+    body: JSON.stringify({ license_number: license, unitcode, tool_code: toolCode, status, available_for_service })
   });
   closeVehicleModal();
   clearForm();
@@ -500,11 +522,11 @@ async function updateVehicle() {
   const toolCode = document.getElementById("toolCode1").value.trim();
   const status = document.getElementById("statusSelect1").value;
   const available_for_service = document.getElementById("vehicleAvailable").checked;
-    await fetch(`${API}/vehicles/${vehicleId}`, {
+  await fetch(`${API}/vehicles/${vehicleId}`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ license_number: license,unitcode, tool_code: toolCode, status, available_for_service })
+    body: JSON.stringify({ license_number: license, unitcode, tool_code: toolCode, status, available_for_service })
   });
 
   closeVehicleModal();
@@ -545,6 +567,7 @@ function clearForm() {
 
 async function uploadExcel() {
   const fileInput = document.getElementById("excelFile");
+
   if (!fileInput.files.length) {
     alert("Please select an Excel file");
     return;
@@ -560,7 +583,11 @@ async function uploadExcel() {
       body: formData
     });
 
-    if (!res.ok) throw new Error("Upload failed");
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Upload failed");
+    }
 
     alert("Excel uploaded successfully!");
     refreshTable();
@@ -568,7 +595,41 @@ async function uploadExcel() {
 
   } catch (err) {
     console.error(err);
-    alert("Failed to upload Excel");
+    alert(err.message);
+  }
+} async function uploadExcel() {
+  const fileInput = document.getElementById("excelFile");
+  const excelFileName = document.getElementById("excelFileName");
+
+  if (!fileInput.files.length) {
+    alert("Please select an Excel file");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  try {
+    const res = await fetch(`${API}/upload_excel`, {
+      method: "POST",
+      credentials: "include",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Upload failed");
+    }
+
+    alert("Excel uploaded successfully!");
+    refreshTable();
+    fileInput.value = "";
+    excelFileName.textContent = "";
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
   }
 }
 
@@ -692,30 +753,30 @@ function closeVehicleModal() {
 async function openVehicleModal2(vehicleOrId = null) {
   const form = document.getElementById("vehicleForm1");
   if (form && typeof form.reset === "function") form.reset();
-    // The select element
-    const statusSelect = document.getElementById("statusSelect1");
+  // The select element
+  const statusSelect = document.getElementById("statusSelect1");
 
-    // Define all possible statuses
-    const allStatuses = ["פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר",
-      "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין",
-      "הופץ - לא תקין", "במוסך"]; // add more if needed
+  // Define all possible statuses
+  const allStatuses = ["פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר",
+    "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין",
+    "הופץ - לא תקין", "במוסך"]; // add more if needed
 
-    // Clear old options
-    statusSelect.innerHTML = "";
+  // Clear old options
+  statusSelect.innerHTML = "";
 
-    // Fill the select with all options
-    allStatuses.forEach(s => {
-      const option = document.createElement("option");
-      option.value = s;
-      option.textContent = s;
-      statusSelect.appendChild(option);
-    });
+  // Fill the select with all options
+  allStatuses.forEach(s => {
+    const option = document.createElement("option");
+    option.value = s;
+    option.textContent = s;
+    statusSelect.appendChild(option);
+  });
   let vehicle = null;
 
   // 1. If an object is passed, use it
   if (vehicleOrId && typeof vehicleOrId === "object") {
     vehicle = vehicleOrId;
-  } 
+  }
   // 2. If an ID is passed, find the vehicle
   else if (vehicleOrId) {
     console.log(vehicles)
@@ -724,7 +785,7 @@ async function openVehicleModal2(vehicleOrId = null) {
       console.error("Vehicle not found:", vehicleOrId);
       return;
     }
-  } 
+  }
   // 3. If nothing passed, do nothing
   else {
     console.warn("No vehicle or ID passed to openVehicleModal2");
@@ -737,8 +798,8 @@ async function openVehicleModal2(vehicleOrId = null) {
   document.getElementById("license1").value = vehicle.license_number || "";
   document.getElementById("toolCode1").value = vehicle.tool_code || "";
   // document.getElementById("statusSelect1").value = vehicle.status || "";
-   // Set the current vehicle status as selected
-   if (vehicle.status) {
+  // Set the current vehicle status as selected
+  if (vehicle.status) {
     // If the status is not in the predefined list, add it
     if (!allStatuses.includes(vehicle.status)) {
       const opt = document.createElement("option");
