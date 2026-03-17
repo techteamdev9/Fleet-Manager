@@ -76,6 +76,9 @@
     .container {
       max-width: 1200px;
       margin: auto;
+      margin-right: 260px;
+      /* space for sidebar */
+
     }
 
     .page-header {
@@ -117,7 +120,7 @@
       }
 
       button {
-        width: 100%;
+        /* width: 100%; */
         margin-top: 5px;
       }
 
@@ -233,34 +236,107 @@
     .file-name {
       font-style: italic;
     }
+
     .disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-    pointer-events: none;
-}
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* sidebar */
+    /* .sidebar {
+  width: 220px;
+  background: #224d8a;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+} */
+    .sidebar {
+      width: 220px;
+      background: #224d8a;
+      color: white;
+      padding: 20px;
+
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+
+      display: flex;
+      flex-direction: column;
+      /* buttons stacked */
+    }
+
+    .sidebar button {
+      background: #374151;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .sidebar button:hover {
+      background: #4b5563;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 15px;
+        position: static;
+      }
+      .edit-btn {
+        width: 100%;
+      }
+      .delete-btn {
+        width: 100%;
+      }
+      body{
+        padding: 5px;
+      }
+
+      .container {
+        margin-right: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+    }
+
+    body {
+      padding-top: 1px;
+      margin: 0px;
+    }
   </style>
 </head>
 
 <body>
 
   <div class="container">
-
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Admin</h2>
+      <button onclick="window.location.href='/dashboard'">Dashboard</button>
+      <button onclick="goToAdmin()">דוחות ותצוגה</button>
+      <button onclick="logout()">התנתקות</button>
+    </aside>
     <!-- Header -->
     <div class="page-header">
-      <h2>רשימת רכבים</h2>
-      <div>
+      <h2>ניהול רכבים</h2>
+      <!-- <div>
         <button onclick="window.location.href='/dashboard'">🏠 ראשי</button>
-        <button id="adminDashboardBtn" style="display:none;" onclick="goToAdmin()">📊 Admin</button>
+        <button id="adminDashboardBtn" style="display:none;" onclick="goToAdmin()">📊דוחות ותצוגה</button>
         <button onclick="logout()">🚪 התנתקות</button>
-      </div>
+      </div> -->
     </div>
 
-    <!-- Search Card -->
-    <div class="card">
-      <input id="search" placeholder="חפש רכב">
-      <button onclick="refreshTable()">חפש</button>
-      <button onclick="clearSearch()">נקה</button>
-    </div>
+   
 
     <!-- Excel Upload -->
     <div id="excelUploadSection" style="display:none; margin-top:10px;">
@@ -274,6 +350,12 @@
     <button class="btn btn-success admin-controls" id="newVehicleBtn" onclick="openVehicleModal()">
       <i class="fas fa-plus"></i> רכב חדש
     </button>
+     <!-- Search Card -->
+     <div class="card">
+      <input id="search" placeholder="חפש רכב">
+      <button onclick="refreshTable()">חפש</button>
+      <button onclick="clearSearch()">נקה</button>
+    </div>
     <!-- Table Card -->
     <div class="card table-wrapper">
       <table id="vehicleTable">
@@ -292,9 +374,9 @@
       </table>
     </div>
     <div class="pagination-container">
-      <button id="prevPage">« Previous</button>
+      <button id="prevPage">« הקודם</button>
       <span id="currentPage">1</span>
-      <button id="nextPage">Next »</button>
+      <button id="nextPage">הבא »</button>
     </div>
     <!-- Form Card -->
     <div class="card" id="vehicleForm">
@@ -339,7 +421,7 @@
           <option value="הופץ - תקין">הופץ - תקין</option>
           <option value="הופץ - לא תקין">הופץ - לא תקין</option>
           <option value="במוסך">במוסך</option>
-        
+
         </select>
         <br>
         <label>קוד יחידה</label>

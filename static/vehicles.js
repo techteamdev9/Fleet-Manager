@@ -32,7 +32,7 @@ let statuses = [
 document.addEventListener("DOMContentLoaded", () => {
   // Show admin dashboard button only for admins
   if (currentUser && currentUser.role === "admin") {
-    document.getElementById("adminDashboardBtn").style.display = "inline-block";
+    // document.getElementById("adminDashboardBtn").style.display = "inline-block";
   }
   const excelInput = document.getElementById("excelFile");
   const excelFileName = document.getElementById("excelFileName");
@@ -221,7 +221,7 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
       });
 
       // show this one
-      editRow.style.display = "table-row";
+      // editRow.style.display = "table-row";
 
       // existing behavior
       document.getElementById("license").value = v.license_number;

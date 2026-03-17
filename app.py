@@ -9,8 +9,8 @@ import time
 
 # ---------------- CONFIG ----------------
 #just for local
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 
