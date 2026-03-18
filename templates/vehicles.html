@@ -290,13 +290,16 @@
         padding: 15px;
         position: static;
       }
+
       .edit-btn {
         width: 100%;
       }
+
       .delete-btn {
         width: 100%;
       }
-      body{
+
+      body {
         padding: 5px;
       }
 
@@ -313,6 +316,88 @@
       padding-top: 1px;
       margin: 0px;
     }
+    /* Outer box */
+.upload-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 10px;
+  background: #f9fafb;
+}
+
+/* Keep file + name in one row */
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Hide default ugly input */
+.file-upload-wrapper input[type="file"] {
+  display: none;
+}
+
+/* Styled button */
+.file-upload-label {
+  background: #224d8a;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* File name */
+#excelFileName {
+  font-weight: bold;
+}
+
+/* Upload button */
+.upload-btn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+/* hide remove button by default */
+.remove-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* optional spacing */
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.upload-box {
+  direction: rtl;
+}
+/* small screens */
+@media (max-width: 768px) {
+  .file-upload-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #excelFileName {
+    margin-top: 5px;
+  }
+
+  .remove-btn {
+    margin-top: 5px;
+  }
+}
   </style>
 </head>
 
@@ -336,22 +421,22 @@
       </div> -->
     </div>
 
-   
+
 
     <!-- Excel Upload -->
-    <div id="excelUploadSection" style="display:none; margin-top:10px;">
+    <!-- <div id="excelUploadSection" style="display:none; margin-top:10px;">
       <button onclick="uploadExcel()">העלאת קובץ</button>
       <div class="file-upload-wrapper">
         <input type="file" id="excelFile" accept=".xlsx,.xls">
         <label for="excelFile" class="file-upload-label">בחר קובץ</label>
         <span id="excelFileName" style="margin-left:10px; font-weight: bold;"></span>
       </div>
-    </div>
+    </div> -->
     <button class="btn btn-success admin-controls" id="newVehicleBtn" onclick="openVehicleModal()">
-      <i class="fas fa-plus"></i> רכב חדש
+      <i class="fas fa-plus"></i> הוספת רכבים
     </button>
-     <!-- Search Card -->
-     <div class="card">
+    <!-- Search Card -->
+    <div class="card">
       <input id="search" placeholder="חפש רכב">
       <button onclick="refreshTable()">חפש</button>
       <button onclick="clearSearch()">נקה</button>
@@ -361,10 +446,10 @@
       <table id="vehicleTable">
         <thead>
           <tr>
-            <th>מזהה</th>
+            <!-- <th>מזהה</th> -->
             <th>מספר רישוי</th>
             <th>קוד כלי</th>
-            <th>קוד-יח</th>
+            <!-- <th>קוד-יח</th> -->
             <th>סטטוס</th>
             <th>זמינות</th>
             <th>פעולות</th>
@@ -437,6 +522,22 @@
       <div class="modal-actions">
         <button type="button" onclick="saveVehicle()">שמור</button>
         <button type="button" onclick="closeVehicleModal()">ביטול</button>
+        <!-- Excel Upload -->
+        <div id="excelUploadSection" class="upload-box">
+
+          <div class="file-upload-wrapper">
+            <input type="file" id="excelFile" accept=".xlsx,.xls">
+            
+            <label for="excelFile" class="file-upload-label">בחר קובץ</label>
+            
+            <span id="excelFileName"></span>
+            
+            <button type="button" id="removeFileBtn" class="remove-btn">הסר</button>
+          </div>
+        
+          <button class="upload-btn" onclick="uploadExcel()">העלאת קובץ</button>
+        
+        </div>
       </div>
 
     </div>

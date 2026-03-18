@@ -286,7 +286,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     // Load stats and vehicles
     await loadTodayStats();  // today & previous stats
     updateCharts();          // charts
-    // await loadVehicles();    // vehicles table with colors
+    await loadVehicles();    // vehicles table with colors
   } catch (err) {
     console.error("Error initializing dashboard:", err);
   }

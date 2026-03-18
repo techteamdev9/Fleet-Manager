@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   const excelInput = document.getElementById("excelFile");
   const excelFileName = document.getElementById("excelFileName");
-
+  const removeFileBtn = document.getElementById("removeFileBtn");
   excelInput.addEventListener("change", function () {
     if (excelInput.files.length > 0) {
       let name = excelInput.files[0].name;
@@ -47,9 +47,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       excelFileName.textContent = name;
+      removeFileBtn.style.display = "inline-block"; 
     } else {
       excelFileName.textContent = ""; // no file selected
+      removeFileBtn.style.display = "none"; 
     }
+  });
+  removeFileBtn.addEventListener("click", function () {
+    excelInput.value = "";
+    excelFileName.textContent = "";
+    removeFileBtn.style.display = "none";
   });
   setupPage();
   refreshTable();
@@ -135,6 +142,8 @@ async function refreshTable(page = 1) {
         (v.license_number || "").toLowerCase().includes(searchValue) ||
         (v.tool_code || "").toLowerCase().includes(searchValue) ||
         (v.status || "").toLowerCase().includes(searchValue) ||
+        (v.unitcode || "").toLowerCase().includes(searchValue) ||
+
         availableText.toLowerCase().includes(searchValue)
       );
     });
@@ -162,12 +171,12 @@ async function refreshTable(page = 1) {
 
     const availableText = v.available_for_service ? "ניתן לגיוס" : "לא ניתן לגיוס";
     const color = v.available_for_service ? "green" : "red";
+// <td>${v.id}</td>
+//      <td>${v.unitcode || ""}</td>
 
     tr.innerHTML = `
-      <td>${v.id}</td>
       <td>${v.license_number}</td>
       <td>${v.tool_code}</td>
-      <td>${v.unitcode || ""}</td>
       <td>${v.status}</td>
       <td style="color:${color}; font-weight:bold;">
         ${availableText}
@@ -250,7 +259,7 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
     if (form && typeof form.reset === "function") form.reset();
 
     document.getElementById("vehicleId").value = "";
-    document.getElementById("vehicleModalTitle").textContent = "רכב חדש";
+    document.getElementById("vehicleModalTitle").textContent = "הוספת רכב ידנית או העלאת קובץ אקסל";
 
     // The select element
     const statusSelect = document.getElementById("statusSelect1");
@@ -588,7 +597,7 @@ async function uploadExcel() {
     if (!res.ok) {
       throw new Error(data.error || "Upload failed");
     }
-
+    closeVehicleModal();
     alert("Excel uploaded successfully!");
     refreshTable();
     fileInput.value = "";
@@ -722,8 +731,8 @@ function openVehicleModal(vehicle = null) {
   if (form && typeof form.reset === "function") form.reset();
 
   document.getElementById("vehicleId").value = "";
-  document.getElementById("vehicleModalTitle").textContent = "רכב חדש";
-
+  document.getElementById("vehicleModalTitle").textContent = "הוספת רכב ידנית או העלאת קובץ אקסל";
+  document.getElementById('excelUploadSection').style.display='block';
   if (vehicle) {
     document.getElementById("vehicleId").value = vehicle.id;
     document.getElementById("license").value = vehicle.license_number || "";
@@ -739,7 +748,7 @@ function openVehicleModal(vehicle = null) {
 
 function closeVehicleModal() {
   const form = document.getElementById("vehicleForm1");
-
+ 
   if (form) {
     form.reset(); // clears all inputs
   }
@@ -748,6 +757,12 @@ function closeVehicleModal() {
   document.getElementById("vehicleId").value = "";
 
   document.getElementById("vehicleModalOverlay").style.display = "none";
+   const excelInput = document.getElementById("excelFile");
+  const excelFileName = document.getElementById("excelFileName");
+  const removeFileBtn = document.getElementById("removeFileBtn");
+  excelInput.value = "";
+  excelFileName.textContent = "";
+  removeFileBtn.style.display = "none";
 }
 
 async function openVehicleModal2(vehicleOrId = null) {
@@ -755,7 +770,7 @@ async function openVehicleModal2(vehicleOrId = null) {
   if (form && typeof form.reset === "function") form.reset();
   // The select element
   const statusSelect = document.getElementById("statusSelect1");
-
+document.getElementById('excelUploadSection').style.display='none';
   // Define all possible statuses
   const allStatuses = ["פעיל", "נמכר", "הוצא משימוש", "גויס", "שוחרר",
     "בדרך לשחרור", "נופק", "זיכוי", "הופץ - תקין",
@@ -820,6 +835,25 @@ function clearVehicleForm() {
   const form = document.getElementById("vehicleForm1");
   if (form) form.reset();
 }
+
+const fileInput = document.getElementById("excelFile");
+const fileName = document.getElementById("excelFileName");
+const removeBtn = document.getElementById("removeFileBtn");
+
+// // When selecting file
+// fileInput.addEventListener("change", function () {
+//   if (this.files.length > 0) {
+//     fileName.textContent = this.files[0].name;
+//     removeBtn.style.display = "inline-block";
+//   }
+// });
+
+// When clicking "הסר"
+removeBtn.addEventListener("click", function () {
+  fileInput.value = "";          // clear file
+  fileName.textContent = "";     // remove name
+  removeBtn.style.display = "none"; // hide button
+});
 
 // Initialize after table loads
 window.addEventListener("load", () => showPageVehicles(1));
