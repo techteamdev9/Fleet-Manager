@@ -136,7 +136,7 @@ async function refreshTable(page = 1) {
   // 🔹 Filter if search value
   if (searchValue) {
     vehicles = vehicles.filter(v => {
-      const availableText = v.available_for_service ? "ניתן לגיוס" : "לא ניתן לגיוס";
+      const availableText = v.available_for_service ? "ניתן לגיוס" : "לא ניתן";
       return (
         (v.id + "").includes(searchValue) ||
         (v.license_number || "").toLowerCase().includes(searchValue) ||
@@ -530,12 +530,13 @@ async function updateVehicle() {
   const unitcode = document.getElementById("unitcode").value.trim();
   const toolCode = document.getElementById("toolCode1").value.trim();
   const status = document.getElementById("statusSelect1").value;
+  const vehicleType=document.getElementById("vehicleType").value;
   const available_for_service = document.getElementById("vehicleAvailable").checked;
   await fetch(`${API}/vehicles/${vehicleId}`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ license_number: license, unitcode, tool_code: toolCode, status, available_for_service })
+    body: JSON.stringify({ license_number: license, unitcode, tool_code: toolCode, status,vehicle_type: vehicleType, available_for_service })
   });
 
   closeVehicleModal();

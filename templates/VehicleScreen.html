@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vehicle Selection</title>
+  <link rel="stylesheet" href="/static/css/VehicleScreen.css" />
+  <style>
+    /* wrapper for horizontal scroll on small screens */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+/* table base */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: system-ui, -apple-system, Arial, sans-serif;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* header */
+thead {
+  background: #1f2937;
+  color: #fff;
+}
+
+th {
+  padding: 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+}
+
+/* cells */
+td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* zebra rows */
+tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+/* hover */
+tbody tr:hover {
+  background: #eef6ff;
+  transition: 0.2s;
+}
+
+/* smooth edges */
+table, th, td {
+  border: none;
+}
+
+/* responsive scroll hint */
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+
+  /* Make horizontal scroll start from the right */
+  direction: rtl;
+}
+
+/* Keep table normal LTR inside so text aligns correctly */
+.table-wrapper table {
+  direction: ltr;   /* table content stays left-to-right */
+  text-align: left; /* optional: aligns text inside cells */
+}
+.card {
+  color: white;
+  font-weight: bold;
+}
+  </style>
+</head>
+<body>
+
+  <div id="app"></div>
+
+  <script src="/static/VehicleScreen.js"></script>
+</body>
+</html>

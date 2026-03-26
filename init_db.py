@@ -64,6 +64,6 @@ CREATE TABLE IF NOT EXISTS vehicles (
     if cur.fetchone()[0] == 0:
         cur.execute("INSERT INTO users (username, password, role, permission_id) VALUES (%s, %s, %s, %s)",
                     ("user", "user123", "user", 2))  # i changed this: MySQL %s placeholders
-
+    
     conn.commit()
     conn.close()

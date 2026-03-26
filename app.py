@@ -106,6 +106,7 @@ def init_db():
     ADD COLUMN IF NOT EXISTS available_for_service BOOLEAN DEFAULT TRUE;
     """)
 
+
     # ✅ Ensure old rows are TRUE (ניתן לגיוס)
     cur.execute("""
     UPDATE vehicles
@@ -137,6 +138,24 @@ def init_db():
     conn.close()
 
 
+def init_db():
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+    ALTER TABLE vehicles
+    ADD COLUMN IF NOT EXISTS category VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS owner_type VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
+    """)  
+
+    conn.commit()
+    conn.close()
+
+   
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
 #init_db() #for manual init
@@ -238,7 +257,20 @@ def get_vehicles():
 
     # ---- NO FILTERS ----
     else:
-        cur.execute("SELECT * FROM vehicles ORDER BY id ASC")
+        cur.execute("""
+            SELECT   id,
+            license_number,
+            tool_code,
+            status,
+            available_for_service,
+            unitcode,
+            category,
+            vehicle_type,
+            sub_type,
+            owner_type,
+            lease_name,
+            images FROM vehicles ORDER BY id ASC
+        """)
 
     rows = cur.fetchall()
     conn.close()
@@ -296,6 +328,7 @@ def update_vehicle(id):
         tool_code = %s,
         unitcode = %s,
         status = %s,
+        vehicle_type = %s,
         available_for_service = %s
     WHERE id = %s
     """, (
@@ -303,6 +336,7 @@ def update_vehicle(id):
     data["tool_code"],
     data["unitcode"],
     data["status"],
+    data["vehicle_type"],
     available,
     id
     ))
@@ -444,7 +478,11 @@ def admin_dashboard():
 
 @app.route("/vehicles-page")
 def vehicles_page():
-    return render_template("vehicles.html")
+    return render_template("vehicles.html")  # "vehicles.html"
+
+@app.route("/vehicles-page1")
+def vehicles_page1():
+    return render_template("VehicleScreen.html")  # "vehicles.html" 
 
 @app.route("/vehicles-stats")
 def vehicles_stats():

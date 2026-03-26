@@ -1,0 +1,34 @@
+body {
+    font-family: Arial;
+    padding: 20px;
+  }
+  
+  .grid {
+    display: grid;
+    /* grid-template-columns: ifr; */
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 12px;
+  }
+  
+  .card {
+    height: 120px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  button {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
