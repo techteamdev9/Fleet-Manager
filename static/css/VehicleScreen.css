@@ -5,22 +5,29 @@ body {
   
   .grid {
     display: grid;
-    /* grid-template-columns: ifr; */
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    direction: rtl;
   }
   
   .card {
-    height: 120px;
+    height: 240px;
     border-radius: 16px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    font-size: 22px;
     color: white;
     cursor: pointer;
     transition: 0.2s;
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding-top: 50px; /* Space for the label */
+    padding-bottom: 10px;
   }
   
   .card:hover {
