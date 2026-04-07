@@ -813,6 +813,7 @@ document.getElementById('excelUploadSection').style.display='none';
   document.getElementById("unitcode").value = vehicle.unitcode || "";
   document.getElementById("license1").value = vehicle.license_number || "";
   document.getElementById("toolCode1").value = vehicle.tool_code || "";
+  document.getElementById("vehicleType").value=vehicle.vehicle_type || "";
   // document.getElementById("statusSelect1").value = vehicle.status || "";
   // Set the current vehicle status as selected
   if (vehicle.status) {

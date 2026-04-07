@@ -87,10 +87,199 @@ table, th, td {
   color: white;
   font-weight: bold;
 }
+/* 650 */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  margin: 40px auto;
+  width: 80%;
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+textarea {
+  width: 200px;
+}
   </style>
 </head>
 <body>
-
+  <button onclick="history.back()" style="padding:10px 15px; cursor:pointer;">
+    ⬅ Back to Vehicles
+  </button>
+  <button onclick="openForm()">Open Form 650</button>
+  <div id="formModal" class="modal">
+    <div class="modal-content">
+  
+      <h2>Form 650 - ID: <span id="formId"></span></h2>
+  
+      <!-- Event -->
+      <div class="row">
+        <label>Event</label>
+        <select id="eventType">
+          <option>גיוס הרכב</option>
+          <option>זיכוי מיחידת הסמך</option>
+          <option>שחרור לבעלים</option>
+        </select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Vehicle -->
+      <div class="row">
+        <label>Vehicle Type</label>
+        <input type="text" id="vehicleType">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <div class="row">
+        <label>Vehicle Number</label>
+        <input type="text" id="vehicleNumber">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Date -->
+      <div class="row">
+        <label>Date</label>
+        <input type="date" id="date">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Location -->
+      <div class="row">
+        <label>Location</label>
+        <select id="location"></select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Owner -->
+      <div class="row">
+        <label>Owner Name</label>
+        <input type="text">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <div class="row">
+        <label>Owner ID</label>
+        <input type="text">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <div class="row">
+        <label>Owner Phone</label>
+        <input type="text">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Licence -->
+      <div class="row">
+        <label>Licence Status</label>
+        <select>
+          <option>תקין</option>
+          <option>לא תקין</option>
+        </select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Fuel -->
+      <div class="row">
+        <label>Fuel</label>
+        <select>
+          <option>מלא</option>
+          <option>חצי</option>
+          <option>ריק</option>
+        </select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Checklist -->
+      <h3>Checklist</h3>
+      <div id="checklist"></div>
+  
+      <!-- Lights -->
+      <div class="row">
+        <label>פנסים</label>
+        <select>
+          <option>תקין</option>
+          <option>לא תקין</option>
+        </select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Tires -->
+      <div class="row">
+        <label>צמיגים</label>
+        <select>
+          <option>תקין</option>
+          <option>לא תקין</option>
+        </select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Damage -->
+      <div class="row">
+        <label>נזקים בפח</label>
+        <textarea></textarea>
+        <input type="file" multiple>
+      </div>
+  
+      <div class="row">
+        <label>נזקים מכניים</label>
+        <textarea></textarea>
+      </div>
+  
+      <!-- Assessor -->
+      <div class="row">
+        <label>המלצת שמאי</label>
+        <select>
+          <option>הרכב כשיר לקבלה</option>
+          <option>לא כשיר לקבלה</option>
+          <option>הרכב כשיר לזיכוי</option>
+          <option>הרכב לא כשיר לזיכוי</option>
+          <option>שחרור</option>
+        </select>
+        <textarea placeholder="הערות"></textarea>
+      </div>
+  
+      <!-- Signatures -->
+      <h3>Signatures</h3>
+  
+      <div class="row">
+        <label>Documenting Person ID</label>
+        <input type="text">
+      </div>
+  
+      <div class="row">
+        <label>Releasing Signature</label>
+        <input type="text">
+      </div>
+  
+      <div class="row">
+        <label>Unit Representative</label>
+        <input type="text">
+      </div>
+  
+      <button onclick="submitForm()">Submit</button>
+      <button onclick="closeForm()">Close</button>
+      <div style="margin-top: 20px;">
+        <button id="openNextForm">ניפוק וקבלת רכב</button>
+      </div>
+    </div>
+  </div>
   <div id="app"></div>
 
   <script src="/static/VehicleScreen.js"></script>

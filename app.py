@@ -872,6 +872,15 @@ def update_user(user_id):
     conn.close()
     return jsonify({"message": "User updated"})
 
+###########650###########################
+# @app.route("/submit650", methods=["POST"])
+# def submit_650():
+#     data = request.json
+#     print(data)
+#     return {"status": "ok"}
+@app.route("/form650")
+def form650():
+    return render_template("form650.html")
 
 @app.route("/users/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
