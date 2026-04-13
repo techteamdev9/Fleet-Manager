@@ -89,6 +89,7 @@ table, th, td {
 }
 /* 650 */
 .modal {
+  direction: rtl;
   display: none;
   position: fixed;
   top: 0;
@@ -96,6 +97,7 @@ table, th, td {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.5);
+  z-index: 9999;
 }
 
 .modal-content {
@@ -115,6 +117,27 @@ table, th, td {
 
 textarea {
   width: 200px;
+}
+
+.issue-modal {
+  direction: rtl;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000; /* slightly higher */
+}
+
+.issue-modal-content {
+  background: white;
+  padding: 20px;
+  margin: 40px auto;
+  width: 80%;
+  max-height: 90%;
+  overflow-y: auto;
 }
   </style>
 </head>
@@ -276,8 +299,66 @@ textarea {
       <button onclick="submitForm()">Submit</button>
       <button onclick="closeForm()">Close</button>
       <div style="margin-top: 20px;">
-        <button id="openNextForm">ניפוק וקבלת רכב</button>
+        <button id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
       </div>
+    </div>
+  </div>
+
+  <div id="issueModal" class="issue-modal">
+    <div class="issue-modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+  
+      <h2>ניפוק וקבלה - רכב</h2>
+  
+      <!-- Top inputs -->
+      <input type="text" id="issuing_unit" placeholder="יח מנפקת">
+      <input type="text" id="receiving_unit" placeholder="יח מקבלת">
+  
+      <!-- 6 fields -->
+      <input type="text" placeholder="קדומת מרץ">
+      <input type="number" placeholder="סוג תנועה">
+      <input type="text" placeholder="reciever unit Representative">
+      <input type="text" placeholder="accept unit Representative">
+      <input type="date">
+      <input type="number" placeholder="voucher number">
+  
+      <!-- Dynamic rows -->
+      <h3>ציוד</h3>
+      <div id="itemsContainer"></div>
+      <button type="button" onclick="addRow()">➕</button>
+  
+      <!-- Accessories -->
+      <h3>פירוט אביזרים/ציוד נלווה</h3>
+      <div id="accessories"></div>
+  
+      <!-- Signatures -->
+      <div class="signatures">
+        <div>
+          <h4>אשור יח מנפקת</h4>
+        
+          <input id="issuer_signature" type="text" placeholder="חתימה">
+          <input id="issuer_id" type="number" placeholder="תעודת זהות">
+          <input id="issuer_rank" type="text" placeholder="דרגה">
+          <input id="issuer_fullname" type="text" placeholder="שם מלא">
+        </div>
+  
+        <div>
+          <h4>אשור יח מקבלת</h4>
+        
+          <input id="receiver_id" type="number" placeholder="תעודת זהות">
+          <input id="receiver_rank" type="text" placeholder="דרגה">
+          <input id="receiver_fullname" type="text" placeholder="שם מלא">
+          <input id="receiver_role" type="text" placeholder="תפקיד">
+          <input id="receiver_signature" type="text" placeholder="חתימה">
+          <input id="receiver_date" type="date">
+          <input id="receiver_form_1006" type="number" placeholder="מספר ט 1006">
+        </div>
+      </div>
+  
+      <label>
+        <input type="checkbox"> אבזרים כמפורש ב-ט 650
+      </label>
+      <button type="button" onclick="submitIssueForm()">שמור</button>
     </div>
   </div>
   <div id="app"></div>

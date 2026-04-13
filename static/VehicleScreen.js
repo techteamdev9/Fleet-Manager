@@ -168,7 +168,25 @@ function closeForm() {
 }
 
 function submitForm() {
-  alert("Form submitted (connect to backend next)");
+  const data = {
+    event_type: document.getElementById("eventType").value,
+    vehicle_type: document.getElementById("vehicleType").value,
+    vehicle_number: document.getElementById("vehicleNumber").value,
+    date: document.getElementById("date").value,
+    location: document.getElementById("location").value
+  };
+
+  fetch("/save-form-650", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Form 650 saved");
+    console.log(data)
+    closeForm();
+  });
 }
 document.getElementById("openNextForm").addEventListener("click", function() {
   // Get the vehicle number (or ID) from the form
@@ -180,6 +198,145 @@ document.getElementById("openNextForm").addEventListener("click", function() {
   // Future: redirect to the next form page with vehicle ID
   // window.location.href = `/nextForm?vehicleId=${vehicleNumber}`;
 });
+function openModal() {
+  document.getElementById("issueModal").style.display = "block";
+
+  // 👇 get vehicle license from first form
+  // const vehicleId = document.getElementById("license_number").value;
+
+  // store globally for rows
+  window.currentVehicleId = vehicleId;
+  rowIndex = 1;
+
+  // reset rows and add first one
+  document.getElementById("itemsContainer").innerHTML = "";
+  addRow();
+}
+function closeModal() {
+  document.getElementById("issueModal").style.display = "none";
+}
+let rowIndex = 1;
+
+function addRow() {
+  const container = document.getElementById("itemsContainer");
+
+  const row = document.createElement("div");
+
+  row.innerHTML = `
+    <input type="number" value="${rowIndex}" readonly>
+    <input type="text" placeholder="סוג ציוד">
+    <input type="text" placeholder="מספר קטלוגי">
+    <input type="text" placeholder="מספר רישוי">
+  `;
+  // <input type="text" value="${window.currentVehicleId || ''}" placeholder="מספר רישוי">
+
+  container.appendChild(row);
+  rowIndex++;
+}
+const accessoriesList = [
+  "מגבה מכני/הדראולי",
+  "ידית למגבה",
+  "מפתח גלגלים",
+  "מטף כיבוי אש",
+  "משולש אזהרה",
+  "רדיו/טייפ",
+  "מע מיזוג אוויר",
+  "חגורות ביטחון",
+  "מראות פנימיות",
+  "מראות חיצוניות",
+  "מגבים",
+  "מק",
+  "גלגל רזרבי",
+  "כיסוי לרכב(ברזנט)",
+  "סולמות"
+];
+
+const container = document.getElementById("accessories");
+
+accessoriesList.forEach(item => {
+  const div = document.createElement("div");
+
+  div.innerHTML = `
+    <label>${item}</label>
+    <input type="number" min="0" value="0">
+  `;
+
+  container.appendChild(div);
+});
+
+function submitIssueForm() {
+  const data = {
+    issuing_unit: document.getElementById("issuing_unit").value,
+    receiving_unit: document.getElementById("receiving_unit").value,
+    vehicle_number: window.currentVehicleId,
+
+    // vehicle_id: window.currentVehicleId,
+    items: [],
+    accessories: [],
+    signatures: {
+      issuer: {
+        signature: document.getElementById("issuer_signature").value,
+        id: document.getElementById("issuer_id").value,
+        rank: document.getElementById("issuer_rank").value,
+        full_name: document.getElementById("issuer_fullname").value
+      },
+    
+      receiver: {
+        id: document.getElementById("receiver_id").value,
+        rank: document.getElementById("receiver_rank").value,
+        full_name: document.getElementById("receiver_fullname").value,
+        role: document.getElementById("receiver_role").value,
+        signature: document.getElementById("receiver_signature").value,
+        date: document.getElementById("receiver_date").value,
+        form_1006: document.getElementById("receiver_form_1006").value
+      }
+    }
+  };
+
+  // collect rows
+  const rows = document.querySelectorAll("#itemsContainer div");
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll("input");
+
+    data.items.push({
+      line: inputs[0].value,
+      type: inputs[1].value,
+      catalog: inputs[2].value,
+      license: inputs[3].value
+
+    });
+  });
+
+  // collect accessories
+  const acc = document.querySelectorAll("#accessories div");
+  acc.forEach(div => {
+    const label = div.querySelector("label").innerText;
+    const value = div.querySelector("input").value;
+
+    data.accessories.push({
+      name: label,
+      amount: value
+    });
+  });
+  console.log("DATA SENT:", data);
+  fetch("/save-issuing-form", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(result => {
+    alert("נשמר בהצלחה");
+    closeModal();
+  })
+  .catch(err => {
+    console.error(err);
+  });
+  console.log(data); 
+}
+
 function render() {
   app.innerHTML = "";
 

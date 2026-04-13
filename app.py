@@ -6,14 +6,14 @@ from datetime import datetime, timedelta
 import pandas as pd
 import os
 import time
-
+import json
 # ---------------- CONFIG ----------------
 #just for local
-# from dotenv import load_dotenv
-# load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
-
+print("🔵 CONNECTING TO DB:", DATABASE_URL)
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = os.getenv("SECRET_KEY") or "devsecret"
@@ -151,6 +151,50 @@ def init_db():
     ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
     ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
     """)  
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS form_650 (
+       id SERIAL PRIMARY KEY,
+       event_type TEXT,
+       vehicle_type TEXT,
+       vehicle_number TEXT,
+       date DATE,
+       location TEXT,
+       owner_name TEXT,
+       owner_id TEXT,
+       owner_phone TEXT,
+       licence_status TEXT,
+       fuel TEXT,
+       checklist JSONB,
+       lights TEXT,
+       tires TEXT,
+       damage_physical TEXT,
+       damage_mechanical TEXT,
+       assessor TEXT,
+       document_person_id TEXT,
+       releasing_signature TEXT,
+       unit_rep TEXT,
+       created_at TIMESTAMP DEFAULT NOW()
+    );
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS issuing_forms (
+        id SERIAL PRIMARY KEY,
+
+        vehicle_number TEXT,
+
+        issuing_unit TEXT,
+        receiving_unit TEXT,
+
+        items JSONB,
+        accessories JSONB,
+        signatures JSONB,
+
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+    """)
+
 
     conn.commit()
     conn.close()
@@ -881,6 +925,99 @@ def update_user(user_id):
 @app.route("/form650")
 def form650():
     return render_template("form650.html")
+
+@app.route("/save-form-650", methods=["POST"])
+def save_form_650():
+
+    data = request.json
+
+   
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO form_650 (
+            event_type,
+            vehicle_type,
+            vehicle_number,
+            date,
+            location
+        )
+        VALUES (%s,%s,%s,%s,%s)
+    """, (
+        data["event_type"],
+        data["vehicle_type"],
+        data["vehicle_number"],
+        data["date"],
+        data["location"]
+    ))
+
+    conn.commit()
+
+  
+    cur.close()
+    conn.close()
+
+    return jsonify({"status": "ok"})
+    #test forms db
+@app.route("/test-db")
+def test_db():
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM form_650 LIMIT 1;")
+    return {"status": "ok"}
+
+@app.route("/save-issuing-form", methods=["POST"])
+def save_issuing():
+    conn = connect()
+    cur = conn.cursor()
+    data = request.json
+#  vehicle_number,
+    cur.execute("""
+        INSERT INTO issuing_forms (
+
+            issuing_unit,
+            receiving_unit,
+            items,
+            accessories,
+            signatures
+        )
+        VALUES (%s,%s,%s,%s,%s)
+    """, (
+        # data["vehicle_number"],
+        data["issuing_unit"],
+        data["receiving_unit"],
+        json.dumps(data["items"]),
+        json.dumps(data["accessories"]),
+        json.dumps(data["signatures"])
+    ))
+
+    conn.commit()
+    conn.close()
+    print(data)
+    return jsonify({"status": "ok"})
+
+
+@app.route("/get-forms-650")
+def get_forms_650():
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM form_650 ORDER BY id DESC;")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return {"data": rows}
+# @app.route("/save-issue-form", methods=["POST"])
+# def save_issue_form():
+#     data = request.get_json()
+
+#     print(data)  # test first
+
+#     return jsonify({"status": "ok"})
 
 @app.route("/users/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
