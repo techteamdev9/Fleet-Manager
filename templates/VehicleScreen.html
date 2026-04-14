@@ -139,15 +139,51 @@ textarea {
   max-height: 90%;
   overflow-y: auto;
 }
+
+.main-btn {
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 10px;
+}
+
+/* Primary button */
+.main-btn.primary {
+    background: #2563eb; /* blue */
+    color: white;
+}
+
+/* Secondary button */
+.main-btn.secondary {
+    background: #10b981; /* green */
+    color: white;
+}
+
+/* Hover effects */
+.main-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* Click effect */
+.main-btn:active {
+    transform: scale(0.97);
+}
   </style>
 </head>
 <body>
   <button onclick="history.back()" style="padding:10px 15px; cursor:pointer;">
     ⬅ Back to Vehicles
   </button>
-  <button onclick="openForm()">Open Form 650</button>
+  <button class="main-btn primary" onclick="openForm()">Open Form 650</button>
+  <button  class="main-btn secondary" id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
   <div id="formModal" class="modal">
     <div class="modal-content">
+      <button onclick="closeForm()">✕</button>
   
       <h2>Form 650 - ID: <span id="formId"></span></h2>
   
@@ -306,7 +342,7 @@ textarea {
 
   <div id="issueModal" class="issue-modal">
     <div class="issue-modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
+      <button onclick="closeModal()">✕</button>
   
       <h2>ניפוק וקבלה - רכב</h2>
   
@@ -319,7 +355,11 @@ textarea {
       <input type="number" placeholder="סוג תנועה">
       <input type="text" placeholder="reciever unit Representative">
       <input type="text" placeholder="accept unit Representative">
-      <input type="date">
+      <br>
+      <label class="inline-date">
+        תאריך ניפוק:
+        <input type="date">
+    </label>
       <input type="number" placeholder="voucher number">
   
       <!-- Dynamic rows -->
@@ -350,7 +390,7 @@ textarea {
           <input id="receiver_fullname" type="text" placeholder="שם מלא">
           <input id="receiver_role" type="text" placeholder="תפקיד">
           <input id="receiver_signature" type="text" placeholder="חתימה">
-          <input id="receiver_date" type="date">
+          <label>תאריך: <input id="receiver_date" type="date"></label>
           <input id="receiver_form_1006" type="number" placeholder="מספר ט 1006">
         </div>
       </div>

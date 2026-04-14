@@ -221,17 +221,23 @@ function addRow() {
   const container = document.getElementById("itemsContainer");
 
   const row = document.createElement("div");
+  row.classList.add("item-row");
 
   row.innerHTML = `
     <input type="number" value="${rowIndex}" readonly>
     <input type="text" placeholder="סוג ציוד">
     <input type="text" placeholder="מספר קטלוגי">
     <input type="text" placeholder="מספר רישוי">
+
+    <button type="button" class="remove-btn" onclick="removeRow(this)">➖</button>
   `;
-  // <input type="text" value="${window.currentVehicleId || ''}" placeholder="מספר רישוי">
 
   container.appendChild(row);
   rowIndex++;
+}
+function removeRow(button) {
+  const row = button.parentElement;
+  row.remove();
 }
 const accessoriesList = [
   "מגבה מכני/הדראולי",
