@@ -96,12 +96,26 @@ async function getVehicles() {
   render(); //  render AFTER data loads
 }
 
+// function getVehiclesByType(typeId, subTypeId = null) {
+//   if (selectedCategory === "1" && subTypeId) {
+//     // For Leasing: filter by Company (lease_name) and Sub-Type (vehicle_type)
+//     return vehiclesData.filter(v => v.lease_name === typeId && v.vehicle_type === subTypeId);
+//   }
+//   return vehiclesData.filter(v => v.vehicle_type === typeId);
+// }
 function getVehiclesByType(typeId, subTypeId = null) {
   if (selectedCategory === "1" && subTypeId) {
-    // For Leasing: filter by Company (lease_name) and Sub-Type (vehicle_type)
-    return vehiclesData.filter(v => v.lease_name === typeId && v.vehicle_type === subTypeId);
+    return vehiclesData.filter(v =>
+      v.lease_name === typeId &&
+      v.vehicle_type === subTypeId &&
+      (!selectedUnit || v.unitcode == selectedUnit) // 👈 added
+    );
   }
-  return vehiclesData.filter(v => v.vehicle_type === typeId);
+
+  return vehiclesData.filter(v =>
+    v.vehicle_type === typeId &&
+    (!selectedUnit || v.unitcode == selectedUnit) // 👈 added
+  );
 }
 
 let selectedCategory = null;
@@ -343,6 +357,23 @@ function submitIssueForm() {
   console.log(data); 
 }
 
+// select unit
+let selectedUnit = "";
+
+function filterVehicles() {
+  const select = document.getElementById("unitSelect");
+  selectedUnit = select.value;
+
+  console.log("Selected unit:", selectedUnit);
+  render(); 
+  
+  // later: filter table here
+}
+function refreshVehiclesTable() {
+  const vehicles = getVehiclesByType(selectedType, selectedSubType);
+  renderVehiclesTable(vehicles);
+}
+
 function render() {
   app.innerHTML = "";
 
@@ -547,6 +578,7 @@ function render() {
   };
 
   app.appendChild(backBtn);
+
 
   const filteredVehicles = getVehiclesByType(selectedType, selectedSubType);
 
