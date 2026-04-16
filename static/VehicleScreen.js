@@ -655,7 +655,7 @@ function render() {
       if (headersMap[key]) {
         const td = document.createElement("td");
         if (key === 'available_for_service') {
-          td.innerText = value ? "ניתן לגיוס" : "לא ניתן לגיוס";
+          td.innerText = value ? "ניתן" : "לא ניתן";
           td.style.color = value ? "green" : "red";
           td.style.fontWeight = "bold";
         } else {

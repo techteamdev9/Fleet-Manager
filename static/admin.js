@@ -218,18 +218,18 @@ async function showVehicleInfo(vehicleId) {
   // Admin editable
   if (currentUser.role === "admin") {
     html += `
-      <label>ניתן/לא ניתן לגיוס:
+      <label>ניתן/לא ניתן:
         <select id="cardAvailableSelect">
-          <option value="true" ${vehicle.available_for_service ? "selected" : ""}>ניתן לגיוס</option>
-          <option value="false" ${!vehicle.available_for_service ? "selected" : ""}>לא ניתן לגיוס</option>
+          <option value="true" ${vehicle.available_for_service ? "selected" : ""}>ניתן</option>
+          <option value="false" ${!vehicle.available_for_service ? "selected" : ""}>לא ניתן</option>
         </select>
       </label>
       <button id="saveCardBtn" style="background: #4CAF50; color: white; padding: 5px 10px; border: none; border-radius: 5px; margin-top: 10px;">Save</button>
     `;
   } else {
     html += `
-      <p>ניתן/לא ניתן לגיוס:
-        ${vehicle.available_for_service ? "ניתן לגיוס" : "לא ניתן לגיוס"}
+      <p>ניתן/לא ניתן:
+        ${vehicle.available_for_service ? "ניתן" : "לא ניתן"}
       </p>
     `;
   }

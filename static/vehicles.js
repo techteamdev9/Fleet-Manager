@@ -169,7 +169,7 @@ async function refreshTable(page = 1) {
     const tr = document.createElement("tr");
     tr.classList.add("vehicle-row");
 
-    const availableText = v.available_for_service ? "ניתן לגיוס" : "לא ניתן לגיוס";
+    const availableText = v.available_for_service ? "ניתן" : "לא ניתן";
     const color = v.available_for_service ? "green" : "red";
 // <td>${v.id}</td>
 //      <td>${v.unitcode || ""}</td>
