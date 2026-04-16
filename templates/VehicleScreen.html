@@ -194,11 +194,11 @@ textarea {
 
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-
-  background: linear-gradient(145deg, #ffffff, #f9fafb);
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  /* background: linear-gradient(145deg, #ffffff, #f9fafb); */
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 
-  font-size: 15px;
+  font-size: 20px;
   color: #111827;
 
   cursor: pointer;
@@ -207,7 +207,7 @@ textarea {
 
 /* hover */
 .unit-picker select:hover {
-  border-color: #93c5fd;
+  border-color: #dfe2e6;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
@@ -226,14 +226,29 @@ textarea {
   background-position: left 12px center;
   background-size: 14px;
   padding-left: 40px;
+  background: linear-gradient(135deg, #b5c4f0, #2563eb)
+
 }
-  </style>
+
+.vehicle-modal {
+  display: none;
+  /* background: rgba(157, 169, 238, 0.55); */
+  text-align: center;
+  background: rgb(220, 222, 226);
+  z-index: 10000;
+}
+
+.vehicle-modal.active {
+  display: block;
+}
+
+</style>
 </head>
 <body>
   <button onclick="history.back()" style="padding:10px 15px; cursor:pointer;">
     ⬅ Back to Vehicles
   </button>
-  <button class="main-btn primary" onclick="openForm()">Open Form 650</button>
+  <button class="main-btn primary" onclick="openForm()">  טופס 650</button>
   <button  class="main-btn secondary" id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
   <div class="unit-picker">
     <label>בחר קוד יחידה:</label>
@@ -470,6 +485,21 @@ textarea {
         <input type="checkbox"> אבזרים כמפורש ב-ט 650
       </label>
       <button type="button" onclick="submitIssueForm()">שמור</button>
+    </div>
+  </div>
+
+  <!-- small window -->
+  <div id="vehicleActionsModal" class="vehicle-modal">
+    <div class="vehicle-modal-content">
+  
+      <span class="close-btn" onclick="closeVehicleActionsModal()">×</span>
+  
+      <h3 id="modalTitle">רכב</h3>
+
+      <button onclick="alert('ניפוק')">ניפוק</button>
+      <button onclick="alert('טיפול')">טיפול</button>
+
+  
     </div>
   </div>
   <div id="app"></div>

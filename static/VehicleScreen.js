@@ -10,7 +10,7 @@ const categories = [
 ];
 
 const vehicleTypes = [
-  { id: "אמבולנס", name: "אמבולנס", categories: ["2"] },
+  // { id: "אמבולנס", name: "אמבולנס", categories: ["2"] },
   { id: "ציוד-מכני-הנדסי", name: "ציוד מכני הנדסי", categories: ["2"] },
   { id: "ריינג'ר", name: "ריינג'ר", categories: ["3"] },
   { id: "כבאית", name: "כבאית", categories: ["2"] },
@@ -41,7 +41,7 @@ const vehicleTypes = [
   { id: "מסחרי-נוסעים", name: "מסחרי נוסעים", categories: ["5"], image: "מסחרי-נוסעים.jpg" },
   { id: "טנדר", name: "טנדר", categories: ["5"], image: "טנדר.jpg" },
   { id: "טנדר-קירור", name: "טנדר קירור", categories: ["5"], image: "טנדר-קירור.jpg" },
-  { id: "אמבולנס-ירמ", name: "אמבולנס", categories: ["5"], image: "אמבולנס.jpg" },
+  { id: "אמבולנס", name: "אמבולנס", categories: ["5"], image: "אמבולנס.jpg" },
 
   // צמה Category (4)
   { id: "יעה-זחלי", name: "יעה זחלי", categories: ["4"], image: "יעה-זחלי.jpg" },
@@ -369,10 +369,36 @@ function filterVehicles() {
   
   // later: filter table here
 }
-function refreshVehiclesTable() {
-  const vehicles = getVehiclesByType(selectedType, selectedSubType);
-  renderVehiclesTable(vehicles);
+// function refreshVehiclesTable() {
+//   const vehicles = getVehiclesByType(selectedType, selectedSubType);
+//   renderVehiclesTable(vehicles);
+// }
+function openVehicleActionsModal(vehicle) {
+  const modal = document.getElementById("vehicleActionsModal");
+
+  document.getElementById("modalTitle").innerText =
+    "רכב: " + (vehicle.license_number || "");
+
+  modal.classList.add("active");
 }
+
+function closeVehicleActionsModal() {
+  document.getElementById("vehicleActionsModal").classList.remove("active");
+  
+
+}
+
+document.addEventListener("click", function (event) {
+  const modal = document.getElementById("vehicleActionsModal");
+  const content = document.querySelector(".vehicle-modal-content");
+
+  if (!modal.classList.contains("active")) return;
+
+  // ignore clicks inside modal
+  if (content.contains(event.target)) return;
+
+  closeVehicleActionsModal();
+});
 
 function render() {
   app.innerHTML = "";
@@ -620,7 +646,11 @@ function render() {
 
   filteredVehicles.forEach(vehicle => {
     const row = document.createElement("tr");
-
+    row.style.cursor = "pointer";
+    row.onclick = (event) => {
+      event.stopPropagation();
+      openVehicleActionsModal(vehicle);
+    };
     Object.entries(vehicle).forEach(([key, value]) => {
       if (headersMap[key]) {
         const td = document.createElement("td");
