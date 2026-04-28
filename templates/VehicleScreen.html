@@ -88,7 +88,7 @@ table, th, td {
   font-weight: bold;
 }
 /* 650 */
-.modal {
+/* .modal {
   direction: rtl;
   display: none;
   position: fixed;
@@ -117,27 +117,334 @@ table, th, td {
 
 textarea {
   width: 200px;
+} */
+/* Overlay */
+.modal {
+  direction: rtl;
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  animation: fadeIn 0.25s ease;
 }
 
+/* Modal Card */
+.modal-content {
+  background: #ffffff;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90%;
+  overflow-y: auto;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  animation: slideUp 0.3s ease;
+}
+
+/* Headings */
+.modal-content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.modal-content h3 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #444;
+}
+
+/* Close button */
+.modal-content > button:first-child {
+  background: transparent;
+  color: #666;
+  font-size: 18px;
+  float: left;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-content > button:first-child:hover {
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Row layout (THIS is the big upgrade) */
+.row {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.row:hover {
+  background: #f8fafc;
+}
+
+/* Labels */
+.row label {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Inputs & selects */
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+/* Focus state */
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+/* Textarea sizing */
+textarea {
+  min-height: 40px;
+  resize: vertical;
+}
+
+/* File input tweak */
+input[type="file"] {
+  background: #fff;
+  padding: 6px;
+}
+
+/* Buttons */
+.modal-content button {
+  border: none;
+  background: #3b82f6;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 15px;
+  margin-left: 10px;
+  transition: all 0.2s ease;
+}
+
+.modal-content button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Secondary button (Close) */
+.modal-content button:nth-of-type(3) {
+  background: #e5e7eb;
+  color: #333;
+}
+
+.modal-content button:nth-of-type(3):hover {
+  background: #d1d5db;
+}
+
+/* Section spacing */
+#checklist {
+  padding: 10px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Overlay */
 .issue-modal {
   direction: rtl;
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 10000; /* slightly higher */
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55); /* softer dark blue overlay */
+  backdrop-filter: blur(6px); /* modern glass effect */
+  z-index: 10000;
+  animation: fadeIn 0.25s ease;
 }
 
+/* Modal Card */
 .issue-modal-content {
-  background: white;
-  padding: 20px;
+  background: #ffffff;
   margin: 40px auto;
-  width: 80%;
+  width: 85%;
+  max-width: 950px;
   max-height: 90%;
   overflow-y: auto;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  animation: slideUp 0.3s ease;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* Headings */
+.issue-modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.issue-modal-content h3 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #444;
+}
+
+.issue-modal-content h4 {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #666;
+}
+
+/* Inputs */
+.issue-modal-content input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+}
+
+.issue-modal-content input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+/* Buttons */
+.issue-modal-content button {
+  border: none;
+  background: #3b82f6;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+}
+
+.issue-modal-content button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Close button */
+.issue-modal-content > button:first-child {
+  background: transparent;
+  color: #666;
+  font-size: 18px;
+  float: left;
+}
+
+.issue-modal-content > button:first-child:hover {
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Sections spacing */
+.issue-modal-content > input {
+  margin-bottom: 10px;
+}
+
+/* Grid layout for top inputs */
+.issue-modal-content input#issuing_unit,
+.issue-modal-content input#receiving_unit {
+  width: 48%;
+  display: inline-block;
+}
+
+.issue-modal-content input#receiving_unit {
+  /* margin-right: 4%; */
+}
+
+/* Inline date */
+.inline-date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+/* Signatures layout */
+.signatures {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.signatures > div {
+  flex: 1;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Checkbox */
+.issue-modal-content label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .main-btn {
@@ -242,13 +549,76 @@ textarea {
   display: block;
 }
 
+.row {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 16px; /* THIS is the key */
+  align-items: center;
+}
+.upload-btn {
+  display: inline-block;
+  background: #3b82f6;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.upload-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.accessory-row {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.accessory-row:hover {
+  background: #f8fafc;
+}
+
+/* label */
+.accessory-row label {
+  font-size: 14px;
+}
+
+/* X / number display */
+.display {
+  text-align: center;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #444;
+  transition: all 0.2s;
+}
+
+.display:hover {
+  background: #e2e8f0;
+}
+
+/* input edit mode */
+.edit-input {
+  width: 100%;
+  text-align: center;
+}
 </style>
 </head>
 <body>
   <button onclick="history.back()" style="padding:10px 15px; cursor:pointer;">
-    ⬅ Back to Vehicles
+    ⬅ חזור לניהול רכבים
   </button>
-  <button class="main-btn primary" onclick="openForm()">  טופס 650</button>
+  <button class="main-btn primary" onclick="openForm()">  1טופס 650</button>
   <button  class="main-btn secondary" id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
   <div class="unit-picker">
     <label>בחר קוד יחידה:</label>
@@ -271,11 +641,11 @@ textarea {
     <div class="modal-content">
       <button onclick="closeForm()">✕</button>
   
-      <h2>Form 650 - ID: <span id="formId"></span></h2>
+      <h2>טופס 1650 - מספר טופס: <span id="formId"></span></h2>
   
       <!-- Event -->
       <div class="row">
-        <label>Event</label>
+        <label>בעת:</label>
         <select id="eventType">
           <option>גיוס הרכב</option>
           <option>זיכוי מיחידת הסמך</option>
@@ -286,53 +656,73 @@ textarea {
   
       <!-- Vehicle -->
       <div class="row">
-        <label>Vehicle Type</label>
+        <label>סוג הרכב</label>
         <input type="text" id="vehicleType">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <div class="row">
-        <label>Vehicle Number</label>
+        <label>מספר רישוי</label>
         <input type="text" id="vehicleNumber">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <!-- Date -->
       <div class="row">
-        <label>Date</label>
+        <label>תאריך</label>
         <input type="date" id="date">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <!-- Location -->
       <div class="row">
-        <label>Location</label>
+        <label>אתר</label>
         <select id="location"></select>
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <!-- Owner -->
       <div class="row">
-        <label>Owner Name</label>
+        <label>שם בעלים</label>
         <input type="text">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <div class="row">
-        <label>Owner ID</label>
+        <label>ת.ז בעלים</label>
         <input type="text">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <div class="row">
-        <label>Owner Phone</label>
+        <label>טלפון בעלים</label>
+        <input type="text">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+      <div class="row">
+        <label>שעת גיוס/זיכוי/שחרור הרכב</label>
+        <input type="date">
+        <textarea placeholder="הערות"></textarea>
+      </div>
+      <div class="row">
+        <label>איתורן</label>
+        <input type="text">
+        <textarea placeholder="נדרש לציין קוד"></textarea>
+      </div>
+      <div class="row">
+        <label>קוד נעילה</label>
+        <input type="text">
+        <textarea placeholder="נדרש לציין קוד"></textarea>
+      </div>
+      <div class="row">
+        <label>קריאת מד אוץ (קילומטראז')</label>
         <input type="text">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <!-- Licence -->
       <div class="row">
-        <label>Licence Status</label>
+        <label>תוקף רישוי</label>
         <select>
           <option>תקין</option>
           <option>לא תקין</option>
@@ -342,7 +732,7 @@ textarea {
   
       <!-- Fuel -->
       <div class="row">
-        <label>Fuel</label>
+        <label>מיכל דלק</label>
         <select>
           <option>מלא</option>
           <option>חצי</option>
@@ -352,7 +742,7 @@ textarea {
       </div>
   
       <!-- Checklist -->
-      <h3>Checklist</h3>
+      <h3>ציוד נלווה (סמן יש / אין)</h3>
       <div id="checklist"></div>
   
       <!-- Lights -->
@@ -376,10 +766,19 @@ textarea {
       </div>
   
       <!-- Damage -->
-      <div class="row">
+      <!-- <div class="row">
         <label>נזקים בפח</label>
         <textarea></textarea>
         <input type="file" multiple>
+      </div> -->
+      <div class="row">
+        <label>נזקים בפח</label>
+        <textarea></textarea>
+      
+        <label class="upload-btn">
+          העלה תמונה
+          <input type="file" multiple hidden>
+        </label>
       </div>
   
       <div class="row">
@@ -401,25 +800,25 @@ textarea {
       </div>
   
       <!-- Signatures -->
-      <h3>Signatures</h3>
+      <h3>חתימות</h3>
   
       <div class="row">
-        <label>Documenting Person ID</label>
+        <label>חתימת המתעד + מ.א</label>
         <input type="text">
       </div>
   
       <div class="row">
-        <label>Releasing Signature</label>
+        <label>חתימת מוסר הרכב</label>
         <input type="text">
       </div>
   
       <div class="row">
-        <label>Unit Representative</label>
+        <label>חתימת נציג היח'</label>
         <input type="text">
       </div>
   
-      <button onclick="submitForm()">Submit</button>
-      <button onclick="closeForm()">Close</button>
+      <button onclick="submitForm()">שלח</button>
+      <button onclick="closeForm()">סגור</button>
       <div style="margin-top: 20px;">
         <button id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
       </div>
@@ -439,14 +838,14 @@ textarea {
       <!-- 6 fields -->
       <input type="text" placeholder="קדומת מרץ">
       <input type="number" placeholder="סוג תנועה">
-      <input type="text" placeholder="reciever unit Representative">
-      <input type="text" placeholder="accept unit Representative">
+      <input type="text" placeholder="נציג יח' מנפקת">
+      <input type="text" placeholder="נציג יח' מקבלת">
       <br>
       <label class="inline-date">
         תאריך ניפוק:
         <input type="date">
     </label>
-      <input type="number" placeholder="voucher number">
+      <input type="number" placeholder="מספר שובר">
   
       <!-- Dynamic rows -->
       <h3>ציוד</h3>
@@ -482,7 +881,7 @@ textarea {
       </div>
   
       <label>
-        <input type="checkbox"> אבזרים כמפורש ב-ט 650
+        <input type="checkbox"> אביזרים כמפורש ב - ט 1650
       </label>
       <button type="button" onclick="submitIssueForm()">שמור</button>
     </div>

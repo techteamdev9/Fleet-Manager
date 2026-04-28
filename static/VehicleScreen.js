@@ -253,6 +253,36 @@ function removeRow(button) {
   const row = button.parentElement;
   row.remove();
 }
+// const accessoriesList = [
+//   "מגבה מכני/הדראולי",
+//   "ידית למגבה",
+//   "מפתח גלגלים",
+//   "מטף כיבוי אש",
+//   "משולש אזהרה",
+//   "רדיו/טייפ",
+//   "מע מיזוג אוויר",
+//   "חגורות ביטחון",
+//   "מראות פנימיות",
+//   "מראות חיצוניות",
+//   "מגבים",
+//   "מק",
+//   "גלגל רזרבי",
+//   "כיסוי לרכב(ברזנט)",
+//   "סולמות"
+// ];
+
+// const container = document.getElementById("accessories");
+
+// accessoriesList.forEach(item => {
+//   const div = document.createElement("div");
+
+//   div.innerHTML = `
+//     <label>${item}</label>
+//     <input type="number" min="0" value="0">
+//   `;
+
+//   container.appendChild(div);
+// });
 const accessoriesList = [
   "מגבה מכני/הדראולי",
   "ידית למגבה",
@@ -275,11 +305,38 @@ const container = document.getElementById("accessories");
 
 accessoriesList.forEach(item => {
   const div = document.createElement("div");
+  div.classList.add("accessory-row");
 
   div.innerHTML = `
     <label>${item}</label>
-    <input type="number" min="0" value="0">
+    <span class="display">✖</span>
+    <input type="number" min="0" value="0" class="edit-input">
   `;
+
+  const display = div.querySelector(".display");
+  const input = div.querySelector(".edit-input");
+
+  // start hidden
+  input.style.display = "none";
+
+  // click X → switch to input
+  display.addEventListener("click", () => {
+    display.style.display = "none";
+    input.style.display = "block";
+    input.focus();
+  });
+
+  // when leaving input → back to display
+  input.addEventListener("blur", () => {
+    if (input.value === "0" || input.value === "") {
+      display.textContent = "✖";
+    } else {
+      display.textContent = input.value;
+    }
+
+    input.style.display = "none";
+    display.style.display = "inline-block";
+  });
 
   container.appendChild(div);
 });
