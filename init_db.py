@@ -31,22 +31,54 @@ def init_db():
 
     # ---------------- Vehicles table ----------------
    # ---------------- Vehicles ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS vehicles (
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS vehicles (
+#     id SERIAL PRIMARY KEY,
+#     license_number VARCHAR(50) UNIQUE NOT NULL,
+#     tool_code VARCHAR(50) NOT NULL,
+#     status VARCHAR(50) NOT NULL,
+#     available_for_service BOOLEAN DEFAULT TRUE,
+#     unitCode VARCHAR(50),
+#     category VARCHAR(50),
+#     vehicle_type VARCHAR(50),
+#     sub_type VARCHAR(50),
+#     owner_type VARCHAR(50),
+#     lease_name VARCHAR(100),
+#     images TEXT[] DEFAULT '{}'
+# );
+#     """)
+cur.execute("""CREATE TABLE IF NOT EXISTS vehicles (
     id SERIAL PRIMARY KEY,
+
     license_number VARCHAR(50) UNIQUE NOT NULL,
-    tool_code VARCHAR(50) NOT NULL,
+
+    tool_code VARCHAR(50),
     status VARCHAR(50) NOT NULL,
+
     available_for_service BOOLEAN DEFAULT TRUE,
+
     unitCode VARCHAR(50),
     category VARCHAR(50),
     vehicle_type VARCHAR(50),
     sub_type VARCHAR(50),
     owner_type VARCHAR(50),
     lease_name VARCHAR(100),
-    images TEXT[] DEFAULT '{}'
+
+    owner_name TEXT,
+    owner_id TEXT,
+    owner_phone TEXT,
+
+    location TEXT,
+
+    fuel TEXT,
+    licence_status TEXT,
+
+    images TEXT[] DEFAULT '{}',
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
-    """)
+""")
   # i changed this: MySQL compatible
 
     # ---------------- Vehicle history table ----------------
@@ -75,29 +107,45 @@ def init_db():
     
 #650
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS form_650 (
-       id SERIAL PRIMARY KEY,
-       event_type TEXT,
-       vehicle_type TEXT,
-       vehicle_number TEXT,
-       date DATE,
-       location TEXT,
-       owner_name TEXT,
-       owner_id TEXT,
-       owner_phone TEXT,
-       licence_status TEXT,
-       fuel TEXT,
-       checklist JSONB,
-       lights TEXT,
-       tires TEXT,
-       damage_physical TEXT,
-       damage_mechanical TEXT,
-       assessor TEXT,
-       document_person_id TEXT,
-       releasing_signature TEXT,
-       unit_rep TEXT,
-       created_at TIMESTAMP DEFAULT NOW()
-    );
+CREATE TABLE IF NOT EXISTS form_650 (
+    id SERIAL PRIMARY KEY,
+
+    vehicle_id INTEGER REFERENCES vehicles(id),
+
+    vehicle_number TEXT NOT NULL,
+
+    event_type TEXT,
+
+    vehicle_type TEXT,
+
+    date DATE,
+
+    location TEXT,
+
+    owner_name TEXT,
+    owner_id TEXT,
+    owner_phone TEXT,
+
+    licence_status TEXT,
+    fuel TEXT,
+
+    checklist JSONB,
+
+    lights TEXT,
+    tires TEXT,
+
+    damage_physical TEXT,
+    damage_mechanical TEXT,
+
+    assessor TEXT,
+
+    document_person_id TEXT,
+    releasing_signature TEXT,
+    unit_rep TEXT,
+
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
     """)
 
     cur.execute("""

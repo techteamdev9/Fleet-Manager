@@ -684,24 +684,24 @@ input[type="file"] {
       <!-- Owner -->
       <div class="row">
         <label>שם בעלים</label>
-        <input type="text">
+        <input type="text" id="ownerName">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <div class="row">
         <label>ת.ז בעלים</label>
-        <input type="text">
+        <input type="text" id="ownerId">
         <textarea placeholder="הערות"></textarea>
       </div>
   
       <div class="row">
         <label>טלפון בעלים</label>
-        <input type="text">
+        <input type="text" id="ownerPhone">
         <textarea placeholder="הערות"></textarea>
       </div>
       <div class="row">
         <label>שעת גיוס/זיכוי/שחרור הרכב</label>
-        <input type="date">
+        <input type="datetime-local" id="eventTime">
         <textarea placeholder="הערות"></textarea>
       </div>
       <div class="row">
@@ -723,7 +723,7 @@ input[type="file"] {
       <!-- Licence -->
       <div class="row">
         <label>תוקף רישוי</label>
-        <select>
+        <select id="licenceStatus">
           <option>תקין</option>
           <option>לא תקין</option>
         </select>
@@ -733,7 +733,7 @@ input[type="file"] {
       <!-- Fuel -->
       <div class="row">
         <label>מיכל דלק</label>
-        <select>
+        <select id="fuel">
           <option>מלא</option>
           <option>חצי</option>
           <option>ריק</option>
@@ -748,7 +748,7 @@ input[type="file"] {
       <!-- Lights -->
       <div class="row">
         <label>פנסים</label>
-        <select>
+        <select id="lights">
           <option>תקין</option>
           <option>לא תקין</option>
         </select>
@@ -758,7 +758,7 @@ input[type="file"] {
       <!-- Tires -->
       <div class="row">
         <label>צמיגים</label>
-        <select>
+        <select id="tires">
           <option>תקין</option>
           <option>לא תקין</option>
         </select>
@@ -773,7 +773,7 @@ input[type="file"] {
       </div> -->
       <div class="row">
         <label>נזקים בפח</label>
-        <textarea></textarea>
+        <textarea id="damagePhysical"></textarea>
       
         <label class="upload-btn">
           העלה תמונה
@@ -783,13 +783,13 @@ input[type="file"] {
   
       <div class="row">
         <label>נזקים מכניים</label>
-        <textarea></textarea>
+        <textarea id="damageMechanical"></textarea>
       </div>
   
       <!-- Assessor -->
       <div class="row">
         <label>המלצת שמאי</label>
-        <select>
+        <select id="assessor">
           <option>הרכב כשיר לקבלה</option>
           <option>לא כשיר לקבלה</option>
           <option>הרכב כשיר לזיכוי</option>
@@ -804,17 +804,17 @@ input[type="file"] {
   
       <div class="row">
         <label>חתימת המתעד + מ.א</label>
-        <input type="text">
+        <input type="text" id="documentPerson">
       </div>
   
       <div class="row">
         <label>חתימת מוסר הרכב</label>
-        <input type="text">
+        <input type="text" id="releasingSignature">
       </div>
   
       <div class="row">
         <label>חתימת נציג היח'</label>
-        <input type="text">
+        <input type="text" id="unitRep">>
       </div>
   
       <button onclick="submitForm()">שלח</button>

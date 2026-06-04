@@ -145,12 +145,19 @@ def init_db():
     cur.execute("""
     ALTER TABLE vehicles
     ADD COLUMN IF NOT EXISTS category VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS tool_code VARCHAR(50),
     ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50),
     ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50),
     ADD COLUMN IF NOT EXISTS owner_type VARCHAR(50),
     ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
     ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
     """)  
+    cur.execute("""
+    ALTER TABLE vehicles
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+    """)
+
+
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS form_650 (
@@ -1019,6 +1026,153 @@ def get_forms_650():
 
 #     return jsonify({"status": "ok"})
 
+@app.route("/submit-form", methods=["POST"])
+def submit_form():
+
+    data = request.json
+
+    event_type = data["event_type"]
+    vehicle_number = data["vehicle_number"]
+
+    conn = connect()
+    cur = conn.cursor()
+
+    # --------------------------------
+    # CHECK IF VEHICLE EXISTS
+    # --------------------------------
+
+    cur.execute("""
+        SELECT id FROM vehicles
+        WHERE license_number = %s
+    """, (vehicle_number,))
+
+    vehicle = cur.fetchone()
+
+    # --------------------------------
+    # ADD VEHICLE
+    # --------------------------------
+
+    if event_type == "גיוס הרכב":
+
+        if vehicle:
+            return jsonify({
+                "message": "Vehicle already exists"
+            }), 400
+
+        cur.execute("""
+            INSERT INTO vehicles (
+                license_number,
+                status,
+                vehicle_type,
+                owner_name,
+                owner_id,
+                owner_phone,
+                location,
+                fuel,
+                licence_status
+            )
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
+        """, (
+            vehicle_number,
+            "מגוייס",
+            data["vehicle_type"],
+            data["owner_name"],
+            data["owner_id"],
+            data["owner_phone"],
+            data["location"],
+            data["fuel"],
+            data["licence_status"]
+        ))
+
+        vehicle_id = cur.fetchone()[0]
+
+    # --------------------------------
+    # UPDATE VEHICLE
+    # --------------------------------
+
+    else:
+
+        if not vehicle:
+            return jsonify({
+                "message": "Vehicle not found"
+            }), 404
+
+        vehicle_id = vehicle[0]
+
+        new_status = ""
+
+        if event_type == "שחרור לבעלים":
+            new_status = "שוחרר"
+
+        elif event_type == "זיכוי מיחידת הסמך":
+            new_status = "זיכוי"
+
+        cur.execute("""
+            UPDATE vehicles
+            SET
+                status = %s,
+                owner_name = %s,
+                owner_id = %s,
+                owner_phone = %s,
+                location = %s,
+                fuel = %s,
+                licence_status = %s,
+                updated_at = NOW()
+            WHERE id = %s
+        """, (
+            new_status,
+            data["owner_name"],
+            data["owner_id"],
+            data["owner_phone"],
+            data["location"],
+            data["fuel"],
+            data["licence_status"],
+            vehicle_id
+        ))
+
+    # --------------------------------
+    # SAVE FORM
+    # --------------------------------
+
+    cur.execute("""
+        INSERT INTO form_650 (
+            vehicle_id,
+            vehicle_number,
+            event_type,
+            vehicle_type,
+            date,
+            location,
+            owner_name,
+            owner_id,
+            owner_phone,
+            licence_status,
+            fuel
+        )
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        vehicle_id,
+        vehicle_number,
+        data["event_type"],
+        data["vehicle_type"],
+        data["date"],
+        data["location"],
+        data["owner_name"],
+        data["owner_id"],
+        data["owner_phone"],
+        data["licence_status"],
+        data["fuel"]
+    ))
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return jsonify({
+        "message": "Form submitted successfully"
+    })
+    
 @app.route("/users/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
     conn = connect()

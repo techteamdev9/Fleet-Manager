@@ -181,26 +181,69 @@ function closeForm() {
   document.getElementById("formModal").style.display = "none";
 }
 
-function submitForm() {
-  const data = {
-    event_type: document.getElementById("eventType").value,
-    vehicle_type: document.getElementById("vehicleType").value,
-    vehicle_number: document.getElementById("vehicleNumber").value,
-    date: document.getElementById("date").value,
-    location: document.getElementById("location").value
+// function submitForm() {
+//   const data = {
+//     event_type: document.getElementById("eventType").value,
+//     vehicle_type: document.getElementById("vehicleType").value,
+//     vehicle_number: document.getElementById("vehicleNumber").value,
+//     date: document.getElementById("date").value,
+//     location: document.getElementById("location").value
+//   };
+
+//   fetch("/save-form-650", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(data)
+//   })
+//   .then(res => res.json())
+//   .then(() => {
+//     alert("Form 650 saved");
+//     console.log(data)
+//     closeForm();
+//   });
+// }
+async function submitForm() {
+
+  const formData = {
+      event_type: document.getElementById("eventType").value,
+      vehicle_type: document.getElementById("vehicleType").value,
+      vehicle_number: document.getElementById("vehicleNumber").value,
+      date: document.getElementById("date").value,
+      location: document.getElementById("location").value,
+
+      owner_name: document.getElementById("ownerName").value,
+      owner_id: document.getElementById("ownerId").value,
+      owner_phone: document.getElementById("ownerPhone").value,
+
+      licence_status: document.getElementById("licenceStatus").value,
+      fuel: document.getElementById("fuel").value,
+
+      lights: document.getElementById("lights").value,
+      tires: document.getElementById("tires").value,
+
+      damage_physical: document.getElementById("damagePhysical").value,
+      damage_mechanical: document.getElementById("damageMechanical").value,
+
+      assessor: document.getElementById("assessor").value,
+
+      document_person_id: document.getElementById("documentPerson").value,
+      releasing_signature: document.getElementById("releasingSignature").value,
+      unit_rep: document.getElementById("unitRep").value
   };
 
-  fetch("/save-form-650", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(() => {
-    alert("Form 650 saved");
-    console.log(data)
-    closeForm();
+  const response = await fetch("/submit-form", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
   });
+
+  const result = await response.json();
+
+  alert(result.message);
+  console.log(formData);
+  closeForm();
 }
 document.getElementById("openNextForm").addEventListener("click", function() {
   // Get the vehicle number (or ID) from the form
