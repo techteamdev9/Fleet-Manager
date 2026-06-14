@@ -3,6 +3,7 @@ from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
+from init_db import init_db
 import pandas as pd
 import os
 import time
@@ -35,181 +36,187 @@ def connect(retries=5, delay=2):
             retries -= 1
             time.sleep(delay)
     
-    raise Exception("Could not connect to DB after retries")
+    raise Exception("Could not connect to DB after retries")  
+# def init_db():
+#     conn = connect()
+#     cur = conn.cursor()
 
-def init_db():
-    conn = connect()
-    cur = conn.cursor()
+#     # ---------------- Permissions ----------------
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS permissions (
+#         id INT PRIMARY KEY,
+#         name VARCHAR(50) NOT NULL
+#     )
+#     """)
 
-    # ---------------- Permissions ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS permissions (
-        id INT PRIMARY KEY,
-        name VARCHAR(50) NOT NULL
-    )
-    """)
+#     cur.execute("""
+#     INSERT INTO permissions (id, name)
+#     VALUES (1, 'admin'), (2, 'user')
+#     ON CONFLICT (id) DO NOTHING
+#     """)
 
-    cur.execute("""
-    INSERT INTO permissions (id, name)
-    VALUES (1, 'admin'), (2, 'user')
-    ON CONFLICT (id) DO NOTHING
-    """)
+#     # ---------------- Users ----------------
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS users (
+#         id SERIAL PRIMARY KEY,
+#         username VARCHAR(50) UNIQUE NOT NULL,
+#         password VARCHAR(255) NOT NULL,
+#         role VARCHAR(20),
+#         permission_id INT REFERENCES permissions(id)
+#     )
+#     """)
 
-    # ---------------- Users ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(50) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        role VARCHAR(20),
-        permission_id INT REFERENCES permissions(id)
-    )
-    """)
+#     # ---------------- Vehicles ----------------
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS vehicles (
+#         id SERIAL PRIMARY KEY,
+#         license_number VARCHAR(50) UNIQUE NOT NULL,
+#         tool_code VARCHAR(50) NOT NULL,
+#         status VARCHAR(50) NOT NULL
+#     )
+#     """)
+   
+#     # ---------------- Vehicle History ----------------
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS vehicle_history (
+#         id SERIAL PRIMARY KEY,
+#         vehicle_id INT REFERENCES vehicles(id) ON DELETE CASCADE,
+#         status VARCHAR(50) NOT NULL,
+#         timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+#     )
+#     """)
 
-    # ---------------- Vehicles ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS vehicles (
-        id SERIAL PRIMARY KEY,
-        license_number VARCHAR(50) UNIQUE NOT NULL,
-        tool_code VARCHAR(50) NOT NULL,
-        status VARCHAR(50) NOT NULL
-    )
-    """)
+    # def init_db():
+    #     conn = connect()
+    #     cur = conn.cursor()
 
-    # ---------------- Vehicle History ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS vehicle_history (
-        id SERIAL PRIMARY KEY,
-        vehicle_id INT REFERENCES vehicles(id) ON DELETE CASCADE,
-        status VARCHAR(50) NOT NULL,
-        timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    # # ---------------- Vehicles ----------------
+    # cur.execute("""
+    # CREATE TABLE IF NOT EXISTS vehicles (
+    #     id SERIAL PRIMARY KEY,
+    #     license_number VARCHAR(50) UNIQUE NOT NULL,
+    #     tool_code VARCHAR(50) NOT NULL,
+    #     status VARCHAR(50) NOT NULL
+    # )
+    # """)
 
-    def init_db():
-        conn = connect()
-        cur = conn.cursor()
-
-    # ---------------- Vehicles ----------------
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS vehicles (
-        id SERIAL PRIMARY KEY,
-        license_number VARCHAR(50) UNIQUE NOT NULL,
-        tool_code VARCHAR(50) NOT NULL,
-        status VARCHAR(50) NOT NULL
-    )
-    """)
-
-    # ✅ Ensure available_for_service column always exists
-    cur.execute("""
-    ALTER TABLE vehicles
-    ADD COLUMN IF NOT EXISTS available_for_service BOOLEAN DEFAULT TRUE;
-    """)
-
-
-    # ✅ Ensure old rows are TRUE (ניתן לגיוס)
-    cur.execute("""
-    UPDATE vehicles
-    SET available_for_service = TRUE
-    WHERE available_for_service IS NULL;
-    """)
-
-    # ✅ Prevent NULL in future
-    cur.execute("""
-    ALTER TABLE vehicles
-    ALTER COLUMN available_for_service SET NOT NULL;
-    """)
+    # # ✅ Ensure available_for_service column always exists
+    # cur.execute("""
+    # ALTER TABLE vehicles
+    # ADD COLUMN IF NOT EXISTS available_for_service BOOLEAN DEFAULT TRUE;
+    # """)
 
 
-    # ---------------- Default users ----------------
-    cur.execute("""
-    INSERT INTO users (username, password, role, permission_id)
-    VALUES (%s, %s, %s, %s)
-    ON CONFLICT (username) DO NOTHING
-    """, ("admin", "admin123", "admin", 1))
+    # # ✅ Ensure old rows are TRUE (ניתן לגיוס)
+    # cur.execute("""
+    # UPDATE vehicles
+    # SET available_for_service = TRUE
+    # WHERE available_for_service IS NULL;
+    # """)
 
-    cur.execute("""
-    INSERT INTO users (username, password, role, permission_id)
-    VALUES (%s, %s, %s, %s)
-    ON CONFLICT (username) DO NOTHING
-    """, ("user", "user123", "user", 2))
+    # # ✅ Prevent NULL in future
+    # cur.execute("""
+    # ALTER TABLE vehicles
+    # ALTER COLUMN available_for_service SET NOT NULL;
+    # """)
+    # # cur.execute("""
+    # # ALTER TABLE vehicles ADD COLUMN owner_name TEXT;
 
-    conn.commit()
-    conn.close()
-init_db()
-
-def init_db():
-    conn = connect()
-    cur = conn.cursor()
-
-    cur.execute("""
-    ALTER TABLE vehicles
-    ADD COLUMN IF NOT EXISTS category VARCHAR(50),
-    ADD COLUMN IF NOT EXISTS tool_code VARCHAR(50),
-    ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50),
-    ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50),
-    ADD COLUMN IF NOT EXISTS owner_type VARCHAR(50),
-    ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
-    ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
-    """)  
-    cur.execute("""
-    ALTER TABLE vehicles
-    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
-    """)
+    # # """)
 
 
+    # # ---------------- Default users ----------------
+    # cur.execute("""
+    # INSERT INTO users (username, password, role, permission_id)
+    # VALUES (%s, %s, %s, %s)
+    # ON CONFLICT (username) DO NOTHING
+    # """, ("admin", "admin123", "admin", 1))
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS form_650 (
-       id SERIAL PRIMARY KEY,
-       event_type TEXT,
-       vehicle_type TEXT,
-       vehicle_number TEXT,
-       date DATE,
-       location TEXT,
-       owner_name TEXT,
-       owner_id TEXT,
-       owner_phone TEXT,
-       licence_status TEXT,
-       fuel TEXT,
-       checklist JSONB,
-       lights TEXT,
-       tires TEXT,
-       damage_physical TEXT,
-       damage_mechanical TEXT,
-       assessor TEXT,
-       document_person_id TEXT,
-       releasing_signature TEXT,
-       unit_rep TEXT,
-       created_at TIMESTAMP DEFAULT NOW()
-    );
-    """)
+    # cur.execute("""
+    # INSERT INTO users (username, password, role, permission_id)
+    # VALUES (%s, %s, %s, %s)
+    # ON CONFLICT (username) DO NOTHING
+    # """, ("user", "user123", "user", 2))
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS issuing_forms (
-        id SERIAL PRIMARY KEY,
+    # conn.commit()
+    # conn.close()
+#init_db()
 
-        vehicle_number TEXT,
+# def init_db():
+#     conn = connect()
+#     cur = conn.cursor()
 
-        issuing_unit TEXT,
-        receiving_unit TEXT,
-
-        items JSONB,
-        accessories JSONB,
-        signatures JSONB,
-
-        created_at TIMESTAMP DEFAULT NOW()
-    );
-    """)
+#     # cur.execute("""
+#     # ALTER TABLE vehicles
+#     # ADD COLUMN IF NOT EXISTS category VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS tool_code VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS owner_type VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
+#     # ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
+#     # """)  
+#     # cur.execute("""
+#     # ALTER TABLE vehicles
+#     # ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+#     # """)
 
 
-    conn.commit()
-    conn.close()
+
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS form_650 (
+#        id SERIAL PRIMARY KEY,
+#        event_type TEXT,
+#        vehicle_type TEXT,
+#        vehicle_number TEXT,
+#        date DATE,
+#        location TEXT,
+#        owner_name TEXT,
+#        owner_id TEXT,
+#        owner_phone TEXT,
+#        licence_status TEXT,
+#        fuel TEXT,
+#        checklist JSONB,
+#        lights TEXT,
+#        tires TEXT,
+#        damage_physical TEXT,
+#        damage_mechanical TEXT,
+#        assessor TEXT,
+#        document_person_id TEXT,
+#        releasing_signature TEXT,
+#        unit_rep TEXT,
+#        created_at TIMESTAMP DEFAULT NOW()
+#     );
+#     """)
+
+#     cur.execute("""
+#     CREATE TABLE IF NOT EXISTS issuing_forms (
+#         id SERIAL PRIMARY KEY,
+
+#         vehicle_number TEXT,
+
+#         issuing_unit TEXT,
+#         receiving_unit TEXT,
+
+#         items JSONB,
+#         accessories JSONB,
+#         signatures JSONB,
+
+#         created_at TIMESTAMP DEFAULT NOW()
+#     );
+#     """)
+
+
+#     conn.commit()
+#     conn.close()
 
    
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
-init_db() #for manual init
+#print("Running init_db")
+#init_db() #for manual init
+#print("Running after init_db")
+
 # ---------------- ROUTES ----------------
 
 @app.route("/")
@@ -260,7 +267,28 @@ def login():
     })
 
 # ---------------- VEHICLES ----------------
+# @app.route("/drop-vehicles")
+# def drop_vehicles():
+#     conn = connect()
+#     cur = conn.cursor()
 
+#     cur.execute("DROP TABLE IF EXISTS vehicles CASCADE;")
+
+#     conn.commit()
+#     conn.close()
+
+#     return "vehicles table dropped"
+# @app.route("/drop-form650")
+# def drop_form650():
+#     conn = connect()
+#     cur = conn.cursor()
+
+#     cur.execute("DROP TABLE IF EXISTS form_650 CASCADE;")
+
+#     conn.commit()
+#     conn.close()
+
+#     return "form_650 dropped"
 @app.route("/vehicles", methods=["GET"])
 def get_vehicles():
     from_date = request.args.get("from_date")
@@ -1025,12 +1053,11 @@ def get_forms_650():
 #     print(data)  # test first
 
 #     return jsonify({"status": "ok"})
-
 @app.route("/submit-form", methods=["POST"])
 def submit_form():
 
     data = request.json
-
+    date_value = data["date"] if data["date"] else None
     event_type = data["event_type"]
     vehicle_number = data["vehicle_number"]
 
@@ -1134,7 +1161,6 @@ def submit_form():
     # --------------------------------
     # SAVE FORM
     # --------------------------------
-
     cur.execute("""
         INSERT INTO form_650 (
             vehicle_id,
@@ -1155,7 +1181,7 @@ def submit_form():
         vehicle_number,
         data["event_type"],
         data["vehicle_type"],
-        data["date"],
+        date_value,
         data["location"],
         data["owner_name"],
         data["owner_id"],
@@ -1185,7 +1211,7 @@ def delete_user(user_id):
 conn = connect()
 cur = conn.cursor()
 
-cur.execute("ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS unitcode VARCHAR(50);")
+#cur.execute("ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS unitcode VARCHAR(50);")
 conn.commit()
 
 conn = connect()
@@ -1221,4 +1247,5 @@ conn.close()
 #test
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    #init_db()
     app.run(host="0.0.0.0", port=port)
