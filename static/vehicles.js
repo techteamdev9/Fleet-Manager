@@ -121,7 +121,6 @@ function refreshStatusOptions() {
 
 let currentPageVehicles = 1;
 const rowsPerPageVehicles = 10; // Adjust how many vehicles per page
-
 async function refreshTable(page = 1) {
   const searchInput = document.getElementById("search");
   const searchValue = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -176,7 +175,7 @@ async function refreshTable(page = 1) {
 
     tr.innerHTML = `
       <td>${v.license_number}</td>
-      <td>${v.tool_code}</td>
+      <td>${v.vehicle_type}</td>
       <td>${v.status}</td>
       <td style="color:${color}; font-weight:bold;">
         ${availableText}
@@ -367,7 +366,6 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
   document.getElementById("prevPage").disabled = page <= 1;
   document.getElementById("nextPage").disabled = page >= totalPages;
 }
-
 function saveVehicle() {
 
   const vehicleId = document.getElementById("vehicleId").value;

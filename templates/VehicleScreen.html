@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>מערכת ינשוף</title>
+  <title>מערכת ניהול כלים</title>
   <link rel="stylesheet" href="/static/css/VehicleScreen.css" />
   <style>
     /* wrapper for horizontal scroll on small screens */
@@ -615,7 +615,7 @@ input[type="file"] {
 </style>
 </head>
 <body>
-  <button onclick="history.back()" style="padding:10px 15px; cursor:pointer;">
+  <button onclick="goBackToVehicles()" style="padding:10px 15px; cursor:pointer;">
     ⬅ חזור לניהול רכבים
   </button>
   <button class="main-btn primary" onclick="openForm()">  1טופס 650</button>
@@ -647,6 +647,7 @@ input[type="file"] {
       <div class="row">
         <label>בעת:</label>
         <select id="eventType">
+          <option value="" selected disabled>בחר פעולה</option>
           <option>גיוס הרכב</option>
           <option>זיכוי מיחידת הסמך</option>
           <option>שחרור לבעלים</option>
@@ -706,12 +707,12 @@ input[type="file"] {
       </div>
       <div class="row">
         <label>איתורן</label>
-        <input type="text">
+        <input type="text"  id="locatorCode">
         <textarea placeholder="נדרש לציין קוד"></textarea>
       </div>
       <div class="row">
         <label>קוד נעילה</label>
-        <input type="text">
+        <input type="text" id="lockCode">
         <textarea placeholder="נדרש לציין קוד"></textarea>
       </div>
       <div class="row">
@@ -893,10 +894,11 @@ input[type="file"] {
   
       <span class="close-btn" onclick="closeVehicleActionsModal()">×</span>
   
-      <h3 id="modalTitle">רכב</h3>
-
+      <h3 id="modalTitle">כלי</h3>
+      <button onclick="open650Form()">650</button>
       <button onclick="alert('ניפוק')">ניפוק</button>
       <button onclick="alert('טיפול')">טיפול</button>
+
 
   
     </div>

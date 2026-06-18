@@ -179,6 +179,18 @@ function openForm() {
 
 function closeForm() {
   document.getElementById("formModal").style.display = "none";
+  document.getElementById("vehicleType").value = "";
+  document.getElementById("vehicleNumber").value = "";
+  document.getElementById("ownerName").value = "";
+  document.getElementById("ownerId").value = "";
+  document.getElementById("ownerPhone").value = "";
+  document.getElementById("locatorCode").value = "";
+  document.getElementById("lockCode").value = "";
+  document.getElementById("licenceStatus").selectedIndex = 0;
+
+  selectedVehicle = null;
+  document.getElementById("eventType").innerHTML =
+  originalEventTypeOptions;
 }
 
 // function submitForm() {
@@ -202,41 +214,91 @@ function closeForm() {
 //     closeForm();
 //   });
 // }
+const eventTypeSelect = document.getElementById("eventType");
+const originalEventTypeOptions = eventTypeSelect.innerHTML;
+
+//form filler for each row
+function open650Form() {
+  if (!selectedVehicle) return;
+
+  // Open your existing form
+  // document.getElementById("formModal").style.display = "block";
+  openForm();
+  const eventTypeSelect = document.getElementById("eventType");
+
+  // Restore original list first
+  eventTypeSelect.innerHTML = originalEventTypeOptions;
+
+  // Remove "גיוס הרכב"
+  [...eventTypeSelect.options].forEach(option => {
+    if (option.text === "גיוס הרכב") {
+      option.remove();
+    }
+  });
+  eventTypeSelect.selectedIndex = 0;
+  // Fill fields from vehicle data
+  document.getElementById("vehicleType").value =
+    selectedVehicle.vehicle_type || "";
+
+  document.getElementById("vehicleNumber").value =
+    selectedVehicle.license_number || "";
+
+  document.getElementById("ownerName").value =
+    selectedVehicle.ownerName || "";
+
+  document.getElementById("ownerId").value =
+    selectedVehicle.ownerId || "";
+
+  document.getElementById("ownerPhone").value =
+    selectedVehicle.ownerPhone || "";
+
+  document.getElementById("locatorCode").value =
+    selectedVehicle.locatorCode || "";
+
+  document.getElementById("lockCode").value =
+    selectedVehicle.lockCode || "";
+
+  const licenseStatusField = document.getElementById("licenseStatus");
+  if (licenseStatusField) {
+    licenseStatusField.value =
+      selectedVehicle.licenseStatus || "";
+  }
+}
 async function submitForm() {
 
   const formData = {
-      event_type: document.getElementById("eventType").value,
-      vehicle_type: document.getElementById("vehicleType").value,
-      vehicle_number: document.getElementById("vehicleNumber").value,
-      date: document.getElementById("date").value,
-      location: document.getElementById("location").value,
+    event_type: document.getElementById("eventType").value,
+    vehicle_type: document.getElementById("vehicleType").value,
+    vehicle_number: document.getElementById("vehicleNumber").value,
+    date: document.getElementById("date").value,
+    location: document.getElementById("location").value,
 
-      owner_name: document.getElementById("ownerName").value,
-      owner_id: document.getElementById("ownerId").value,
-      owner_phone: document.getElementById("ownerPhone").value,
+    owner_name: document.getElementById("ownerName").value,
+    owner_id: document.getElementById("ownerId").value,
+    owner_phone: document.getElementById("ownerPhone").value,
 
-      licence_status: document.getElementById("licenceStatus").value,
-      fuel: document.getElementById("fuel").value,
+    licence_status: document.getElementById("licenceStatus").value,
+    fuel: document.getElementById("fuel").value,
 
-      lights: document.getElementById("lights").value,
-      tires: document.getElementById("tires").value,
+    lights: document.getElementById("lights").value,
+    tires: document.getElementById("tires").value,
 
-      damage_physical: document.getElementById("damagePhysical").value,
-      damage_mechanical: document.getElementById("damageMechanical").value,
+    damage_physical: document.getElementById("damagePhysical").value,
+    damage_mechanical: document.getElementById("damageMechanical").value,
 
-      assessor: document.getElementById("assessor").value,
+    assessor: document.getElementById("assessor").value,
 
-      document_person_id: document.getElementById("documentPerson").value,
-      releasing_signature: document.getElementById("releasingSignature").value,
-      unit_rep: document.getElementById("unitRep").value
+    document_person_id: document.getElementById("documentPerson").value,
+    releasing_signature: document.getElementById("releasingSignature").value,
+    unit_rep: document.getElementById("unitRep").value
   };
 
   const response = await fetch("/submit-form", {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData)
   });
 
   const result = await response.json();
@@ -244,8 +306,9 @@ async function submitForm() {
   alert(result.message);
   console.log(formData);
   closeForm();
+  window.location.href='/vehicles-page1'
 }
-document.getElementById("openNextForm").addEventListener("click", function() {
+document.getElementById("openNextForm").addEventListener("click", function () {
   // Get the vehicle number (or ID) from the form
   const vehicleNumber = document.getElementById("vehicleNumber").value;
 
@@ -400,7 +463,7 @@ function submitIssueForm() {
         rank: document.getElementById("issuer_rank").value,
         full_name: document.getElementById("issuer_fullname").value
       },
-    
+
       receiver: {
         id: document.getElementById("receiver_id").value,
         rank: document.getElementById("receiver_rank").value,
@@ -446,15 +509,15 @@ function submitIssueForm() {
     },
     body: JSON.stringify(data)
   })
-  .then(res => res.json())
-  .then(result => {
-    alert("נשמר בהצלחה");
-    closeModal();
-  })
-  .catch(err => {
-    console.error(err);
-  });
-  console.log(data); 
+    .then(res => res.json())
+    .then(result => {
+      alert("נשמר בהצלחה");
+      closeModal();
+    })
+    .catch(err => {
+      console.error(err);
+    });
+  console.log(data);
 }
 
 // select unit
@@ -465,26 +528,30 @@ function filterVehicles() {
   selectedUnit = select.value;
 
   console.log("Selected unit:", selectedUnit);
-  render(); 
-  
+  render();
+
   // later: filter table here
 }
 // function refreshVehiclesTable() {
 //   const vehicles = getVehiclesByType(selectedType, selectedSubType);
 //   renderVehiclesTable(vehicles);
 // }
+let selectedVehicle = null
 function openVehicleActionsModal(vehicle) {
+  selectedVehicle = vehicle;
+  console.log(vehicle)
+
   const modal = document.getElementById("vehicleActionsModal");
 
   document.getElementById("modalTitle").innerText =
-    "רכב: " + (vehicle.license_number || "");
+    "כלי " + (vehicle.license_number || "");
 
   modal.classList.add("active");
 }
 
 function closeVehicleActionsModal() {
   document.getElementById("vehicleActionsModal").classList.remove("active");
-  
+
 
 }
 
@@ -500,6 +567,12 @@ document.addEventListener("click", function (event) {
   closeVehicleActionsModal();
 });
 
+function goBackToVehicles() {
+  // sessionStorage.setItem("refreshVehiclesTable", "1");
+  // history.back();
+  window.location.href="/vehicles-page"
+
+}
 function render() {
   app.innerHTML = "";
 
@@ -581,7 +654,7 @@ function render() {
     types.forEach(type => {
       const card = document.createElement("div");
       card.className = "card";
-      
+
       card.style.backgroundColor = "#fff";
 
       const label = document.createElement("div");
@@ -725,7 +798,7 @@ function render() {
   const headersMap = {
     id: "#",
     license_number: "מספר רישוי",
-    tool_code: "קוד כלי",
+    vehicle_type: "סוג כלי",
     status: "סטטוס",
     available_for_service: "זמינות",
     unitcode: "קוד יחידה"
