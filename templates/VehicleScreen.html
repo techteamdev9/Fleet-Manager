@@ -1,94 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>מערכת ניהול כלים</title>
   <link rel="stylesheet" href="/static/css/VehicleScreen.css" />
   <style>
     /* wrapper for horizontal scroll on small screens */
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  margin-top: 20px;
-}
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
 
-/* table base */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: system-ui, -apple-system, Arial, sans-serif;
-  background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
+    /* table base */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: system-ui, -apple-system, Arial, sans-serif;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
 
-/* header */
-thead {
-  background: #1f2937;
-  color: #fff;
-}
+    /* header */
+    thead {
+      background: #1f2937;
+      color: #fff;
+    }
 
-th {
-  padding: 14px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.3px;
-}
+    th {
+      padding: 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+    }
 
-/* cells */
-td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-}
+    /* cells */
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
 
-/* zebra rows */
-tbody tr:nth-child(even) {
-  background: #f9fafb;
-}
+    /* zebra rows */
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
 
-/* hover */
-tbody tr:hover {
-  background: #eef6ff;
-  transition: 0.2s;
-}
+    /* hover */
+    tbody tr:hover {
+      background: #eef6ff;
+      transition: 0.2s;
+    }
 
-/* smooth edges */
-table, th, td {
-  border: none;
-}
+    /* smooth edges */
+    table,
+    th,
+    td {
+      border: none;
+    }
 
-/* responsive scroll hint */
-.table-wrapper::-webkit-scrollbar {
-  height: 8px;
-}
+    /* responsive scroll hint */
+    .table-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
 
-.table-wrapper::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-}
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
 
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
 
-  /* Make horizontal scroll start from the right */
-  direction: rtl;
-}
+      /* Make horizontal scroll start from the right */
+      direction: rtl;
+    }
 
-/* Keep table normal LTR inside so text aligns correctly */
-.table-wrapper table {
-  direction: ltr;   /* table content stays left-to-right */
-  text-align: left; /* optional: aligns text inside cells */
-}
-.card {
-  color: white;
-  font-weight: bold;
-}
-/* 650 */
-/* .modal {
+    /* Keep table normal LTR inside so text aligns correctly */
+    .table-wrapper table {
+      direction: ltr;
+      /* table content stays left-to-right */
+      text-align: left;
+      /* optional: aligns text inside cells */
+    }
+
+    .card {
+      color: white;
+      font-weight: bold;
+    }
+
+    /* 650 */
+    /* .modal {
   direction: rtl;
   display: none;
   position: fixed;
@@ -118,508 +125,710 @@ table, th, td {
 textarea {
   width: 200px;
 } */
-/* Overlay */
-.modal {
-  direction: rtl;
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(6px);
-  z-index: 9999;
-  animation: fadeIn 0.25s ease;
-}
+    /* Overlay */
+    /* =========================
+   MODAL BACKGROUND
+========================= */
+    .modal {
+      direction: rtl;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      padding: 20px;
+      overflow-y: auto;
+    }
 
-/* Modal Card */
-.modal-content {
-  background: #ffffff;
-  margin: 40px auto;
-  width: 90%;
-  max-width: 1000px;
-  max-height: 90%;
-  overflow-y: auto;
-  padding: 32px;
-  border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-  font-family: "Segoe UI", system-ui, sans-serif;
-  animation: slideUp 0.3s ease;
-}
+    /* =========================
+   MODAL CARD
+========================= */
+    .modal-content {
+      background: #ffffff;
+      margin: 20px auto;
+      width: 95%;
+      max-width: 1100px;
+      max-height: 95vh;
+      overflow-y: auto;
+      padding: 35px;
+      border-radius: 24px;
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.15),
+        0 5px 15px rgba(0, 0, 0, 0.05);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      position: relative;
+    }
 
-/* Headings */
-.modal-content h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-}
+    /* =========================
+   SCROLLBAR
+========================= */
+    .modal-content::-webkit-scrollbar {
+      width: 10px;
+    }
 
-.modal-content h3 {
-  margin-top: 30px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  color: #444;
-}
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 20px;
+    }
 
-/* Close button */
-.modal-content > button:first-child {
-  background: transparent;
-  color: #666;
-  font-size: 18px;
-  float: left;
-  border: none;
-  cursor: pointer;
-}
+    .modal-content::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
 
-.modal-content > button:first-child:hover {
-  color: #000;
-  transform: scale(1.1);
-}
+    /* =========================
+   TITLES
+========================= */
+    .modal-content h2 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #0f172a;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e2e8f0;
+    }
 
-/* Row layout (THIS is the big upgrade) */
-.row {
-  display: grid;
-  grid-template-columns: 180px 1fr 1fr;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 12px;
-  transition: background 0.2s;
-}
+    .modal-content h3 {
+      margin-top: 35px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: #eff6ff;
+      border-right: 5px solid #3b82f6;
+      border-radius: 12px;
+      color: #1e40af;
+      font-size: 18px;
+    }
 
-.row:hover {
-  background: #f8fafc;
-}
+    /* =========================
+   CLOSE BUTTON
+========================= */
+    .modal-content>button:first-child {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      background: #f1f5f9;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: #64748b;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      transition: 0.25s;
+    }
 
-/* Labels */
-.row label {
-  font-size: 14px;
-  color: #555;
-  font-weight: 500;
-}
+    .modal-content>button:first-child:hover {
+      background: #ef4444;
+      color: white;
+      transform: rotate(90deg);
+    }
 
-/* Inputs & selects */
-.modal-content input,
-.modal-content select,
-.modal-content textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 14px;
-  background: #f8fafc;
-  transition: all 0.2s ease;
-}
+    /* =========================
+   ROWS
+========================= */
+    .row {
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid #edf2f7;
+      border-radius: 16px;
+      background: #ffffff;
+      transition: all 0.25s ease;
+    }
 
-/* Focus state */
-.modal-content input:focus,
-.modal-content select:focus,
-.modal-content textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
+    .row:hover {
+      background: #f8fafc;
+      border-color: #dbeafe;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+    }
 
-/* Textarea sizing */
-textarea {
-  min-height: 40px;
-  resize: vertical;
-}
+    /* =========================
+   LABELS
+========================= */
+    .row label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      padding-top: 12px;
+    }
 
-/* File input tweak */
-input[type="file"] {
-  background: #fff;
-  padding: 6px;
-}
+    /* =========================
+   INPUTS
+========================= */
+    .modal-content input,
+    .modal-content select,
+    .modal-content textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border: 1px solid #dbe3ee;
+      border-radius: 12px;
+      font-size: 14px;
+      background: #f8fafc;
+      transition: 0.25s;
+      font-family: inherit;
+    }
 
-/* Buttons */
-.modal-content button {
-  border: none;
-  background: #3b82f6;
+    .modal-content input:hover,
+    .modal-content select:hover,
+    .modal-content textarea:hover {
+      border-color: #93c5fd;
+    }
+
+    .modal-content input:focus,
+    .modal-content select:focus,
+    .modal-content textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+
+    /* =========================
+   TEXTAREAS
+========================= */
+    textarea {
+      min-height: 48px;
+      resize: vertical;
+    }
+
+    /* Damage fields bigger */
+    #damagePhysical,
+    #damageMechanical {
+      min-height: 120px;
+    }
+
+    /* =========================
+   CHECKLIST AREA
+========================= */
+    #checklist {
+      background: #f8fafc;
+      border: 1px solid #dbe3ee;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* =========================
+   FILE BUTTON
+========================= */
+    .upload-btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background: #3b82f6;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.25s;
+      min-height: 46px;
+    }
+
+    .upload-btn:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    /* =========================
+   ACTION BUTTONS
+========================= */
+    .modal-content button {
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 22px;
+      transition: 0.25s;
+    }
+
+    /* Submit */
+    button[onclick="submitForm()"] {
+      background: #10b981;
+      color: white;
+    }
+
+    button[onclick="submitForm()"]:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+
+    /* Close */
+    button[onclick="closeForm()"]:not(:first-child) {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    button[onclick="closeForm()"]:not(:first-child):hover {
+      background: #cbd5e1;
+    }
+
+    /* Open next */
+    #openNextForm {
+      background: #3b82f6;
+      color: white;
+    }
+
+    #openNextForm:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    /* =========================
+   BUTTON CONTAINER LOOK
+========================= */
+    .modal-content>button:not(:first-child) {
+      margin-top: 15px;
+      margin-left: 8px;
+    }
+
+    /* =========================
+   MOBILE
+========================= */
+    @media (max-width: 768px) {
+
+      .modal-content {
+        padding: 20px;
+        width: 100%;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .row label {
+        padding-top: 0;
+      }
+
+      .modal-content h2 {
+        font-size: 22px;
+      }
+
+      .modal-content h3 {
+        font-size: 16px;
+      }
+
+      button[onclick="submitForm()"],
+      button[onclick="closeForm()"],
+      #openNextForm {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Overlay */
+    .issue-modal {
+      direction: rtl;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      /* softer dark blue overlay */
+      backdrop-filter: blur(6px);
+      /* modern glass effect */
+      z-index: 10000;
+      animation: fadeIn 0.25s ease;
+    }
+
+    /* Modal Card */
+    .issue-modal-content {
+      background: #ffffff;
+      margin: 40px auto;
+      width: 85%;
+      max-width: 950px;
+      max-height: 90%;
+      overflow-y: auto;
+      padding: 32px;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+      animation: slideUp 0.3s ease;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    /* Headings */
+    .issue-modal-content h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .issue-modal-content h3 {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #444;
+    }
+
+    .issue-modal-content h4 {
+      margin-bottom: 10px;
+      font-size: 15px;
+      color: #666;
+    }
+
+    /* Inputs */
+    .issue-modal-content input {
+      width: 100%;
+      padding: 10px 12px;
+      margin: 6px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      background: #f8fafc;
+    }
+
+    .issue-modal-content input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Buttons */
+    .issue-modal-content button {
+      border: none;
+      background: #3b82f6;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .issue-modal-content button:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    /* Close button */
+    .issue-modal-content>button:first-child {
+      background: transparent;
+      color: #666;
+      font-size: 18px;
+      float: left;
+    }
+
+    .issue-modal-content>button:first-child:hover {
+      color: #000;
+      transform: scale(1.1);
+    }
+
+    /* Sections spacing */
+    .issue-modal-content>input {
+      margin-bottom: 10px;
+    }
+
+    /* Grid layout for top inputs */
+    .issue-modal-content input#issuing_unit,
+    .issue-modal-content input#receiving_unit {
+      width: 48%;
+      display: inline-block;
+    }
+
+    .issue-modal-content input#receiving_unit {
+      /* margin-right: 4%; */
+    }
+
+    /* Inline date */
+    .inline-date {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    /* Signatures layout */
+    .signatures {
+      display: flex;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .signatures>div {
+      flex: 1;
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Checkbox */
+    .issue-modal-content label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .main-btn {
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 10px;
+    }
+
+    /* Primary button */
+    .main-btn.primary {
+      background: #2563eb;
+      /* blue */
+      color: white;
+    }
+
+    /* Secondary button */
+    .main-btn.secondary {
+      background: #10b981;
+      /* green */
+      color: white;
+    }
+
+    /* Hover effects */
+    .main-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Click effect */
+    .main-btn:active {
+      transform: scale(0.97);
+    }
+
+    .unit-picker {
+      direction: rtl;
+      margin: 15px 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .unit-picker label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* modern dropdown */
+    .unit-picker select {
+      width: 260px;
+      padding: 12px 14px;
+
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      /* background: linear-gradient(145deg, #ffffff, #f9fafb); */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      font-size: 20px;
+      color: #111827;
+
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    /* hover */
+    .unit-picker select:hover {
+      border-color: #dfe2e6;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+
+    /* focus */
+    .unit-picker select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    /* make dropdown arrow nicer */
+    .unit-picker select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7l5 5 5-5H5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 12px center;
+      background-size: 14px;
+      padding-left: 40px;
+      background: linear-gradient(135deg, #b5c4f0, #2563eb)
+    }
+
+    .vehicle-modal {
+      display: none;
+      /* background: rgba(157, 169, 238, 0.55); */
+      text-align: center;
+      background: rgb(220, 222, 226);
+      z-index: 10000;
+    }
+
+    .vehicle-modal.active {
+      display: block;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 180px 1fr auto;
+      gap: 16px;
+      /* THIS is the key */
+      align-items: center;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    .accessory-row {
+      display: grid;
+      grid-template-columns: 1fr 60px;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+
+    .accessory-row:hover {
+      background: #f8fafc;
+    }
+
+    /* label */
+    .accessory-row label {
+      font-size: 14px;
+    }
+
+    /* X / number display */
+    .display {
+      text-align: center;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #444;
+      transition: all 0.2s;
+    }
+
+    .display:hover {
+      background: #e2e8f0;
+    }
+
+    /* input edit mode */
+    .edit-input {
+      width: 100%;
+      text-align: center;
+    }
+    #vehicleCardBtn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 15px;
-  margin-left: 10px;
-  transition: all 0.2s ease;
-}
-
-.modal-content button:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-/* Secondary button (Close) */
-.modal-content button:nth-of-type(3) {
-  background: #e5e7eb;
-  color: #333;
-}
-
-.modal-content button:nth-of-type(3):hover {
-  background: #d1d5db;
-}
-
-/* Section spacing */
-#checklist {
-  padding: 10px;
+  border: none;
   border-radius: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(25px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Overlay */
-.issue-modal {
-  direction: rtl;
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.55); /* softer dark blue overlay */
-  backdrop-filter: blur(6px); /* modern glass effect */
-  z-index: 10000;
-  animation: fadeIn 0.25s ease;
-}
-
-/* Modal Card */
-.issue-modal-content {
-  background: #ffffff;
-  margin: 40px auto;
-  width: 85%;
-  max-width: 950px;
-  max-height: 90%;
-  overflow-y: auto;
-  padding: 32px;
-  border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-  animation: slideUp 0.3s ease;
-  font-family: "Segoe UI", system-ui, sans-serif;
-}
-
-/* Headings */
-.issue-modal-content h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
+  padding: 12px 18px;
+  font-size: 14px;
   font-weight: 600;
-}
-
-.issue-modal-content h3 {
-  margin-top: 30px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  color: #444;
-}
-
-.issue-modal-content h4 {
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #666;
-}
-
-/* Inputs */
-.issue-modal-content input {
-  width: 100%;
-  padding: 10px 12px;
-  margin: 6px 0;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  background: #f8fafc;
-}
-
-.issue-modal-content input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
-
-/* Buttons */
-.issue-modal-content button {
-  border: none;
-  background: #3b82f6;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-  transition: all 0.2s ease;
-}
-
-.issue-modal-content button:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-/* Close button */
-.issue-modal-content > button:first-child {
-  background: transparent;
-  color: #666;
-  font-size: 18px;
-  float: left;
-}
-
-.issue-modal-content > button:first-child:hover {
-  color: #000;
-  transform: scale(1.1);
-}
-
-/* Sections spacing */
-.issue-modal-content > input {
-  margin-bottom: 10px;
-}
-
-/* Grid layout for top inputs */
-.issue-modal-content input#issuing_unit,
-.issue-modal-content input#receiving_unit {
-  width: 48%;
-  display: inline-block;
-}
-
-.issue-modal-content input#receiving_unit {
-  /* margin-right: 4%; */
-}
-
-/* Inline date */
-.inline-date {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-/* Signatures layout */
-.signatures {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.signatures > div {
-  flex: 1;
-  background: #f8fafc;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-/* Checkbox */
-.issue-modal-content label {
-  display: flex;
+  transition: all .25s ease;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 15px;
-  font-size: 14px;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+#vehicleCardBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37,99,235,.25);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+#vehicleCardBtn:active {
+  transform: translateY(0);
 }
-
-.main-btn {
-    padding: 14px 28px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin: 10px;
-}
-
-/* Primary button */
-.main-btn.primary {
-    background: #2563eb; /* blue */
-    color: white;
-}
-
-/* Secondary button */
-.main-btn.secondary {
-    background: #10b981; /* green */
-    color: white;
-}
-
-/* Hover effects */
-.main-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-}
-
-/* Click effect */
-.main-btn:active {
-    transform: scale(0.97);
-}
-
-.unit-picker {
-  direction: rtl;
-  margin: 15px 0;
-  font-family: Arial, sans-serif;
-}
-
-.unit-picker label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* modern dropdown */
-.unit-picker select {
-  width: 260px;
-  padding: 12px 14px;
-
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
-  /* background: linear-gradient(145deg, #ffffff, #f9fafb); */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-
-  font-size: 20px;
-  color: #111827;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* hover */
-.unit-picker select:hover {
-  border-color: #dfe2e6;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-}
-
-/* focus */
-.unit-picker select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-/* make dropdown arrow nicer */
-.unit-picker select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7l5 5 5-5H5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 12px center;
-  background-size: 14px;
-  padding-left: 40px;
-  background: linear-gradient(135deg, #b5c4f0, #2563eb)
-
-}
-
-.vehicle-modal {
-  display: none;
-  /* background: rgba(157, 169, 238, 0.55); */
-  text-align: center;
-  background: rgb(220, 222, 226);
-  z-index: 10000;
-}
-
-.vehicle-modal.active {
-  display: block;
-}
-
-.row {
+.card-grid {
   display: grid;
-  grid-template-columns: 180px 1fr auto;
-  gap: 16px; /* THIS is the key */
-  align-items: center;
-}
-.upload-btn {
-  display: inline-block;
-  background: #3b82f6;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: center;
-  transition: all 0.2s ease;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.upload-btn:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-.accessory-row {
-  display: grid;
-  grid-template-columns: 1fr 60px;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 10px;
-  transition: background 0.2s;
-}
-
-.accessory-row:hover {
+.card-grid div {
   background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
 }
-
-/* label */
-.accessory-row label {
-  font-size: 14px;
-}
-
-/* X / number display */
-.display {
-  text-align: center;
-  background: #f1f5f9;
-  border-radius: 8px;
-  padding: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  color: #444;
-  transition: all 0.2s;
-}
-
-.display:hover {
-  background: #e2e8f0;
-}
-
-/* input edit mode */
-.edit-input {
-  width: 100%;
-  text-align: center;
-}
-</style>
+  </style>
 </head>
+
 <body>
   <button onclick="goBackToVehicles()" style="padding:10px 15px; cursor:pointer;">
     ⬅ חזור לניהול רכבים
   </button>
-  <button class="main-btn primary" onclick="openForm()">  1טופס 650</button>
-  <button  class="main-btn secondary" id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
+  <button class="main-btn primary" onclick="openForm()"> 1טופס 650</button>
+  <button class="main-btn secondary" id="openNextForm" type="button" onclick="openModal()">ניפוק וקבלת רכב</button>
   <div class="unit-picker">
     <label>בחר קוד יחידה:</label>
     <select id="unitSelect" onchange="filterVehicles()">
@@ -640,9 +849,9 @@ input[type="file"] {
   <div id="formModal" class="modal">
     <div class="modal-content">
       <button onclick="closeForm()">✕</button>
-  
+
       <h2>טופס 1650 - מספר טופס: <span id="formId"></span></h2>
-  
+
       <!-- Event -->
       <div class="row">
         <label>בעת:</label>
@@ -654,47 +863,47 @@ input[type="file"] {
         </select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Vehicle -->
       <div class="row">
         <label>סוג הרכב</label>
         <input type="text" id="vehicleType">
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <div class="row">
         <label>מספר רישוי</label>
         <input type="text" id="vehicleNumber">
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Date -->
       <div class="row">
         <label>תאריך</label>
         <input type="date" id="date">
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Location -->
       <div class="row">
         <label>אתר</label>
         <select id="location"></select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Owner -->
       <div class="row">
         <label>שם בעלים</label>
         <input type="text" id="ownerName">
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <div class="row">
         <label>ת.ז בעלים</label>
         <input type="text" id="ownerId">
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <div class="row">
         <label>טלפון בעלים</label>
         <input type="text" id="ownerPhone">
@@ -707,7 +916,7 @@ input[type="file"] {
       </div>
       <div class="row">
         <label>איתורן</label>
-        <input type="text"  id="locatorCode">
+        <input type="text" id="locatorCode">
         <textarea placeholder="נדרש לציין קוד"></textarea>
       </div>
       <div class="row">
@@ -720,7 +929,7 @@ input[type="file"] {
         <input type="text">
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Licence -->
       <div class="row">
         <label>תוקף רישוי</label>
@@ -730,7 +939,7 @@ input[type="file"] {
         </select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Fuel -->
       <div class="row">
         <label>מיכל דלק</label>
@@ -741,11 +950,11 @@ input[type="file"] {
         </select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Checklist -->
       <h3>ציוד נלווה (סמן יש / אין)</h3>
       <div id="checklist"></div>
-  
+
       <!-- Lights -->
       <div class="row">
         <label>פנסים</label>
@@ -755,7 +964,7 @@ input[type="file"] {
         </select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Tires -->
       <div class="row">
         <label>צמיגים</label>
@@ -765,7 +974,7 @@ input[type="file"] {
         </select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Damage -->
       <!-- <div class="row">
         <label>נזקים בפח</label>
@@ -775,18 +984,18 @@ input[type="file"] {
       <div class="row">
         <label>נזקים בפח</label>
         <textarea id="damagePhysical"></textarea>
-      
+
         <label class="upload-btn">
           העלה תמונה
           <input type="file" multiple hidden>
         </label>
       </div>
-  
+
       <div class="row">
         <label>נזקים מכניים</label>
         <textarea id="damageMechanical"></textarea>
       </div>
-  
+
       <!-- Assessor -->
       <div class="row">
         <label>המלצת שמאי</label>
@@ -799,25 +1008,25 @@ input[type="file"] {
         </select>
         <textarea placeholder="הערות"></textarea>
       </div>
-  
+
       <!-- Signatures -->
       <h3>חתימות</h3>
-  
+
       <div class="row">
         <label>חתימת המתעד + מ.א</label>
         <input type="text" id="documentPerson">
       </div>
-  
+
       <div class="row">
         <label>חתימת מוסר הרכב</label>
         <input type="text" id="releasingSignature">
       </div>
-  
+
       <div class="row">
         <label>חתימת נציג היח'</label>
-        <input type="text" id="unitRep">>
+        <input type="text" id="unitRep">
       </div>
-  
+
       <button onclick="submitForm()">שלח</button>
       <button onclick="closeForm()">סגור</button>
       <div style="margin-top: 20px;">
@@ -829,13 +1038,13 @@ input[type="file"] {
   <div id="issueModal" class="issue-modal">
     <div class="issue-modal-content">
       <button onclick="closeModal()">✕</button>
-  
+
       <h2>ניפוק וקבלה - רכב</h2>
-  
+
       <!-- Top inputs -->
       <input type="text" id="issuing_unit" placeholder="יח מנפקת">
       <input type="text" id="receiving_unit" placeholder="יח מקבלת">
-  
+
       <!-- 6 fields -->
       <input type="text" placeholder="קדומת מרץ">
       <input type="number" placeholder="סוג תנועה">
@@ -845,32 +1054,32 @@ input[type="file"] {
       <label class="inline-date">
         תאריך ניפוק:
         <input type="date">
-    </label>
+      </label>
       <input type="number" placeholder="מספר שובר">
-  
+
       <!-- Dynamic rows -->
       <h3>ציוד</h3>
       <div id="itemsContainer"></div>
       <button type="button" onclick="addRow()">➕</button>
-  
+
       <!-- Accessories -->
       <h3>פירוט אביזרים/ציוד נלווה</h3>
       <div id="accessories"></div>
-  
+
       <!-- Signatures -->
       <div class="signatures">
         <div>
           <h4>אשור יח מנפקת</h4>
-        
+
           <input id="issuer_signature" type="text" placeholder="חתימה">
           <input id="issuer_id" type="number" placeholder="תעודת זהות">
           <input id="issuer_rank" type="text" placeholder="דרגה">
           <input id="issuer_fullname" type="text" placeholder="שם מלא">
         </div>
-  
+
         <div>
           <h4>אשור יח מקבלת</h4>
-        
+
           <input id="receiver_id" type="number" placeholder="תעודת זהות">
           <input id="receiver_rank" type="text" placeholder="דרגה">
           <input id="receiver_fullname" type="text" placeholder="שם מלא">
@@ -880,7 +1089,7 @@ input[type="file"] {
           <input id="receiver_form_1006" type="number" placeholder="מספר ט 1006">
         </div>
       </div>
-  
+
       <label>
         <input type="checkbox"> אביזרים כמפורש ב - ט 1650
       </label>
@@ -891,15 +1100,59 @@ input[type="file"] {
   <!-- small window -->
   <div id="vehicleActionsModal" class="vehicle-modal">
     <div class="vehicle-modal-content">
-  
+
       <span class="close-btn" onclick="closeVehicleActionsModal()">×</span>
-  
+
       <h3 id="modalTitle">כלי</h3>
       <button onclick="open650Form()">650</button>
       <button onclick="alert('ניפוק')">ניפוק</button>
       <button onclick="alert('טיפול')">טיפול</button>
+      <button id="vehicleCardBtn" type="button" onclick="openVehicleCard()">
+        📋 כרטיס רכב
+      </button>
 
 
+
+    </div>
+  </div>
+  <div id="vehicleCardModal" class="modal">
+    <div class="modal-content">
+  
+      <button onclick="document.getElementById('vehicleCardModal').style.display='none'">✕</button>
+  
+      <h2>🚗 כרטיס רכב</h2>
+  
+      <div class="card-grid">
+  
+        <div><b>מספר רישוי:</b> <span id="vc_license_number"></span></div>
+<div><b>קוד כלי:</b> <span id="vc_tool_code"></span></div>
+<div><b>סטטוס:</b> <span id="vc_status"></span></div>
+<div><b>זמין לשירות:</b> <span id="vc_available"></span></div>
+
+<div><b>יחידה:</b> <span id="vc_unitCode"></span></div>
+<div><b>קטגוריה:</b> <span id="vc_category"></span></div>
+<div><b>סוג רכב:</b> <span id="vc_vehicle_type"></span></div>
+<div><b>תת סוג:</b> <span id="vc_sub_type"></span></div>
+
+<div><b>סוג בעלות:</b> <span id="vc_owner_type"></span></div>
+<div><b>שם ליסינג:</b> <span id="vc_lease_name"></span></div>
+
+<div><b>שם בעלים:</b> <span id="vc_owner_name"></span></div>
+<div><b>ת"ז:</b> <span id="vc_owner_id"></span></div>
+<div><b>טלפון:</b> <span id="vc_owner_phone"></span></div>
+
+<div><b>קוד איתור:</b> <span id="vc_locator_code"></span></div>
+<div><b>קוד נעילה:</b> <span id="vc_lock_code"></span></div>
+
+<div><b>מיקום:</b> <span id="vc_location"></span></div>
+
+<div><b>דלק:</b> <span id="vc_fuel"></span></div>
+<div><b>רישוי:</b> <span id="vc_licence_status"></span></div>
+
+<div><b>נוצר:</b> <span id="vc_created_at"></span></div>
+<div><b>עודכן:</b> <span id="vc_updated_at"></span></div>
+  
+      </div>
   
     </div>
   </div>
@@ -907,4 +1160,5 @@ input[type="file"] {
 
   <script src="/static/VehicleScreen.js"></script>
 </body>
+
 </html>

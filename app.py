@@ -217,6 +217,30 @@ def connect(retries=5, delay=2):
 #init_db() #for manual init
 #print("Running after init_db")
 
+#alter table vehicle and form_650 w locator and lock once after init_db:
+# def add_vehicle_columns():
+#     conn = connect()  # replace with your DB file
+#     cursor = conn.cursor()
+
+#     try:
+#         cursor.execute(
+#             "ALTER TABLE form_650 ADD COLUMN locatorCode TEXT"
+#         )
+#     except Exception:
+#         pass
+
+#     try:
+#         cursor.execute(
+#             "ALTER TABLE form_650 ADD COLUMN lockCode TEXT"
+#         )
+#     except Exception:
+#         pass
+
+#     conn.commit()
+#     conn.close()
+
+# # Run once
+# add_vehicle_columns()
 # ---------------- ROUTES ----------------
 
 @app.route("/")
@@ -343,11 +367,19 @@ def get_vehicles():
             status,
             available_for_service,
             unitcode,
+            owner_name,
+            owner_id,
+            owner_phone,
+            locatorcode,
+            lockcode,
             category,
             vehicle_type,
             sub_type,
             owner_type,
             lease_name,
+            location,
+            created_at,
+            updated_at,
             images FROM vehicles ORDER BY id ASC
         """)
 
@@ -1094,11 +1126,13 @@ def submit_form():
                 owner_name,
                 owner_id,
                 owner_phone,
+                locatorcode,
+                lockcode,
                 location,
                 fuel,
                 licence_status
             )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
         """, (
             vehicle_number,
@@ -1107,6 +1141,8 @@ def submit_form():
             data["owner_name"],
             data["owner_id"],
             data["owner_phone"],
+            data["locatorcode"],
+            data["lockcode"],
             data["location"],
             data["fuel"],
             data["licence_status"]
@@ -1142,6 +1178,8 @@ def submit_form():
                 owner_name = %s,
                 owner_id = %s,
                 owner_phone = %s,
+                locatorcode= %s,
+                lockcode= %s,
                 location = %s,
                 fuel = %s,
                 licence_status = %s,
@@ -1152,6 +1190,8 @@ def submit_form():
             data["owner_name"],
             data["owner_id"],
             data["owner_phone"],
+            data["locatorcode"],
+            data["lockcode"],
             data["location"],
             data["fuel"],
             data["licence_status"],
@@ -1172,10 +1212,12 @@ def submit_form():
             owner_name,
             owner_id,
             owner_phone,
+            locatorcode,
+            lockcode,
             licence_status,
             fuel
         )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """, (
         vehicle_id,
         vehicle_number,
@@ -1186,6 +1228,8 @@ def submit_form():
         data["owner_name"],
         data["owner_id"],
         data["owner_phone"],
+        data["locatorcode"],
+        data["lockcode"],
         data["licence_status"],
         data["fuel"]
     ))
@@ -1239,6 +1283,7 @@ else:
 
 cur.close()
 conn.close()
+
 # ---------------- RUN ----------------
 
 # if __name__ == "__main__":

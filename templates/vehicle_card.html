@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>כרטיס רכב</title>
+
+<style>
+    body {
+  font-family: Arial;
+  background: #f1f5f9;
+  margin: 0;
+  padding: 30px;
+}
+
+.card {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.grid div {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <h1>🚗 כרטיס רכב</h1>
+
+  <div class="grid">
+
+    <div><b>מספר רישוי:</b> {{ vehicle[1] }}</div>
+    <div><b>סוג רכב:</b> {{ vehicle[2] }}</div>
+    <div><b>סטטוס:</b> {{ vehicle[3] }}</div>
+    <div><b>זמין:</b> {{ vehicle[4] }}</div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

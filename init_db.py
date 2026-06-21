@@ -128,7 +128,7 @@ def init_db():
     owner_name TEXT,
     owner_id TEXT,
     owner_phone TEXT,
-
+   
     licence_status TEXT,
     fuel TEXT,
 

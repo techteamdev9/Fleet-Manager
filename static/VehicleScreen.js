@@ -190,7 +190,7 @@ function closeForm() {
 
   selectedVehicle = null;
   document.getElementById("eventType").innerHTML =
-  originalEventTypeOptions;
+    originalEventTypeOptions;
 }
 
 // function submitForm() {
@@ -244,19 +244,19 @@ function open650Form() {
     selectedVehicle.license_number || "";
 
   document.getElementById("ownerName").value =
-    selectedVehicle.ownerName || "";
+    selectedVehicle.owner_name || "";
 
   document.getElementById("ownerId").value =
-    selectedVehicle.ownerId || "";
+    selectedVehicle.owner_id || "";
 
   document.getElementById("ownerPhone").value =
-    selectedVehicle.ownerPhone || "";
+    selectedVehicle.owner_phone || "";
 
   document.getElementById("locatorCode").value =
-    selectedVehicle.locatorCode || "";
+    selectedVehicle.locatorcode || "";
 
   document.getElementById("lockCode").value =
-    selectedVehicle.lockCode || "";
+    selectedVehicle.lockcode || "";
 
   const licenseStatusField = document.getElementById("licenseStatus");
   if (licenseStatusField) {
@@ -282,6 +282,8 @@ async function submitForm() {
 
     lights: document.getElementById("lights").value,
     tires: document.getElementById("tires").value,
+    locatorcode: document.getElementById("locatorCode").value,
+    lockcode: document.getElementById("lockCode").value,
 
     damage_physical: document.getElementById("damagePhysical").value,
     damage_mechanical: document.getElementById("damageMechanical").value,
@@ -306,7 +308,7 @@ async function submitForm() {
   alert(result.message);
   console.log(formData);
   closeForm();
-  window.location.href='/vehicles-page1'
+  window.location.href = '/vehicles-page1'
 }
 document.getElementById("openNextForm").addEventListener("click", function () {
   // Get the vehicle number (or ID) from the form
@@ -318,6 +320,49 @@ document.getElementById("openNextForm").addEventListener("click", function () {
   // Future: redirect to the next form page with vehicle ID
   // window.location.href = `/nextForm?vehicleId=${vehicleNumber}`;
 });
+
+function openVehicleCard() {
+
+  if (!selectedVehicle) {
+    alert("יש לבחור רכב תחילה");
+    return;
+  }
+
+  const v = selectedVehicle;
+
+  document.getElementById("vc_license_number").innerText = v.license_number || "";
+  document.getElementById("vc_tool_code").innerText = v.tool_code || "";
+  document.getElementById("vc_status").innerText = v.status || "";
+  document.getElementById("vc_available").innerText = v.available_for_service ? "כן" : "לא";
+
+  document.getElementById("vc_unitCode").innerText = v.unitcode || "";
+  document.getElementById("vc_category").innerText = v.category || "";
+  document.getElementById("vc_vehicle_type").innerText = v.vehicle_type || "";
+  document.getElementById("vc_sub_type").innerText = v.sub_type || "";
+
+  document.getElementById("vc_owner_type").innerText = v.owner_type || "";
+  document.getElementById("vc_lease_name").innerText = v.lease_name || "";
+
+  document.getElementById("vc_owner_name").innerText = v.owner_name || "";
+  document.getElementById("vc_owner_id").innerText = v.owner_id || "";
+  document.getElementById("vc_owner_phone").innerText = v.owner_phone || "";
+
+  document.getElementById("vc_locator_code").innerText =
+    v.locatorcode || "";
+
+  document.getElementById("vc_lock_code").innerText =
+    v.lockcode || "";
+
+  document.getElementById("vc_location").innerText = v.location || "";
+
+  document.getElementById("vc_fuel").innerText = v.fuel || "";
+  document.getElementById("vc_licence_status").innerText = v.licence_status || "";
+
+  document.getElementById("vc_created_at").innerText = v.created_at || "";
+  document.getElementById("vc_updated_at").innerText = v.updated_at || "";
+
+  document.getElementById("vehicleCardModal").style.display = "block";
+}
 function openModal() {
   document.getElementById("issueModal").style.display = "block";
 
@@ -570,7 +615,7 @@ document.addEventListener("click", function (event) {
 function goBackToVehicles() {
   // sessionStorage.setItem("refreshVehiclesTable", "1");
   // history.back();
-  window.location.href="/vehicles-page"
+  window.location.href = "/vehicles-page"
 
 }
 function render() {
