@@ -261,7 +261,7 @@ function open650Form() {
   const licenseStatusField = document.getElementById("licenseStatus");
   if (licenseStatusField) {
     licenseStatusField.value =
-      selectedVehicle.licenseStatus || "";
+      selectedVehicle.licence_status || "";
   }
 }
 async function submitForm() {

@@ -378,6 +378,7 @@ def get_vehicles():
             owner_type,
             lease_name,
             location,
+            licence_status,
             created_at,
             updated_at,
             images FROM vehicles ORDER BY id ASC
