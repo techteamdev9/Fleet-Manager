@@ -8,6 +8,7 @@ import pandas as pd
 import os
 import time
 import json
+import requests
 # ---------------- CONFIG ----------------
 #just for local
 #from dotenv import load_dotenv
@@ -242,7 +243,48 @@ def connect(retries=5, delay=2):
 # # Run once
 # add_vehicle_columns()
 # ---------------- ROUTES ----------------
+#vehicle search:
+RESOURCE_ID = "053cea08-09bc-40ec-8f7a-156f0677aff3"
 
+@app.route("/api/vehicle-registry/<license_number>")
+def vehicle_registry(license_number):
+
+    try:
+
+        url = "https://data.gov.il/api/3/action/datastore_search"
+
+        params = {
+            "resource_id": RESOURCE_ID,
+            "filters": f'{{"mispar_rechev":"{license_number}"}}',
+            "limit": 1
+        }
+
+        response = requests.get(
+            url,
+            params=params,
+            timeout=15
+        )
+
+        data = response.json()
+
+        records = data.get("result", {}).get("records", [])
+
+        if not records:
+            return jsonify({
+                "success": False,
+                "message": "לא נמצא רכב"
+            })
+
+        return jsonify({
+            "success": True,
+            "vehicle": records[0]
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
 @app.route("/")
 def home():
     return render_template("index.html")

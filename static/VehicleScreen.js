@@ -264,6 +264,140 @@ function open650Form() {
       selectedVehicle.licence_status || "";
   }
 }
+
+// search vehicle
+async function searchVehicleRegistry() {
+
+  const plate = document
+      .getElementById("licenseSearch")
+      .value
+      .replace(/-/g, "")
+      .trim();
+
+  if (!plate) {
+      alert("יש להזין מספר רכב");
+      return;
+  }
+
+  try {
+
+      const response =
+          await fetch(`/api/vehicle-registry/${plate}`);
+
+      const data =
+          await response.json();
+
+      if (!data.success) {
+
+          document.getElementById("registryResult").innerHTML = `
+              <div class="vehicle-result-card">
+                  <div class="vehicle-result-header">
+                      <h3>תוצאות חיפוש</h3>
+                      <button
+                          class="close-result-btn"
+                          onclick="closeVehicleResult()">
+                          ✕
+                      </button>
+                  </div>
+
+                  <div class="no-result">
+                      לא נמצא רכב
+                  </div>
+              </div>
+          `;
+
+          return;
+      }
+
+      const v = data.vehicle;
+
+      document.getElementById("registryResult").innerHTML = `
+          <div class="vehicle-result-card">
+      
+              <div class="vehicle-result-header">
+                  <h3>פרטי רכב ממאגר משרד הרישוי</h3>
+      
+                  <button
+                      class="close-result-btn"
+                      onclick="closeVehicleResult()">
+                      ✕
+                  </button>
+              </div>
+      
+              <div class="vehicle-info-grid">
+      
+                  <div class="info-item">
+                      <span class="info-label">מספר רכב</span>
+                      <span class="info-value">${v.mispar_rechev || "-"}</span>
+                  </div>
+      
+                  <div class="info-item">
+                      <span class="info-label">יצרן</span>
+                      <span class="info-value">${v.tozeret_nm || "-"}</span>
+                  </div>
+      
+                  <div class="info-item">
+                      <span class="info-label">דגם</span>
+                      <span class="info-value">${v.kinuy_mishari || "-"}</span>
+                  </div>
+      
+                  <div class="info-item">
+                      <span class="info-label">שנת ייצור</span>
+                      <span class="info-value">${v.shnat_yitzur || "-"}</span>
+                  </div>
+      
+                  <div class="info-item">
+                      <span class="info-label">צבע</span>
+                      <span class="info-value">${v.tzeva_rechev || "-"}</span>
+                  </div>
+      
+                  <div class="info-item">
+                      <span class="info-label">סוג דלק</span>
+                      <span class="info-value">${v.sug_delek_nm || "-"}</span>
+                  </div>
+      
+                  <div class="info-item">
+                      <span class="info-label">תוקף רישוי</span>
+                      <span class="info-value">${v.tokef_dt || "-"}</span>
+                  </div>
+      
+              </div>
+      
+          </div>
+      `;
+
+  } catch (err) {
+
+      console.error(err);
+
+      document.getElementById("registryResult").innerHTML = `
+          <div class="vehicle-result-card">
+              <div class="vehicle-result-header">
+                  <h3>שגיאה</h3>
+                  <button
+                      class="close-result-btn"
+                      onclick="closeVehicleResult()">
+                      ✕
+                  </button>
+              </div>
+
+              <div class="error-result">
+                  אירעה שגיאה בחיפוש
+              </div>
+          </div>
+      `;
+  }
+}
+
+function closeVehicleResult() {
+  document.getElementById("registryResult").innerHTML = "";
+}
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+      closeVehicleResult();
+  }
+});
 async function submitForm() {
 
   const formData = {
