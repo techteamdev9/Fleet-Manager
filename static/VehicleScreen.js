@@ -82,6 +82,82 @@ const leasingSubTypes = [
   { id: "מסחרי-נוסעים", name: "מסחרי נוסעים", image: "מסחרי-נוסעים.jpg" },
 ];
 
+const manufacturers = [
+  { value: "", label: "בחר יצרן" },
+
+  { value: "אאודי", label: "אאודי" },
+  { value: "אאודי בלגיה", label: "אאודי בלגיה" },
+  { value: "אאודי הונגריה", label: "אאודי הונגריה" },
+  { value: "אאודי סלובקיה", label: "אאודי סלובקיה" },
+  { value: "אאודי ספרד", label: "אאודי ספרד" },
+
+  { value: "אודי מכסיקו", label: "אודי מכסיקו" },
+
+  { value: "אוואטר סין", label: "אוואטר סין" },
+  { value: "אומודה סין", label: "אומודה סין" },
+  { value: "אופל אנגליה", label: "אופל אנגליה" },
+  { value: "אופל ד.קוריאה", label: "אופל ד.קוריאה" },
+  { value: "אופל סלובקיה", label: "אופל סלובקיה" },
+  { value: "אופל פולין", label: "אופל פולין" },
+  { value: "אופל פורטוגל", label: "אופל פורטוגל" },
+  { value: "אופל צרפת", label: "אופל צרפת" },
+  { value: "אופל-בלגיה", label: "אופל-בלגיה" },
+  { value: "אופל-גרמניה", label: "אופל-גרמניה" },
+  { value: "אופל-ספרד", label: "אופל-ספרד" },
+
+  { value: "אורה סין", label: "אורה סין" },
+  { value: "איווייס סין", label: "איווייס סין" },
+  { value: "איויאיסי סין", label: "איויאיסי סין" },
+  { value: "איון סין", label: "איון סין" },
+  { value: "איי אם סין", label: "איי אם סין" },
+
+  { value: "איסוזו ארה\"ב", label: "איסוזו ארה\"ב" },
+  { value: "איסוזו יפן", label: "איסוזו יפן" },
+  { value: "איסוזו תאילנד", label: "איסוזו תאילנד" },
+
+  { value: "אלפא רומיאו", label: "אלפא רומיאו" },
+  { value: "אסטון מרטין", label: "אסטון מרטין" },
+
+  { value: "אקספנג סין", label: "אקספנג סין" },
+
+  { value: "ב מ וו גרמניה", label: "ב מ וו גרמניה" },
+  { value: "ב מ וו סין", label: "ב מ וו סין" },
+
+  { value: "בי ווי די", label: "בי ווי די" },
+
+  { value: "ג'אק סין", label: "ג'אק סין" },
+  { value: "ג'ילי סין", label: "ג'ילי סין" },
+
+  { value: "טויוטה יפן", label: "טויוטה יפן" },
+  { value: "טויוטה ארה\"ב", label: "טויוטה ארה\"ב" },
+
+  { value: "טסלה ארה''ב", label: "טסלה ארה''ב" },
+  { value: "טסלה גרמניה", label: "טסלה גרמניה" },
+  { value: "טסלה סין", label: "טסלה סין" },
+
+  { value: "יונדאי קוריאה", label: "יונדאי קוריאה" },
+
+  { value: "לקסוס יפן", label: "לקסוס יפן" },
+
+  { value: "מרצדס בנץ גרמניה", label: "מרצדס בנץ גרמניה" },
+
+  { value: "ניסאן יפן", label: "ניסאן יפן" },
+
+  { value: "סובארו יפן", label: "סובארו יפן" },
+
+  { value: "סקודה צ'כיה", label: "סקודה צ'כיה" },
+
+  { value: "פולקסווגן גרמניה", label: "פולקסווגן גרמניה" },
+
+  { value: "פורד ארה\"ב", label: "פורד ארה\"ב" },
+
+  { value: "פיג'ו צרפת", label: "פיג'ו צרפת" },
+
+  { value: "רנו צרפת", label: "רנו צרפת" },
+
+  { value: "שברולט ארה\"ב", label: "שברולט ארה\"ב" }
+];
+
 const API = window.location.origin;
 
 let vehiclesData = [];
@@ -269,27 +345,27 @@ function open650Form() {
 async function searchVehicleRegistry() {
 
   const plate = document
-      .getElementById("licenseSearch")
-      .value
-      .replace(/-/g, "")
-      .trim();
+    .getElementById("licenseSearch")
+    .value
+    .replace(/-/g, "")
+    .trim();
 
   if (!plate) {
-      alert("יש להזין מספר רכב");
-      return;
+    alert("יש להזין מספר רכב");
+    return;
   }
 
   try {
 
-      const response =
-          await fetch(`/api/vehicle-registry/${plate}`);
+    const response =
+      await fetch(`/api/vehicle-registry/${plate}`);
 
-      const data =
-          await response.json();
+    const data =
+      await response.json();
 
-      if (!data.success) {
+    if (!data.success) {
 
-          document.getElementById("registryResult").innerHTML = `
+      document.getElementById("registryResult").innerHTML = `
               <div class="vehicle-result-card">
                   <div class="vehicle-result-header">
                       <h3>תוצאות חיפוש</h3>
@@ -306,12 +382,12 @@ async function searchVehicleRegistry() {
               </div>
           `;
 
-          return;
-      }
+      return;
+    }
 
-      const v = data.vehicle;
+    const v = data.vehicle;
 
-      document.getElementById("registryResult").innerHTML = `
+    document.getElementById("registryResult").innerHTML = `
           <div class="vehicle-result-card">
       
               <div class="vehicle-result-header">
@@ -368,9 +444,9 @@ async function searchVehicleRegistry() {
 
   } catch (err) {
 
-      console.error(err);
+    console.error(err);
 
-      document.getElementById("registryResult").innerHTML = `
+    document.getElementById("registryResult").innerHTML = `
           <div class="vehicle-result-card">
               <div class="vehicle-result-header">
                   <h3>שגיאה</h3>
@@ -395,7 +471,7 @@ function closeVehicleResult() {
 
 document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") {
-      closeVehicleResult();
+    closeVehicleResult();
   }
 });
 async function submitForm() {
@@ -711,10 +787,150 @@ function filterVehicles() {
 
   // later: filter table here
 }
+
+async function searchAdvancedRegistry() {
+  let results = allVehicles;
+  const filters = {
+
+    vehicle_type: document.getElementById("advVehicleType").value,
+    manufacturer: document.getElementById("advManufacturer").value,
+    fuel: document.getElementById("advFuel").value,
+    owner_type: document.getElementById("advOwnerType").value,
+    year: document.getElementById("advYear").value,
+    limit: document.getElementById("advLimit").value
+  
+
+  };
+  
+
+  const response = await fetch("/api/vehicle-registry/filter-search", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(filters)
+  });
+
+  const data = await response.json();
+
+  if (!data.success) {
+    alert(data.message);
+    return;
+  }
+
+  renderAdvancedTable(data.vehicles);
+}
+
+function renderAdvancedTable(vehicles) {
+
+  if (!vehicles || vehicles.length === 0) {
+    document.getElementById("advancedResults").innerHTML =
+      "<h3>No vehicles found</h3>";
+    return;
+  }
+
+  let html = `
+  <table class="adv-table">
+      <thead>
+          <tr>
+              <th>Plate</th>
+              <th>יצרן</th>
+              <th>Model</th>
+              <th>Year</th>
+              <th>Fuel</th>
+              <th>Owner</th>
+              <th>מועד עליה לכביש</th>
+          </tr>
+      </thead>
+      <tbody>
+  `;
+
+  vehicles.forEach(v => {
+    html += `
+      <tr>
+          <td>${v.mispar_rechev || ""}</td>
+          <td>${v.tozeret_nm || ""}</td>
+          <td>${v.kinuy_mishari || ""}</td>
+          <td>${v.shnat_yitzur || ""}</td>
+          <td>${v.sug_delek_nm || ""}</td>
+          <td>${v.baalut || ""}</td>
+          <td>${formatDate(v.moed_aliya_lakvish)}</td>
+      </tr>
+      `;
+  });
+
+  html += `
+      </tbody>
+  </table>
+  `;
+
+  document.getElementById("advancedResults").innerHTML = html;
+}
+
+function formatDate(val) {
+  if (!val) return "";
+  return val.replace("-", "/"); // 2014-11 → 2014/11
+}
+async function loadManufacturers() {
+  const select = document.getElementById("advManufacturer");
+  if (!select || select.dataset.loaded) return;
+
+  select.innerHTML = manufacturers
+    .map(m => `<option value="${m.value}">${m.label}</option>`)
+    .join("");
+
+  select.dataset.loaded = "true";
+  // try {
+
+  //   const res = await fetch("/api/vehicle-registry/manufacturers");
+  //   const data = await res.json();
+
+  //   if (!data.success || !data.manufacturers) {
+  //     console.error("Bad response:", data);
+  //     return;
+  //   }
+
+  //   const select = document.getElementById("advManufacturer");
+  //   select.innerHTML = `<option value="">בחר יצרן</option>`;
+
+  //   data.manufacturers.forEach(m => {
+
+  //     const opt = document.createElement("option");
+  //     opt.value = m;
+  //     opt.textContent = m;
+
+  //     select.appendChild(opt);
+  //   });
+
+  // } catch (err) {
+  //   console.error("Failed loading manufacturers:", err);
+  // }
+}
+
+loadManufacturers();
 // function refreshVehiclesTable() {
 //   const vehicles = getVehiclesByType(selectedType, selectedSubType);
 //   renderVehiclesTable(vehicles);
 // }
+function matchesSearch(vehicle, search) {
+  if (!search.trim()) return true;
+
+  const text = [
+      vehicle.manufacturer,
+      vehicle.model,
+      vehicle.year,
+      vehicle.fuel,
+      vehicle.ownerType,
+      vehicle.vehicleType
+  ]
+      .join(" ")
+      .toLowerCase();
+
+  return search
+      .toLowerCase()
+      .split(/\s+/)
+      .every(word => text.includes(word));
+}
 let selectedVehicle = null
 function openVehicleActionsModal(vehicle) {
   selectedVehicle = vehicle;

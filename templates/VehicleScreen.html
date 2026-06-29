@@ -784,129 +784,199 @@ textarea {
       width: 100%;
       text-align: center;
     }
+
     #vehicleCardBtn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .25s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-#vehicleCardBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(37,99,235,.25);
-}
+    #vehicleCardBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+    }
 
-#vehicleCardBtn:active {
-  transform: translateY(0);
-}
-.card-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 20px;
-}
+    #vehicleCardBtn:active {
+      transform: translateY(0);
+    }
 
-.card-grid div {
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-/* vehicle search  */
-.vehicle-result-card {
-    direction: rtl;
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 24px;
-    margin-top: 20px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    animation: fadeInVehicleCard .25s ease;
-}
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
 
-.vehicle-result-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+    .card-grid div {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
 
-.vehicle-result-header h3 {
-    margin: 0;
-    color: #1e293b;
-    font-size: 20px;
-    font-weight: 700;
-}
+    /* vehicle search  */
+    .vehicle-result-card {
+      direction: rtl;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px;
+      margin-top: 20px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      animation: fadeInVehicleCard .25s ease;
+    }
 
-.close-result-btn {
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 50%;
-    background: #ef4444;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: 0.2s;
-}
+    .vehicle-result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-.close-result-btn:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-}
+    .vehicle-result-header h3 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 20px;
+      font-weight: 700;
+    }
 
-.vehicle-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 15px;
-}
+    .close-result-btn {
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 50%;
+      background: #ef4444;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
 
-.info-item {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transition: 0.2s;
-}
+    .close-result-btn:hover {
+      background: #dc2626;
+      transform: scale(1.05);
+    }
 
-.info-item:hover {
-    background: #eff6ff;
-    border-color: #93c5fd;
-}
+    .vehicle-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+    }
 
-.info-label {
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 600;
-}
+    .info-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: 0.2s;
+    }
 
-.info-value {
-    font-size: 16px;
-    color: #0f172a;
-    font-weight: 700;
-    word-break: break-word;
-}
+    .info-item:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
 
-@keyframes fadeInVehicleCard {
-    from {
+    .info-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .info-value {
+      font-size: 16px;
+      color: #0f172a;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    @keyframes fadeInVehicleCard {
+      from {
         opacity: 0;
         transform: translateY(8px);
-    }
-    to {
+      }
+
+      to {
         opacity: 1;
         transform: translateY(0);
+      }
     }
+    
+    .advanced-search-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+
+    background: #ffffff;
+    padding: 18px;
+    margin: 20px 0;
+
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+}
+
+.advanced-search-panel select {
+    flex: 1;
+    min-width: 180px;
+
+    padding: 11px 14px;
+
+    border-radius: 10px;
+    border: 1px solid #d6d6d6;
+
+    background: #fafafa;
+    color: #333;
+
+    font-size: 14px;
+
+    transition: all .2s;
+}
+
+.advanced-search-panel select:hover {
+    border-color: #3b82f6;
+}
+
+.advanced-search-panel select:focus {
+    outline: none;
+    background: white;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.15);
+}
+
+.advanced-search-panel button {
+    padding: 11px 28px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg,#2563eb,#3b82f6);
+
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.advanced-search-panel button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(37,99,235,.25);
 }
   </style>
 </head>
@@ -934,12 +1004,77 @@ textarea {
       <option value="111">יחידה 111</option>
     </select>
   </div>
+
+  <div class="advanced-search-panel">
+
+    <select id="advVehicleType">
+      <option value="">סוג רכב</option>
+      <option value="P">פרטי</option>
+      <option value="M">מסחרי</option>
+      <!-- <option value="N">אופנוע</option>
+      <option value="B">אוטובוס</option>
+      <option value="T">משאית</option> -->
+    </select>
+
+    <select id="advManufacturer">
+       <script type="module">
+  import { manufacturers } from "../static/manufacturers.js";
+
+  const select = document.getElementById("advManufacturer");
+
+  select.innerHTML = manufacturers
+    .map(m => `<option value="${m.value}">${m.label}</option>`)
+    .join("");
+</script>
+    </select>
+
+    <select id="advFuel">
+        <option value="">Fuel</option>
+        <option>בנזין</option>
+        <option>דיזל</option>
+        <option>חשמלי</option>
+        <option>היברידי</option>
+    </select>
+
+    <select id="advOwnerType">
+        <option value="">בעלות</option>
+        <option>פרטי</option>
+        <option>ליסינג</option>
+        <option>השכרה</option>
+    </select>
+
+    <select id="advYear">
+        <option value="">שנת יצור</option>
+        <script>
+            for (let y = new Date().getFullYear(); y >= 1990; y--) {
+                document.write(`<option value="${y}">${y}</option>`);
+            }
+        </script>
+    </select>
+
+    <!-- LIMIT -->
+    <select id="advLimit">
+        <option value="25">25 הצג</option>
+        <option value="50" selected>50 הצג</option>
+        <option value="100">100 הצג</option>
+        <option value="250">250 הצג</option>
+        <option value="500">500 הצג</option>
+    </select>
+
+    <button onclick="searchAdvancedRegistry()">
+        🔍 Search
+    </button>
+
+</div>
+
+<div id="advancedResults"></div>
+
   <div class="vehicle-search-container">
     <input type="text" id="licenseSearch" placeholder="הכנס מספר רישוי">
     <button onclick="searchVehicleRegistry()">חפש</button>
-</div>
+  </div>
 
-<div id="registryResult"></div>
+  <div id="registryResult"></div>
   <div id="formModal" class="modal">
     <div class="modal-content">
       <button onclick="closeForm()">✕</button>
@@ -1211,45 +1346,47 @@ textarea {
   </div>
   <div id="vehicleCardModal" class="modal">
     <div class="modal-content">
-  
+
       <button onclick="document.getElementById('vehicleCardModal').style.display='none'">✕</button>
-  
+
       <h2>🚗 כרטיס רכב</h2>
-  
+
       <div class="card-grid">
-  
+
         <div><b>מספר רישוי:</b> <span id="vc_license_number"></span></div>
-<div><b>קוד כלי:</b> <span id="vc_tool_code"></span></div>
-<div><b>סטטוס:</b> <span id="vc_status"></span></div>
-<div><b>זמין לשירות:</b> <span id="vc_available"></span></div>
+        <div><b>קוד כלי:</b> <span id="vc_tool_code"></span></div>
+        <div><b>סטטוס:</b> <span id="vc_status"></span></div>
+        <div><b>זמין לשירות:</b> <span id="vc_available"></span></div>
 
-<div><b>יחידה:</b> <span id="vc_unitCode"></span></div>
-<div><b>קטגוריה:</b> <span id="vc_category"></span></div>
-<div><b>סוג רכב:</b> <span id="vc_vehicle_type"></span></div>
-<div><b>תת סוג:</b> <span id="vc_sub_type"></span></div>
+        <div><b>יחידה:</b> <span id="vc_unitCode"></span></div>
+        <div><b>קטגוריה:</b> <span id="vc_category"></span></div>
+        <div><b>סוג רכב:</b> <span id="vc_vehicle_type"></span></div>
+        <div><b>תת סוג:</b> <span id="vc_sub_type"></span></div>
 
-<div><b>סוג בעלות:</b> <span id="vc_owner_type"></span></div>
-<div><b>שם ליסינג:</b> <span id="vc_lease_name"></span></div>
+        <div><b>סוג בעלות:</b> <span id="vc_owner_type"></span></div>
+        <div><b>שם ליסינג:</b> <span id="vc_lease_name"></span></div>
 
-<div><b>שם בעלים:</b> <span id="vc_owner_name"></span></div>
-<div><b>ת"ז:</b> <span id="vc_owner_id"></span></div>
-<div><b>טלפון:</b> <span id="vc_owner_phone"></span></div>
+        <div><b>שם בעלים:</b> <span id="vc_owner_name"></span></div>
+        <div><b>ת"ז:</b> <span id="vc_owner_id"></span></div>
+        <div><b>טלפון:</b> <span id="vc_owner_phone"></span></div>
 
-<div><b>קוד איתור:</b> <span id="vc_locator_code"></span></div>
-<div><b>קוד נעילה:</b> <span id="vc_lock_code"></span></div>
+        <div><b>קוד איתור:</b> <span id="vc_locator_code"></span></div>
+        <div><b>קוד נעילה:</b> <span id="vc_lock_code"></span></div>
 
-<div><b>מיקום:</b> <span id="vc_location"></span></div>
+        <div><b>מיקום:</b> <span id="vc_location"></span></div>
 
-<div><b>דלק:</b> <span id="vc_fuel"></span></div>
-<div><b>רישוי:</b> <span id="vc_licence_status"></span></div>
+        <div><b>דלק:</b> <span id="vc_fuel"></span></div>
+        <div><b>רישוי:</b> <span id="vc_licence_status"></span></div>
 
-<div><b>נוצר:</b> <span id="vc_created_at"></span></div>
-<div><b>עודכן:</b> <span id="vc_updated_at"></span></div>
-  
+        <div><b>נוצר:</b> <span id="vc_created_at"></span></div>
+        <div><b>עודכן:</b> <span id="vc_updated_at"></span></div>
+
       </div>
-  
+
     </div>
   </div>
+
+  
   <div id="app"></div>
 
   <script src="/static/VehicleScreen.js"></script>

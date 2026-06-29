@@ -245,8 +245,120 @@ def connect(retries=5, delay=2):
 # ---------------- ROUTES ----------------
 #vehicle search:
 RESOURCE_ID = "053cea08-09bc-40ec-8f7a-156f0677aff3"
+@app.route("/api/vehicle-registry/manufacturers")
+def get_manufacturers():
 
-@app.route("/api/vehicle-registry/<license_number>")
+    try:
+
+        url = "https://data.gov.il/api/3/action/datastore_search"
+
+        all_records = []
+        offset = 0
+        limit = 3200  # CKAN max safe batch
+
+        while True:
+
+            params = {
+                "resource_id": RESOURCE_ID,
+                "limit": limit,
+                "offset": offset
+            }
+
+            res = requests.get(url, params=params, timeout=30)
+            data = res.json()
+
+            records = data.get("result", {}).get("records", [])
+
+            if not records:
+                break
+
+            all_records.extend(records)
+
+            offset += limit
+
+            # safety stop (prevents infinite loop)
+            if offset > 200000:
+                break
+
+        manufacturers = sorted(set(
+            r.get("tozeret_nm") for r in all_records if r.get("tozeret_nm")
+        ))
+
+        return jsonify({
+        "success": True,
+        "manufacturers": manufacturers
+        }), 200, {
+        "Content-Type": "application/json; charset=utf-8"
+        }
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+@app.route("/api/vehicle-registry/filter-search", methods=["POST"])
+def filter_search_vehicle_registry():
+
+    try:
+        filters = request.json or {}
+
+        base_filters = {}
+
+        # VEHICLE TYPE (IMPORTANT FIX)
+        if filters.get("vehicle_type"):
+            base_filters["sug_degem"] = filters["vehicle_type"]
+
+        # OWNER TYPE
+        if filters.get("owner_type"):
+            base_filters["baalut"] = filters["owner_type"]
+
+        # MANUFACTURER
+        if filters.get("manufacturer"):
+            base_filters["tozeret_nm"] = filters["manufacturer"]
+
+        # MODEL
+        if filters.get("model"):
+            base_filters["kinuy_mishari"] = filters["model"]
+
+        # FUEL
+        if filters.get("fuel"):
+            base_filters["sug_delek_nm"] = filters["fuel"]
+
+        # YEAR
+        if filters.get("year"):
+            base_filters["shnat_yitzur"] = int(filters["year"])
+
+        limit = int(filters.get("limit") or 50)
+
+        params = {
+            "resource_id": RESOURCE_ID,
+            "filters": json.dumps(base_filters, ensure_ascii=False),
+            "limit": limit
+        }
+
+        response = requests.get(
+            "https://data.gov.il/api/3/action/datastore_search",
+            params=params,
+            timeout=20
+        )
+
+        data = response.json()
+
+        records = data.get("result", {}).get("records", [])
+
+        return jsonify({
+            "success": True,
+            "vehicles": records
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+
+@app.route("/api/vehicle-registry/<string:license_number>")
 def vehicle_registry(license_number):
 
     try:
