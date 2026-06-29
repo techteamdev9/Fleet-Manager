@@ -789,7 +789,6 @@ function filterVehicles() {
 }
 
 async function searchAdvancedRegistry() {
-  let results = allVehicles;
   const filters = {
 
     vehicle_type: document.getElementById("advVehicleType").value,
