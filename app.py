@@ -215,7 +215,7 @@ def connect(retries=5, delay=2):
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
 #print("Running init_db")
-#init_db() #for manual init
+init_db() #for manual init
 #print("Running after init_db")
 
 #alter table vehicle and form_650 w locator and lock once after init_db:
