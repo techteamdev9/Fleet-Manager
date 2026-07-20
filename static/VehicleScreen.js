@@ -14,7 +14,7 @@ const vehicleTypes = [
   { id: "ציוד-מכני-הנדסי", name: "ציוד מכני הנדסי", categories: ["2"] },
   { id: "ריינג'ר", name: "ריינג'ר", categories: ["3"] },
   { id: "כבאית", name: "כבאית", categories: ["2"] },
-  { id: "קראוון", name: "קראוון", categories: ["3"] },
+  { id:'נצ"מ', name: 'נצ"מ', categories: ["3"] },
   { id: "קירורית", name: "קירורית", categories: ["2"] },
   { id: "נגרר-כיבוי-אש", name: "נגרר כיבוי אש", categories: ["3"] },
   { id: "ברינקס", name: "ברינקס", categories: ["5"], image: "ברינקס.jpg" },
@@ -34,12 +34,12 @@ const vehicleTypes = [
   { id: "ליסינג ועוד בע״מ", name: "ליסינג ועוד בע״מ", categories: ["1"], image: "ליסינג ועוד בעמ.png" },
 
   // ירמ Category (5)
-  { id: "משא-12-טון", name: "משא 12 טון", categories: ["5"], image: "משא-12-טון.jpg" },
+  { id: "משא", name: "משא", categories: ["5"], image: "משא-12-טון.jpg" },
   { id: "משא-מעל-12-טון", name: "משא מעל 12 טון", categories: ["5"], image: "משא-מעל-12-טון.jpg" },
   { id: "מסחרי-פינוי", name: "מסחרי פינוי", categories: ["5"], image: "מסחרי-פינוי.jpg" },
   { id: "מסחרי-קירור", name: "מסחרי קירור", categories: ["5"], image: "מסחרי-קירור.jpg" },
   { id: "מסחרי-נוסעים", name: "מסחרי נוסעים", categories: ["5"], image: "מסחרי-נוסעים.jpg" },
-  { id: "טנדר", name: "טנדר", categories: ["5"], image: "טנדר.jpg" },
+  { id: "טנדר 4*4", name:"טנדר 4*4", categories: ["5"], image: "טנדר.jpg" },
   { id: "טנדר-קירור", name: "טנדר קירור", categories: ["5"], image: "טנדר-קירור.jpg" },
   { id: "אמבולנס", name: "אמבולנס", categories: ["5"], image: "אמבולנס.jpg" },
 
@@ -183,13 +183,13 @@ function getVehiclesByType(typeId, subTypeId = null) {
   if (selectedCategory === "1" && subTypeId) {
     return vehiclesData.filter(v =>
       v.lease_name === typeId &&
-      v.vehicle_type === subTypeId &&
+      v.manager_group === subTypeId &&
       (!selectedUnit || v.unitcode == selectedUnit) // 👈 added
     );
   }
 
   return vehiclesData.filter(v =>
-    v.vehicle_type === typeId &&
+    v.manager_group === typeId &&
     (!selectedUnit || v.unitcode == selectedUnit) // 👈 added
   );
 }

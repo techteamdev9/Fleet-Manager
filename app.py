@@ -11,8 +11,8 @@ import json
 import requests
 # ---------------- CONFIG ----------------
 #just for local
-#from dotenv import load_dotenv
-#load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 print("🔵 CONNECTING TO DB:", DATABASE_URL)
@@ -38,6 +38,79 @@ def connect(retries=5, delay=2):
             time.sleep(delay)
     
     raise Exception("Could not connect to DB after retries")  
+
+#excel upload const 
+COLUMN_MAP = {
+    'מס"ד': 'excel_index',
+    'מספר רישוי': 'license_number',
+    'סוג אמצעי גיוס': 'recruitment_type',
+    'קבוצת אב-מנהלים': 'manager_group',
+    'סוג רכב משרד התחבורה': 'vehicle_type',
+
+    'סוג בעלות - חברה/ פרטי': 'ownership_type',
+    'שם חברת ליסינג/השכרה \n(אם רלוונטי)': 'leasing_company',
+    'ירמ"א אחראית\n(אגד לאו"ם)': 'responsible_yerma',
+
+    'תאריך גיוס': 'recruitment_date',
+    'פעימת שחרור': 'release_batch',
+    'סיבת שחרור': 'release_reason',
+    'תאריך פקודה לשחרור': 'release_order_date',
+
+    'פיקוד אחראי': 'responsible_command',
+    'שייכות (תחת הפיקוד)': 'affiliation',
+    'יחידה מזדכה': 'credited_unit',
+
+    'תאריך זיכוי': 'credit_date',
+    'תאריך שחרור': 'release_date',
+
+    'סטאטוס': 'excel_status',
+    'הערות': 'notes',
+
+    'מספר רישוי נקי ללא אותיות': 'clean_license_number'
+}
+def alter_tables():
+    conn =connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+        ALTER TABLE vehicles
+ADD COLUMN IF NOT EXISTS locatorcode VARCHAR(50);
+
+ALTER TABLE vehicles
+ADD COLUMN IF NOT EXISTS lockcode VARCHAR(50);
+
+       ALTER TABLE form_650
+ADD COLUMN IF NOT EXISTS locatorcode VARCHAR(50);
+
+ALTER TABLE form_650
+ADD COLUMN IF NOT EXISTS lockcode VARCHAR(50);
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS excel_index INTEGER;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS recruitment_type TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS manager_group TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS ownership_type TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS leasing_company TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS responsible_yerma TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS recruitment_date DATE;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS release_batch TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS release_reason TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS release_order_date DATE;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS responsible_command TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS affiliation TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS credited_unit TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS credit_date DATE;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS release_date DATE;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS excel_status TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS clean_license_number TEXT;
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    print("✅ Database columns checked/updated")
+    #init_db()
+alter_tables()
 # def init_db():
 #     conn = connect()
 #     cur = conn.cursor()
@@ -215,7 +288,7 @@ def connect(retries=5, delay=2):
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
 #print("Running init_db")
-init_db() #for manual init
+#init_db() #for manual init
 #print("Running after init_db")
 
 #alter table vehicle and form_650 w locator and lock once after init_db:
@@ -467,6 +540,88 @@ def login():
 #     conn.close()
 
 #     return "form_650 dropped"
+
+#deleted 19/07/26
+# @app.route("/vehicles", methods=["GET"])
+# def get_vehicles():
+#     from_date = request.args.get("from_date")
+#     to_date = request.args.get("to_date")
+#     q = request.args.get("q")
+
+#     conn = connect()
+#     cur = conn.cursor(cursor_factory=RealDictCursor)
+
+#     # ---- SEARCH + DATE FILTER ----
+#     if from_date and to_date:
+#         query = """
+#             SELECT DISTINCT v.*
+#             FROM vehicles v
+#             JOIN vehicle_history vh ON vh.vehicle_id = v.id
+#             WHERE DATE(vh.timestamp) >= %s
+#               AND DATE(vh.timestamp) <= %s
+#         """
+#         params = [from_date, to_date]
+
+#         if q:
+#             query += """
+#               AND (
+#                   v.license_number ILIKE %s OR
+#                   v.tool_code ILIKE %s OR
+#                   v.status ILIKE %s
+#               )
+#             """
+#             params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+
+#         query += " ORDER BY v.id ASC"
+#         cur.execute(query, params)
+
+#     # ---- SEARCH ONLY ----
+#     elif q:
+#         query = """
+#             SELECT *
+#             FROM vehicles
+#             WHERE license_number ILIKE %s
+#                OR tool_code ILIKE %s
+#                OR status ILIKE %s
+#             ORDER BY id ASC
+#         """
+#         cur.execute(query, (f"%{q}%", f"%{q}%", f"%{q}%"))
+
+#     # ---- NO FILTERS ----
+#     else:
+#         cur.execute("""
+# SELECT
+#     id,
+#     license_number,
+#     tool_code,
+#     status,
+#     available_for_service,
+#     unitcode,
+#     owner_name,
+#     owner_id,
+#     owner_phone,
+#     locatorcode,
+#     lockcode,
+#     category,
+#     vehicle_type,
+#     sub_type,
+#     owner_type,
+#     lease_name,
+#     location,
+#     fuel,
+#     licence_status,
+#     created_at,
+#     updated_at,
+#     images
+# FROM vehicles
+# ORDER BY id ASC;
+# """)
+
+#     rows = cur.fetchall()
+#     conn.close()
+
+#     return jsonify(rows)
+
 @app.route("/vehicles", methods=["GET"])
 def get_vehicles():
     from_date = request.args.get("from_date")
@@ -476,74 +631,146 @@ def get_vehicles():
     conn = connect()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # ---- SEARCH + DATE FILTER ----
-    if from_date and to_date:
-        query = """
-            SELECT DISTINCT v.*
-            FROM vehicles v
-            JOIN vehicle_history vh ON vh.vehicle_id = v.id
-            WHERE DATE(vh.timestamp) >= %s
-              AND DATE(vh.timestamp) <= %s
-        """
-        params = [from_date, to_date]
-
-        if q:
-            query += """
-              AND (
-                  v.license_number ILIKE %s OR
-                  v.tool_code ILIKE %s OR
-                  v.status ILIKE %s
-              )
+    try:
+        # ---- SEARCH + DATE FILTER ----
+        if from_date and to_date:
+            query = """
+                SELECT DISTINCT v.*
+                FROM vehicles v
+                JOIN vehicle_history vh ON vh.vehicle_id = v.id
+                WHERE DATE(vh.timestamp) >= %s
+                  AND DATE(vh.timestamp) <= %s
             """
-            params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+            params = [from_date, to_date]
 
-        query += " ORDER BY v.id ASC"
-        cur.execute(query, params)
+            if q:
+                query += """
+                  AND (
+                      v.license_number ILIKE %s OR
+                      v.clean_license_number ILIKE %s OR
+                      v.tool_code ILIKE %s OR
+                      v.status ILIKE %s OR
+                      v.excel_status ILIKE %s OR
+                      v.vehicle_type ILIKE %s OR
+                      v.unitcode ILIKE %s OR
+                      v.responsible_command ILIKE %s
+                  )
+                """
 
-    # ---- SEARCH ONLY ----
-    elif q:
-        query = """
-            SELECT *
-            FROM vehicles
-            WHERE license_number ILIKE %s
-               OR tool_code ILIKE %s
-               OR status ILIKE %s
-            ORDER BY id ASC
-        """
-        cur.execute(query, (f"%{q}%", f"%{q}%", f"%{q}%"))
+                params.extend([
+                    f"%{q}%",
+                    f"%{q}%",
+                    f"%{q}%",
+                    f"%{q}%",
+                    f"%{q}%",
+                    f"%{q}%",
+                    f"%{q}%",
+                    f"%{q}%"
+                ])
 
-    # ---- NO FILTERS ----
-    else:
-        cur.execute("""
-            SELECT   id,
-            license_number,
-            tool_code,
-            status,
-            available_for_service,
-            unitcode,
-            owner_name,
-            owner_id,
-            owner_phone,
-            locatorcode,
-            lockcode,
-            category,
-            vehicle_type,
-            sub_type,
-            owner_type,
-            lease_name,
-            location,
-            licence_status,
-            created_at,
-            updated_at,
-            images FROM vehicles ORDER BY id ASC
-        """)
+            query += " ORDER BY v.id ASC"
 
-    rows = cur.fetchall()
-    conn.close()
+            cur.execute(query, params)
 
-    return jsonify(rows)
+        # ---- SEARCH ONLY ----
+        elif q:
+            query = """
+                SELECT *
+                FROM vehicles
+                WHERE license_number ILIKE %s
+                   OR clean_license_number ILIKE %s
+                   OR tool_code ILIKE %s
+                   OR status ILIKE %s
+                   OR excel_status ILIKE %s
+                   OR vehicle_type ILIKE %s
+                   OR unitcode ILIKE %s
+                   OR responsible_command ILIKE %s
+                ORDER BY id ASC
+            """
 
+            cur.execute(query, (
+                f"%{q}%",
+                f"%{q}%",
+                f"%{q}%",
+                f"%{q}%",
+                f"%{q}%",
+                f"%{q}%",
+                f"%{q}%",
+                f"%{q}%"
+            ))
 
+        # ---- NO FILTERS ----
+        else:
+            cur.execute("""
+                SELECT
+                    id,
+                    excel_index,
+                    license_number,
+                    clean_license_number,
+                    tool_code,
+
+                    status,
+                    excel_status,
+                    available_for_service,
+
+                    unitcode,
+
+                    owner_name,
+                    owner_id,
+                    owner_phone,
+
+                    locatorcode,
+                    lockcode,
+
+                    category,
+                    vehicle_type,
+                    sub_type,
+                    owner_type,
+                    lease_name,
+
+                    recruitment_type,
+                    manager_group,
+                    ownership_type,
+                    leasing_company,
+                    responsible_yerma,
+
+                    recruitment_date,
+                    release_batch,
+                    release_reason,
+                    release_order_date,
+
+                    responsible_command,
+                    affiliation,
+                    credited_unit,
+
+                    credit_date,
+                    release_date,
+
+                    notes,
+
+                    location,
+                    fuel,
+                    licence_status,
+
+                    created_at,
+                    updated_at,
+
+                    images
+
+                FROM vehicles
+                ORDER BY id ASC;
+            """)
+
+        rows = cur.fetchall()
+
+        return jsonify(rows)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cur.close()
+        conn.close()
 
 
 @app.route("/vehicles", methods=["POST"])
@@ -623,7 +850,8 @@ def update_vehicle(id):
 def delete_vehicle(id):
     conn = connect()
     cur = conn.cursor()
-    cur.execute("DELETE FROM vehicles WHERE id=%s", (id,))
+    cur.execute("DELETE FROM form_650 WHERE vehicle_id = %s", (id,))
+    cur.execute("DELETE FROM vehicles WHERE id = %s", (id,))
     conn.commit()
     conn.close()
     return jsonify({"ok": True})
@@ -821,6 +1049,69 @@ def reports_by_day():
     return jsonify({r[0]: r[1] for r in rows})
 
 
+# @app.route("/upload_excel", methods=["POST"])
+# def upload_excel():
+#     if "user" not in session or session["user"]["role"] != "admin":
+#         return jsonify({"error": "Unauthorized"}), 403
+
+#     if "file" not in request.files:
+#         return jsonify({"error": "No file uploaded"}), 400
+
+#     file = request.files["file"]
+
+#     try:
+#         df = pd.read_excel(file)
+#         df.rename(columns=COLUMN_MAP, inplace=True)
+
+#         # required_columns = ["license_number", "tool_code", "status"]
+
+#         # for col in required_columns:
+#         #     if col not in df.columns:
+#         #         return jsonify({"error": f"Missing column: {col}"}), 400
+# required_columns = ["license_number"]
+
+# for col in required_columns:
+#     if col not in df.columns:
+#         return jsonify({"error": f"Missing column: {col}"}), 400
+#         conn = connect()
+#         cur = conn.cursor()
+
+#         for _, row in df.iterrows():
+
+#             available = True  # default = ניתן
+
+#             if "available_for_service" in df.columns:
+#                 value = str(row["available_for_service"]).strip().lower()
+
+#                 if value in ["false", "FALSE", "0", "לא ניתן", "no"]:
+#                     available = False
+
+#             unitcode_value = str(row["unitcode"]).strip() if "unitcode" in df.columns else None
+
+#             cur.execute("""
+#                 INSERT INTO vehicles
+#                 (license_number, tool_code, status, available_for_service, unitcode)
+#                 VALUES (%s, %s, %s, %s, %s)
+#                 ON CONFLICT (license_number) DO UPDATE
+#                 SET tool_code = EXCLUDED.tool_code,
+#                     status = EXCLUDED.status,
+#                     available_for_service = EXCLUDED.available_for_service,
+#                     unitcode = COALESCE(EXCLUDED.unitcode, vehicles.unitcode)
+#             """, (
+#                 str(row["license_number"]).strip(),
+#                 str(row["tool_code"]).strip(),
+#                 str(row["status"]).strip(),
+#                 available,
+#                 unitcode_value
+#             ))
+
+#         conn.commit()
+#         conn.close()
+
+#         return jsonify({"success": True})
+
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 @app.route("/upload_excel", methods=["POST"])
 def upload_excel():
     if "user" not in session or session["user"]["role"] != "admin":
@@ -832,54 +1123,217 @@ def upload_excel():
     file = request.files["file"]
 
     try:
-        df = pd.read_excel(file)
+        filename = file.filename.lower()
 
-        required_columns = ["license_number", "tool_code", "status"]
+        # Read Excel or Excel Binary
+        if filename.endswith(".xlsb"):
+            df = pd.read_excel(file, engine="pyxlsb")
+        else:
+            df = pd.read_excel(file)
+            print("Original Excel headers:")
+            print(df.columns.tolist())
 
-        for col in required_columns:
-            if col not in df.columns:
-                return jsonify({"error": f"Missing column: {col}"}), 400
+        # Rename Hebrew Excel headers to database columns
+        # Rename Excel headers to database columns
+        print("BEFORE RENAME:")
+        print(df.columns.tolist())
+        df.rename(columns=COLUMN_MAP, inplace=True)
+        print("excel_index values:")
+        print(df["excel_index"].head(20).to_string())
+        # DEBUG - check renamed columns
+        print("AFTER RENAME COLUMNS:")
+        for col in df.columns:
+            print(repr(col))
+
+        print("Sample imported values:")
+
+        # Save original DataFrame for debugging
+        # df_original = df.copy()
+
+        # Make sure required column exists
+        if "license_number" not in df.columns:
+            return jsonify({"error": "Missing column: license_number"}), 400        
+        # -----------------------------
+        # CLEAN EMPTY EXCEL ROWS
+        # -----------------------------
+        print("Rows before cleanup:", len(df))
+        # Remove spaces from text fields
+        df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
+        # Convert empty strings to None
+        df = df.replace("", None)
+
+        # Remove rows where everything is empty
+        df.dropna(how="all", inplace=True)
+
+        # Keep only rows with license number
+        df = df[
+            df["license_number"].notna()
+        ]
+
+        # Remove blank license numbers
+        df = df[
+            df["license_number"].astype(str).str.strip() != ""
+        ]
+
+        # Remove text "nan"
+        df = df[
+            df["license_number"].astype(str).str.lower() != "nan"
+        ]
+
+
+        print("Rows after cleanup:", len(df))
+        # TEST ONLY
+        # TEST ONLY - import first 100 rows
+        df = df.head(100)
+
+        print("Rows to import:", len(df))       
+        # removed = df_original[~df_original["license_number"].notna()]
+        # print(removed)
+        # DEBUG - show last 50 license numbers
+        # print("Last 50 license numbers:")
+        print(df["license_number"].tail(50).to_string())
+
+
+        # -----------------------------
+        # CONVERT DATES
+        # -----------------------------
+
+        date_columns = [
+            "recruitment_date",
+            "release_order_date",
+            "credit_date",
+            "release_date"
+        ]
+
+        for col in date_columns:
+            if col in df.columns:
+                df[col] = pd.to_datetime(
+                    df[col],
+                    unit="D",
+                    origin="1899-12-30",
+                    errors="coerce"
+                ).dt.date
+
+
+        # Final cleanup for PostgreSQL
+        df = df.replace({pd.NaT: None})
+        df = df.where(pd.notnull(df), None)
+
 
         conn = connect()
         cur = conn.cursor()
 
-        for _, row in df.iterrows():
+        inserted_count = 0
 
-            available = True  # default = ניתן
 
-            if "available_for_service" in df.columns:
-                value = str(row["available_for_service"]).strip().lower()
+        for index, row in df.iterrows():
 
-                if value in ["false", "FALSE", "0", "לא ניתן", "no"]:
-                    available = False
+            # Extra protection
+            if not row.get("license_number"):
+                continue
 
-            unitcode_value = str(row["unitcode"]).strip() if "unitcode" in df.columns else None
+
+            if inserted_count % 100 == 0:
+                print(f"Inserted {inserted_count} rows")
+
 
             cur.execute("""
-                INSERT INTO vehicles
-                (license_number, tool_code, status, available_for_service, unitcode)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT (license_number) DO UPDATE
-                SET tool_code = EXCLUDED.tool_code,
-                    status = EXCLUDED.status,
-                    available_for_service = EXCLUDED.available_for_service,
-                    unitcode = COALESCE(EXCLUDED.unitcode, vehicles.unitcode)
+                INSERT INTO vehicles (
+                    license_number,
+                    status,
+                    excel_index,
+                    recruitment_type,
+                    manager_group,
+                    vehicle_type,
+                    ownership_type,
+                    leasing_company,
+                    responsible_yerma,
+                    recruitment_date,
+                    release_batch,
+                    release_reason,
+                    release_order_date,
+                    responsible_command,
+                    affiliation,
+                    credited_unit,
+                    credit_date,
+                    release_date,
+                    excel_status,
+                    notes,
+                    clean_license_number
+                )
+                VALUES (
+                    %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                    %s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+                )
+
+                ON CONFLICT (license_number)
+
+DO UPDATE SET
+    status = EXCLUDED.status,
+    excel_index = EXCLUDED.excel_index,
+    recruitment_type = EXCLUDED.recruitment_type,
+    manager_group = EXCLUDED.manager_group,
+    vehicle_type = EXCLUDED.vehicle_type,
+    ownership_type = EXCLUDED.ownership_type,
+    leasing_company = EXCLUDED.leasing_company,
+    responsible_yerma = EXCLUDED.responsible_yerma,
+    recruitment_date = EXCLUDED.recruitment_date,
+    release_batch = EXCLUDED.release_batch,
+    release_reason = EXCLUDED.release_reason,
+    release_order_date = EXCLUDED.release_order_date,
+    responsible_command = EXCLUDED.responsible_command,
+    affiliation = EXCLUDED.affiliation,
+    credited_unit = EXCLUDED.credited_unit,
+    credit_date = EXCLUDED.credit_date,
+    release_date = EXCLUDED.release_date,
+    excel_status = EXCLUDED.excel_status,
+    notes = EXCLUDED.notes,
+    clean_license_number = EXCLUDED.clean_license_number,
+    updated_at = CURRENT_TIMESTAMP
+
             """, (
-                str(row["license_number"]).strip(),
-                str(row["tool_code"]).strip(),
-                str(row["status"]).strip(),
-                available,
-                unitcode_value
+                str(row["license_number"]).strip() if row["license_number"] else None,
+                row.get("excel_status"),
+                row.get("excel_index"),
+                row.get("recruitment_type"),
+                row.get("manager_group"),
+                row.get("vehicle_type"),
+                row.get("ownership_type"),
+                row.get("leasing_company"),
+                row.get("responsible_yerma"),
+                row.get("recruitment_date"),
+                row.get("release_batch"),
+                row.get("release_reason"),
+                row.get("release_order_date"),
+                row.get("responsible_command"),
+                row.get("affiliation"),
+                row.get("credited_unit"),
+                row.get("credit_date"),
+                row.get("release_date"),
+                row.get("excel_status"),
+                row.get("notes"),
+                row.get("clean_license_number"),
             ))
 
+            inserted_count += 1
+
+
         conn.commit()
+
+        cur.close()
         conn.close()
 
-        return jsonify({"success": True})
+
+        print("Final inserted:", inserted_count)
+
+        return jsonify({
+            "success": True,
+            "inserted": inserted_count
+        })
+
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 @app.route("/check_session")
 def check_session():
     return jsonify(dict(session))
@@ -1274,34 +1728,34 @@ def submit_form():
             }), 400
 
         cur.execute("""
-            INSERT INTO vehicles (
-                license_number,
-                status,
-                vehicle_type,
-                owner_name,
-                owner_id,
-                owner_phone,
-                locatorcode,
-                lockcode,
-                location,
-                fuel,
-                licence_status
-            )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            RETURNING id
-        """, (
-            vehicle_number,
-            "מגוייס",
-            data["vehicle_type"],
-            data["owner_name"],
-            data["owner_id"],
-            data["owner_phone"],
-            data["locatorcode"],
-            data["lockcode"],
-            data["location"],
-            data["fuel"],
-            data["licence_status"]
-        ))
+   INSERT INTO vehicles (
+        license_number,
+        status,
+        vehicle_type,
+        owner_name,
+        owner_id,
+        owner_phone,
+        locatorcode,
+        lockcode,
+        location,
+        fuel,
+        licence_status
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    RETURNING id;
+""", (
+    vehicle_number,
+    "מגוייס",
+    data.get("vehicle_type"),
+    data.get("owner_name"),
+    data.get("owner_id"),
+    data.get("owner_phone"),
+    data.get("locatorcode"),
+    data.get("lockcode"),
+    data.get("location"),
+    data.get("fuel"),
+    data.get("licence_status")
+))
 
         vehicle_id = cur.fetchone()[0]
 

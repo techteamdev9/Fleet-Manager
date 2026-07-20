@@ -25,6 +25,28 @@ let statuses = [
   "הופץ - לא תקין", "במוסך"
 ];
 
+const headersMap = {
+  excel_index: 'מס"ד',
+  license_number: 'מספר רישוי',
+  recruitment_type: 'סוג אמצעי גיוס',
+  manager_group: 'קבוצת אב-מנהלים',
+  vehicle_type: 'סוג רכב משרד התחבורה',
+  ownership_type: 'סוג בעלות- חברה/פרטי',
+  leasing_company: 'שם חברת ליסינג/השכרה(אם רלוונטי)',
+  responsible_yerma: 'ירמ"א אחראית',
+  recruitment_date: 'תאריך גיוס',
+  release_batch: 'פעימת שחרור',
+  release_reason: 'סיבת שחרור',
+  release_order_date: 'תאריך פקודה לשחרור',
+  responsible_command: 'פיקוד אחראי',
+  affiliation: 'שייכות(תחת פיקוד)',
+  credited_unit: 'יחידה מזכה',
+  credit_date: 'תאריך זיכוי',
+  release_date: 'תאריך שחרור',
+  excel_status: 'סטאטוס',
+  notes: 'הערות',
+  clean_license_number: 'מספר רישוי נקי ללא אותיוית'
+};
 // ---------------------------
 // INITIAL SETUP
 // ---------------------------
@@ -142,6 +164,13 @@ async function refreshTable(page = 1) {
         (v.tool_code || "").toLowerCase().includes(searchValue) ||
         (v.status || "").toLowerCase().includes(searchValue) ||
         (v.unitcode || "").toLowerCase().includes(searchValue) ||
+        (v.recruitment_type || "").toLowerCase().includes(searchValue) ||
+        (v.manager_group || "").toLowerCase().includes(searchValue) ||
+        (v.vehicle_type || "").toLowerCase().includes(searchValue) ||
+        (v.ownership_type || "").toLowerCase().includes(searchValue) ||
+        (v.responsible_yerma || "").toLowerCase().includes(searchValue) ||
+        (v.excel_status || "").toLowerCase().includes(searchValue) ||
+
 
         availableText.toLowerCase().includes(searchValue)
       );
@@ -150,7 +179,26 @@ async function refreshTable(page = 1) {
 
   const tbody = document.querySelector("#vehicleTable tbody");
   if (!tbody) return console.warn("Table body not found");
+// Build Excel-style table headers + keep Actions column
+const thead = document.querySelector("#vehicleTable thead");
 
+if (thead) {
+  let headerHTML = "<tr>";
+
+  Object.entries(headersMap).forEach(([key, header]) => {
+    headerHTML += `<th class="header-${key}">${header}</th>`;
+});
+
+  // App-only columns
+  headerHTML += `
+  <th class="header-available">זמינות</th>
+  <th class="header-actions">פעולות</th>
+  `;
+
+  headerHTML += "</tr>";
+
+  thead.innerHTML = headerHTML;
+}
   tbody.innerHTML = "";
 
   // 🔹 Pagination logic
@@ -173,14 +221,26 @@ async function refreshTable(page = 1) {
 // <td>${v.id}</td>
 //      <td>${v.unitcode || ""}</td>
 
-    tr.innerHTML = `
-      <td>${v.license_number}</td>
-      <td>${v.vehicle_type}</td>
-      <td>${v.status}</td>
-      <td style="color:${color}; font-weight:bold;">
-        ${availableText}
-      </td>
-      <td class="row-actions">
+    // tr.innerHTML = `
+    //   <td>${v.license_number}</td>
+    //   <td>${v.vehicle_type}</td>
+    //   <td>${v.status}</td>
+    //   <td style="color:${color}; font-weight:bold;">
+    //     ${availableText}
+    //   </td>
+    //   <td class="row-actions">
+    let rowHTML = "";
+
+Object.keys(headersMap).forEach(key => {
+  rowHTML += `<td>${v[key] ?? ""}</td>`;
+});
+
+rowHTML += `
+<td style="color:${color}; font-weight:bold;">
+  ${availableText}
+</td>
+
+<td class="row-actions">
 
 <button class="edit-btn"
 onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
@@ -188,12 +248,14 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
 </button>
 
 <button class="delete-btn"
-        onclick="event.stopPropagation(); deleteVehicle('${v.id}')">
+onclick="event.stopPropagation(); deleteVehicle('${v.id}')">
   <i class="fas fa-trash"></i>
 </button>
 
 </td>
-    `;
+`;
+
+tr.innerHTML = rowHTML;   // <-- ADD THIS
 
     // ----- EDIT BUTTON ROW (hidden initially) -----
     const editRow = document.createElement("tr");
@@ -201,7 +263,7 @@ onclick='event.stopPropagation(); openVehicleModal2(${JSON.stringify(v)})'>
     editRow.style.display = "none";
 
     editRow.innerHTML = `
-    <td colspan="5">
+    <td colspan="${Object.keys(headersMap).length + 2}">
     <button class="btn-edit-vehicle" onclick="openVehicleModal2()">ערוך</button>
   </td>
     `;
@@ -618,13 +680,18 @@ async function uploadExcel() {
   formData.append("file", fileInput.files[0]);
 
   try {
+    console.log("Uploading:", fileInput.files[0].name);
+
     const res = await fetch(`${API}/upload_excel`, {
       method: "POST",
       credentials: "include",
       body: formData
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    console.log("Server response:", text);
+
+    const data = JSON.parse(text);
 
     if (!res.ok) {
       throw new Error(data.error || "Upload failed");
@@ -632,11 +699,12 @@ async function uploadExcel() {
 
     alert("Excel uploaded successfully!");
     refreshTable();
+
     fileInput.value = "";
     excelFileName.textContent = "";
 
   } catch (err) {
-    console.error(err);
+    console.error("Upload error:", err);
     alert(err.message);
   }
 }

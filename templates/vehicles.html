@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vehicles</title>
+  <!-- <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator.min.css" rel="stylesheet"> -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
     body {
@@ -398,6 +399,158 @@
     margin-top: 5px;
   }
 }
+
+.table-scroll {
+    overflow-x: auto;
+    width: 100%;
+}
+
+#vehicleTable {
+    min-width: 1800px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+#vehicleTable th,
+#vehicleTable td {
+    white-space: nowrap;
+    padding: 8px 12px;
+    text-align: center;
+    font-size: large;
+}
+
+#vehicleTable th {
+    background: #f2f2f2;
+    font-weight: bold;
+}
+
+#vehicleTable td {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#vehicleTable th {
+    background: #f2f2f2;
+    color: #222;
+    font-weight: bold;
+    white-space: nowrap;
+    padding: 10px 14px;
+    text-align: center;
+}
+
+.header-excel_index{
+  background-color: #478ed4 !important;
+
+}
+.header-license_number {
+  background-color: #478ed4 !important;
+    /* color: white; */
+}
+
+.header-excel_status {
+    background: #2e7d32;
+    /* color: white; */
+}
+
+.header-vehicle_type {
+  background-color: #74a4d3 !important;
+    /* color: white; */
+}
+
+.header-recruitment_type {
+  background-color: #74a4d3 !important;
+    /* color: white; */
+}
+
+.header-manager_group {
+  background-color: #74a4d3 !important;
+    /* color: white; */
+}
+
+.header-ownership_type {
+  background-color: #74a4d3 !important;
+    /* color: white; */
+}
+
+.header-leasing_company{
+  background-color: #74a4d3 !important;
+
+}
+
+.header-responsible_yerma{
+  background-color: #8aeca4 !important;
+
+}
+
+.header-recruitment_date{
+  background-color: #8aeca4 !important;
+
+}
+
+.header-release_batch{
+  background-color: #d4cf47 !important;
+
+}
+.header-release_reason{
+  background-color: #d4cf47 !important;
+
+}
+.header-release_order_date{
+  background-color: #d4cf47 !important;
+
+}
+.header-responsible_command{
+  background-color: #f0b36d !important;
+
+}
+.header-affiliation{
+  background-color: #f0b36d !important;
+
+}
+.header-credited_unit{
+  background-color: #f0b36d !important;
+
+}
+.header-credit_date{
+  background-color: #d4cf47 !important;
+
+}
+.header-release_date{
+  background-color: #d4cf47 !important;
+
+}
+.header-excel_status{
+  background-color: #ec942e !important;
+
+}
+
+.header-notes {
+    background-color: #616161 !important;
+    /* color: white; */
+}
+.header-clean_license_number{
+  background-color: #478ed4 !important;
+
+}
+
+.header-available {
+    background: #43a047;
+    /* color: white; */
+}
+
+.header-actions {
+    /* background-color: #424242 !important; */
+    /* color: white; */
+}
+
+#vehicleTable thead th {
+    height: 60px;
+    padding: 10px 8px;
+    vertical-align: middle;
+    text-align: center;
+    white-space: normal;
+}
+
   </style>
 </head>
 
@@ -444,22 +597,24 @@
       <button onclick="refreshTable()">חפש</button>
       <button onclick="clearSearch()">נקה</button>
     </div>
+    <!-- deleted at 19/07 -->
     <!-- Table Card -->
+    <!-- <tr> -->
+      <!-- <th>מזהה</th> -->
+      <!-- <th>מספר רישוי</th>
+      <th>סוג כלי</th> -->
+      <!-- <th>קוד-יח</th> -->
+      <!-- <th>סטטוס</th>
+      <th>זמינות</th>
+      <th>פעולות</th>
+    </tr> -->
     <div class="card table-wrapper">
-      <table id="vehicleTable">
-        <thead>
-          <tr>
-            <!-- <th>מזהה</th> -->
-            <th>מספר רישוי</th>
-            <th>סוג כלי</th>
-            <!-- <th>קוד-יח</th> -->
-            <th>סטטוס</th>
-            <th>זמינות</th>
-            <th>פעולות</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-scroll">
+        <table id="vehicleTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
     <div class="pagination-container">
       <button id="prevPage">« הקודם</button>
@@ -532,7 +687,7 @@
         <div id="excelUploadSection" class="upload-box">
 
           <div class="file-upload-wrapper">
-            <input type="file" id="excelFile" accept=".xlsx,.xls">
+            <input type="file" id="excelFile" accept=".xlsx,.xls,.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12">
             
             <label for="excelFile" class="file-upload-label">בחר קובץ</label>
             
@@ -584,7 +739,7 @@
       </form>
     </div>
   </div> -->
-
+  <!-- <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script> -->
   <script src="{{ url_for('static', filename='vehicles.js') }}"></script>
 </body>
 
