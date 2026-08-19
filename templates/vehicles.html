@@ -317,240 +317,294 @@
       padding-top: 1px;
       margin: 0px;
     }
+
     /* Outer box */
-.upload-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    .upload-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-  border: 2px dashed #cbd5e1;
-  border-radius: 10px;
-  padding: 15px;
-  margin-top: 10px;
-  background: #f9fafb;
-}
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      background: #f9fafb;
+    }
 
-/* Keep file + name in one row */
-.file-upload-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+    /* Keep file + name in one row */
+    .file-upload-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-/* Hide default ugly input */
-.file-upload-wrapper input[type="file"] {
-  display: none;
-}
+    /* Hide default ugly input */
+    .file-upload-wrapper input[type="file"] {
+      display: none;
+    }
 
-/* Styled button */
-.file-upload-label {
-  background: #224d8a;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
+    /* Styled button */
+    .file-upload-label {
+      background: #224d8a;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
 
-/* File name */
-#excelFileName {
-  font-weight: bold;
-}
+    /* File name */
+    #excelFileName {
+      font-weight: bold;
+    }
 
-/* Upload button */
-.upload-btn {
-  background: #16a34a;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-/* hide remove button by default */
-.remove-btn {
-  display: none;
-  background: transparent;
-  border: none;
-  color: #dc2626;
-  font-weight: bold;
-  cursor: pointer;
-}
+    /* Upload button */
+    .upload-btn {
+      background: #16a34a;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
 
-/* optional spacing */
-.file-upload-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.upload-box {
-  direction: rtl;
-}
-/* small screens */
+    /* hide remove button by default */
+    .remove-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      color: #dc2626;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* optional spacing */
+    .file-upload-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upload-box {
+      direction: rtl;
+    }
+
+    /* small screens */
+    @media (max-width: 768px) {
+      .file-upload-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #excelFileName {
+        margin-top: 5px;
+      }
+
+      .remove-btn {
+        margin-top: 5px;
+      }
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    #vehicleTable {
+      min-width: 1800px;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    #vehicleTable th,
+    #vehicleTable td {
+      white-space: nowrap;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: large;
+    }
+
+    #vehicleTable th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
+
+    #vehicleTable td {
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #vehicleTable th {
+      background: #f2f2f2;
+      color: #222;
+      font-weight: bold;
+      white-space: nowrap;
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    .header-excel_index {
+      background-color: #478ed4 !important;
+
+    }
+
+    .header-license_number {
+      background-color: #478ed4 !important;
+      /* color: white; */
+    }
+
+    .header-excel_status {
+      background: #2e7d32;
+      /* color: white; */
+    }
+
+    .header-vehicle_type {
+      background-color: #74a4d3 !important;
+      /* color: white; */
+    }
+
+    .header-recruitment_type {
+      background-color: #74a4d3 !important;
+      /* color: white; */
+    }
+
+    .header-manager_group {
+      background-color: #74a4d3 !important;
+      /* color: white; */
+    }
+
+    .header-ownership_type {
+      background-color: #74a4d3 !important;
+      /* color: white; */
+    }
+
+    .header-leasing_company {
+      background-color: #74a4d3 !important;
+
+    }
+
+    .header-responsible_yerma {
+      background-color: #8aeca4 !important;
+
+    }
+
+    .header-recruitment_date {
+      background-color: #8aeca4 !important;
+
+    }
+
+    .header-release_batch {
+      background-color: #d4cf47 !important;
+
+    }
+
+    .header-release_reason {
+      background-color: #d4cf47 !important;
+
+    }
+
+    .header-release_order_date {
+      background-color: #d4cf47 !important;
+
+    }
+
+    .header-responsible_command {
+      background-color: #f0b36d !important;
+
+    }
+
+    .header-affiliation {
+      background-color: #f0b36d !important;
+
+    }
+
+    .header-credited_unit {
+      background-color: #f0b36d !important;
+
+    }
+
+    .header-credit_date {
+      background-color: #d4cf47 !important;
+
+    }
+
+    .header-release_date {
+      background-color: #d4cf47 !important;
+
+    }
+
+    .header-excel_status {
+      background-color: #ec942e !important;
+
+    }
+
+    .header-notes {
+      background-color: #616161 !important;
+      /* color: white; */
+    }
+
+    .header-clean_license_number {
+      background-color: #478ed4 !important;
+
+    }
+
+    .header-available {
+      background: #43a047;
+      /* color: white; */
+    }
+
+    .header-actions {
+      /* background-color: #424242 !important; */
+      /* color: white; */
+    }
+
+    #vehicleTable thead th {
+      height: 60px;
+      padding: 10px 8px;
+      vertical-align: middle;
+      text-align: center;
+      white-space: normal;
+    }
+
+    /* Make Edit + Delete buttons visible on mobile */
 @media (max-width: 768px) {
-  .file-upload-wrapper {
-    flex-direction: column;
-    align-items: flex-start;
+  .row-actions {
+    min-width: 110px !important;
+    width: 110px !important;
+    white-space: nowrap !important;
+    display: table-cell !important;
   }
 
-  #excelFileName {
-    margin-top: 5px;
+  .row-actions .edit-btn,
+  .row-actions .delete-btn {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    margin: 2px !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
-  .remove-btn {
-    margin-top: 5px;
+  .row-actions .edit-btn {
+    background: #2563eb !important;
+    color: white !important;
+  }
+
+  .row-actions .delete-btn {
+    background: #dc2626 !important;
+    color: white !important;
+  }
+
+  .row-actions .edit-btn i,
+  .row-actions .delete-btn i {
+    display: inline-block !important;
+    visibility: visible !important;
+    font-size: 16px !important;
   }
 }
-
-.table-scroll {
-    overflow-x: auto;
-    width: 100%;
-}
-
-#vehicleTable {
-    min-width: 1800px;
-    border-collapse: collapse;
-    table-layout: auto;
-}
-
-#vehicleTable th,
-#vehicleTable td {
-    white-space: nowrap;
-    padding: 8px 12px;
-    text-align: center;
-    font-size: large;
-}
-
-#vehicleTable th {
-    background: #f2f2f2;
-    font-weight: bold;
-}
-
-#vehicleTable td {
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-#vehicleTable th {
-    background: #f2f2f2;
-    color: #222;
-    font-weight: bold;
-    white-space: nowrap;
-    padding: 10px 14px;
-    text-align: center;
-}
-
-.header-excel_index{
-  background-color: #478ed4 !important;
-
-}
-.header-license_number {
-  background-color: #478ed4 !important;
-    /* color: white; */
-}
-
-.header-excel_status {
-    background: #2e7d32;
-    /* color: white; */
-}
-
-.header-vehicle_type {
-  background-color: #74a4d3 !important;
-    /* color: white; */
-}
-
-.header-recruitment_type {
-  background-color: #74a4d3 !important;
-    /* color: white; */
-}
-
-.header-manager_group {
-  background-color: #74a4d3 !important;
-    /* color: white; */
-}
-
-.header-ownership_type {
-  background-color: #74a4d3 !important;
-    /* color: white; */
-}
-
-.header-leasing_company{
-  background-color: #74a4d3 !important;
-
-}
-
-.header-responsible_yerma{
-  background-color: #8aeca4 !important;
-
-}
-
-.header-recruitment_date{
-  background-color: #8aeca4 !important;
-
-}
-
-.header-release_batch{
-  background-color: #d4cf47 !important;
-
-}
-.header-release_reason{
-  background-color: #d4cf47 !important;
-
-}
-.header-release_order_date{
-  background-color: #d4cf47 !important;
-
-}
-.header-responsible_command{
-  background-color: #f0b36d !important;
-
-}
-.header-affiliation{
-  background-color: #f0b36d !important;
-
-}
-.header-credited_unit{
-  background-color: #f0b36d !important;
-
-}
-.header-credit_date{
-  background-color: #d4cf47 !important;
-
-}
-.header-release_date{
-  background-color: #d4cf47 !important;
-
-}
-.header-excel_status{
-  background-color: #ec942e !important;
-
-}
-
-.header-notes {
-    background-color: #616161 !important;
-    /* color: white; */
-}
-.header-clean_license_number{
-  background-color: #478ed4 !important;
-
-}
-
-.header-available {
-    background: #43a047;
-    /* color: white; */
-}
-
-.header-actions {
-    /* background-color: #424242 !important; */
-    /* color: white; */
-}
-
-#vehicleTable thead th {
-    height: 60px;
-    padding: 10px 8px;
-    vertical-align: middle;
-    text-align: center;
-    white-space: normal;
-}
-
   </style>
 </head>
 
@@ -591,6 +645,9 @@
     <button onclick="window.location.href='/vehicles-page1'">
       מסך רכבים
     </button>
+    <button type="button" onclick="window.location.href='/summary'">
+      סיכום כלי רכב
+    </button>
     <!-- Search Card -->
     <div class="card">
       <input id="search" placeholder="חפש רכב">
@@ -600,11 +657,11 @@
     <!-- deleted at 19/07 -->
     <!-- Table Card -->
     <!-- <tr> -->
-      <!-- <th>מזהה</th> -->
-      <!-- <th>מספר רישוי</th>
+    <!-- <th>מזהה</th> -->
+    <!-- <th>מספר רישוי</th>
       <th>סוג כלי</th> -->
-      <!-- <th>קוד-יח</th> -->
-      <!-- <th>סטטוס</th>
+    <!-- <th>קוד-יח</th> -->
+    <!-- <th>סטטוס</th>
       <th>זמינות</th>
       <th>פעולות</th>
     </tr> -->
@@ -687,17 +744,18 @@
         <div id="excelUploadSection" class="upload-box">
 
           <div class="file-upload-wrapper">
-            <input type="file" id="excelFile" accept=".xlsx,.xls,.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12">
-            
+            <input type="file" id="excelFile"
+              accept=".xlsx,.xls,.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12">
+
             <label for="excelFile" class="file-upload-label">בחר קובץ</label>
-            
+
             <span id="excelFileName"></span>
-            
+
             <button type="button" id="removeFileBtn" class="remove-btn">הסר</button>
           </div>
-        
+
           <button class="upload-btn" onclick="uploadExcel()">העלאת קובץ</button>
-        
+
         </div>
       </div>
 

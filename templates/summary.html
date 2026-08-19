@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>סיכום כלי רכב</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+            color: #1f2937;
+        }
+
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background-color: #1f2937;
+            color: white;
+            padding: 14px 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 10px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td:first-child {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .total-row {
+            background-color: #e5e7eb;
+            font-weight: bold;
+        }
+
+        .total-row td {
+            border-top: 2px solid #9ca3af;
+        }
+
+        .percentage {
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 18px;
+        }
+
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .back-button {
+            background-color: #374151;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #1f2937;
+        }
+
+        .second-summary-container {
+    margin-top: 25px;
+}
+
+.second-summary-container h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+    </style>
+</head>
+
+<body>
+
+    <div class="page-container">
+        <button type="button" class="back-button" onclick="window.history.back()">
+            ← חזרה
+        </button>
+        <h1>סך האמצעים לפי סוג אמצעי</h1>
+
+        <div id="errorMessage" class="error"></div>
+
+        <div class="table-container">
+
+            <div id="loading" class="loading">
+                טוען נתונים...
+            </div>
+
+            <table id="summaryTable" style="display: none;">
+
+                <thead>
+                    <tr>
+                        <th>סוג אמצעי</th>
+                        <th>גויס</th>
+                        <th>זוכה</th>
+                        <th>שוחרר</th>
+                        <th>מיועדים לשחרור</th>
+                        <th>פעילים</th>
+                        <th>מצבה פעילה</th>
+                        <th>אחוז שחרור</th>
+                    </tr>
+                </thead>
+
+                <tbody id="summaryTableBody">
+                </tbody>
+
+            </table>
+<!-- 19/08/26 -->
+            <div class="table-container second-summary-container">
+
+                <h2>סך האמצעים על פי פיקודים</h2>
+            
+                <table id="commandSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>פיקוד אחראי</th>
+                            <th>גויס</th>
+                            <th>זוכה</th>
+                            <th>שוחרר</th>
+                            <th>מיועדים לשחרור</th>
+                            <th>פעילים</th>
+                            <th>מצבה פעילה</th>
+                            <th>אחוז שחרור</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody id="commandSummaryTableBody">
+                    </tbody>
+            
+                </table>
+            
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='summary.js') }}"></script>
+</body>
+
+</html>

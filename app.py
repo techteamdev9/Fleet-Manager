@@ -11,8 +11,8 @@ import json
 import requests
 # ---------------- CONFIG ----------------
 #just for local
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # 🔁 CHANGED (Render)
 print("🔵 CONNECTING TO DB:", DATABASE_URL)
@@ -68,6 +68,75 @@ COLUMN_MAP = {
 
     'מספר רישוי נקי ללא אותיות': 'clean_license_number'
 }
+def addsome():
+    conn = connect()
+    cur = conn.cursor()
+
+#     # cur.execute("""
+#     # ALTER TABLE vehicles
+#     # ADD COLUMN IF NOT EXISTS category VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS tool_code VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS owner_type VARCHAR(50),
+#     # ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
+#     # ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
+#     # """)  
+#     # cur.execute("""
+#     # ALTER TABLE vehicles
+#     # ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+#     # """)
+
+
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS form_650 (
+       id SERIAL PRIMARY KEY,
+       event_type TEXT,
+       vehicle_type TEXT,
+       vehicle_number TEXT,
+       date DATE,
+       location TEXT,
+       owner_name TEXT,
+       owner_id TEXT,
+       owner_phone TEXT,
+       licence_status TEXT,
+       fuel TEXT,
+       checklist JSONB,
+       lights TEXT,
+       tires TEXT,
+       damage_physical TEXT,
+       damage_mechanical TEXT,
+       assessor TEXT,
+       document_person_id TEXT,
+       releasing_signature TEXT,
+       unit_rep TEXT,
+       created_at TIMESTAMP DEFAULT NOW()
+    );
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS issuing_forms (
+        id SERIAL PRIMARY KEY,
+
+        vehicle_number TEXT,
+
+        issuing_unit TEXT,
+        receiving_unit TEXT,
+
+        items JSONB,
+        accessories JSONB,
+        signatures JSONB,
+
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+    """)
+
+
+    conn.commit()
+    conn.close()
+#addsome()
+
 def alter_tables():
     conn =connect()
     cur = conn.cursor()
@@ -110,7 +179,7 @@ ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS clean_license_number TEXT;
 
     print("✅ Database columns checked/updated")
     #init_db()
-alter_tables()
+#alter_tables()
 # def init_db():
 #     conn = connect()
 #     cur = conn.cursor()
@@ -160,9 +229,9 @@ alter_tables()
 #     )
 #     """)
 
-    # def init_db():
-    #     conn = connect()
-    #     cur = conn.cursor()
+def add1():
+    conn = connect()
+    cur = conn.cursor()
 
     # # ---------------- Vehicles ----------------
     # cur.execute("""
@@ -199,91 +268,22 @@ alter_tables()
     # # """)
 
 
-    # # ---------------- Default users ----------------
-    # cur.execute("""
-    # INSERT INTO users (username, password, role, permission_id)
-    # VALUES (%s, %s, %s, %s)
-    # ON CONFLICT (username) DO NOTHING
-    # """, ("admin", "admin123", "admin", 1))
+    # ---------------- Default users ----------------
+    cur.execute("""
+    INSERT INTO users (username, password, role, permission_id)
+    VALUES (%s, %s, %s, %s)
+    ON CONFLICT (username) DO NOTHING
+    """, ("admin", "admin123", "admin", 1))
 
-    # cur.execute("""
-    # INSERT INTO users (username, password, role, permission_id)
-    # VALUES (%s, %s, %s, %s)
-    # ON CONFLICT (username) DO NOTHING
-    # """, ("user", "user123", "user", 2))
+    cur.execute("""
+    INSERT INTO users (username, password, role, permission_id)
+    VALUES (%s, %s, %s, %s)
+    ON CONFLICT (username) DO NOTHING
+    """, ("user", "user123", "user", 2))
 
-    # conn.commit()
-    # conn.close()
-#init_db()
-
-# def init_db():
-#     conn = connect()
-#     cur = conn.cursor()
-
-#     # cur.execute("""
-#     # ALTER TABLE vehicles
-#     # ADD COLUMN IF NOT EXISTS category VARCHAR(50),
-#     # ADD COLUMN IF NOT EXISTS tool_code VARCHAR(50),
-#     # ADD COLUMN IF NOT EXISTS vehicle_type VARCHAR(50),
-#     # ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50),
-#     # ADD COLUMN IF NOT EXISTS owner_type VARCHAR(50),
-#     # ADD COLUMN IF NOT EXISTS lease_name VARCHAR(100),
-#     # ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
-#     # """)  
-#     # cur.execute("""
-#     # ALTER TABLE vehicles
-#     # ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
-#     # """)
-
-
-
-#     cur.execute("""
-#     CREATE TABLE IF NOT EXISTS form_650 (
-#        id SERIAL PRIMARY KEY,
-#        event_type TEXT,
-#        vehicle_type TEXT,
-#        vehicle_number TEXT,
-#        date DATE,
-#        location TEXT,
-#        owner_name TEXT,
-#        owner_id TEXT,
-#        owner_phone TEXT,
-#        licence_status TEXT,
-#        fuel TEXT,
-#        checklist JSONB,
-#        lights TEXT,
-#        tires TEXT,
-#        damage_physical TEXT,
-#        damage_mechanical TEXT,
-#        assessor TEXT,
-#        document_person_id TEXT,
-#        releasing_signature TEXT,
-#        unit_rep TEXT,
-#        created_at TIMESTAMP DEFAULT NOW()
-#     );
-#     """)
-
-#     cur.execute("""
-#     CREATE TABLE IF NOT EXISTS issuing_forms (
-#         id SERIAL PRIMARY KEY,
-
-#         vehicle_number TEXT,
-
-#         issuing_unit TEXT,
-#         receiving_unit TEXT,
-
-#         items JSONB,
-#         accessories JSONB,
-#         signatures JSONB,
-
-#         created_at TIMESTAMP DEFAULT NOW()
-#     );
-#     """)
-
-
-#     conn.commit()
-#     conn.close()
-
+    conn.commit()
+    conn.close()
+#add1()
    
 # 🔥 run once on startup
 # 🔥 Run database initialization safely
@@ -621,7 +621,10 @@ def login():
 #     conn.close()
 
 #     return jsonify(rows)
-
+@app.route("/summary")
+def summary():
+    return render_template("summary.html")
+    
 @app.route("/vehicles", methods=["GET"])
 def get_vehicles():
     from_date = request.args.get("from_date")
