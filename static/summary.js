@@ -418,8 +418,8 @@ function createCommandSummary(vehicles) {
         // The NUMBER is in responsible_command
         const command =
             vehicle.responsible_command !== null &&
-            vehicle.responsible_command !== undefined &&
-            vehicle.responsible_command !== ''
+                vehicle.responsible_command !== undefined &&
+                vehicle.responsible_command !== ''
                 ? String(vehicle.responsible_command).trim()
                 : 'לא מוגדר';
 
@@ -495,7 +495,7 @@ function createCommandSummary(vehicles) {
             total > 0
                 ? Number(
                     ((row.released / total) * 100).toFixed(1)
-                  )
+                )
                 : 0;
     });
 
@@ -549,31 +549,68 @@ function renderCommandSummary(vehicles) {
     rows.forEach(row => {
 
         const tr = document.createElement('tr');
-
+    
+        const releasePercentage = Number(row.releasePercentage) || 0;
+        const barPercentage = Math.min(Math.max(releasePercentage, 0), 100);
+    
         tr.innerHTML = `
             <td>${row.command}</td>
             <td>${row.recruited}</td>
             <td>${row.credited}</td>
             <td>${row.released}</td>
-            <td>${row.intendedForRelease}</td>
+    
+            <td style="
+                background-color: #b7e4c7;
+                color: #1b4332;
+                font-weight: bold;
+            ">
+                ${row.intendedForRelease}
+            </td>
+    
             <td>${row.active}</td>
             <td>${row.activeInventory}</td>
+    
             <td class="percentage">
-                ${row.releasePercentage}%
+    
+                <div style="
+                    position: relative;
+                    width: 120px;
+                    height: 24px;
+                    background-color: #e5e7eb;
+                    border: 1px solid #aaa;
+                    border-radius: 5px;
+                    overflow: hidden;
+                    margin: auto;
+                ">
+    
+                    <div style="
+                        width: ${barPercentage}%;
+                        height: 100%;
+                        background-color: #4caf50;
+                        transition: width 0.4s ease;
+                    "></div>
+    
+                    <span style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        color: #222;
+                    ">
+                        ${releasePercentage}%
+                    </span>
+    
+                </div>
+    
             </td>
         `;
-
+    
         tbody.appendChild(tr);
-
-
-        // Totals
-        totals.recruited += row.recruited;
-        totals.credited += row.credited;
-        totals.released += row.released;
-        totals.intendedForRelease += row.intendedForRelease;
-        totals.active += row.active;
-        totals.activeInventory += row.activeInventory;
-
     });
 
 
@@ -589,7 +626,7 @@ function renderCommandSummary(vehicles) {
         total > 0
             ? Number(
                 ((totals.released / total) * 100).toFixed(1)
-              )
+            )
             : 0;
 
 
