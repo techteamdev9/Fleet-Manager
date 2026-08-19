@@ -306,11 +306,11 @@ function open650Form() {
   eventTypeSelect.innerHTML = originalEventTypeOptions;
 
   // Remove "גיוס הרכב"
-  [...eventTypeSelect.options].forEach(option => {
-    if (option.text === "גיוס הרכב") {
-      option.remove();
-    }
-  });
+  // [...eventTypeSelect.options].forEach(option => {
+  //   if (option.text === "גיוס הרכב") {
+  //     option.remove();
+  //   }
+  // });
   eventTypeSelect.selectedIndex = 0;
   // Fill fields from vehicle data
   document.getElementById("vehicleType").value =
